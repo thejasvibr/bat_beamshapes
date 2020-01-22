@@ -9,9 +9,6 @@ from tqdm import tqdm
 
 log10 = lambda X: log(X,10)
 dB = lambda X : 20*log10(X).evalf()
-k = 1
-b = 2
-a = 1
 
 
 def Streng(n,m,r,precision=300):
@@ -27,9 +24,9 @@ def Streng(n,m,r,precision=300):
     -------
     n_S_m
 
+    Verified 2020-01-22 by TB and GD via Hangouts
     '''
-    #r, n, m = symbols('r,n,m')
-    numerator = gamma(r/2- 1/2 + KroneckerDelta(r,1))
+    numerator = gamma(r/2 - 1/2 + KroneckerDelta(r,1))
     denominator = (gamma(r/2 + 1)*gamma(r/2-m-1/2)*gamma(r/2+n-m+1))
     n_S_m = (numerator/denominator).evalf(precision)
     return n_S_m
@@ -40,19 +37,23 @@ def Bouwkamp(ka,n,m,b,a,precision=300):
     Parameters
     ----------
     ka : the product of k*a
-    n
-    m
+    n : integer
+        index
+    m : integer
+        index
 
     Returns
     -------
     n_B_m
 
+
+    Verified 2020-01-22 by TB and GD via Hangouts
     '''
 
     beta = b / a
-    NN = int(10 + 2 * ka * beta)
+    NN = int(10 + 2*ka*beta)
     r = symbols('r')
-    term1 = -1j*sqrt(pi)*gamma(n+5/2)*(1/factorial(m)**2)
+    term1 = -I*sqrt(pi)*gamma(n+5/2)*(1/factorial(m)**2)
     summation_function = Streng(n,m,r)*(-I*ka/2)**r
     summation_term = summation(summation_function, (r, 0, 2*NN))
     n_B_m = (term1*summation_term).evalf(precision)
@@ -68,25 +69,30 @@ def calculate_M_b_An(k,b,a,precision=300):
     Returns
     -------
     M
+    Verified 2020-01-22 by TB and GD via Hangouts
+    NOTE: there is likely a typo in indexes in eqn. 13.226 and we
+    chose the indexing as in the code sent by Tim Mellow.
 
     '''
 
-    beta = b / a
-    NN = int(20 + 2*k*a*beta) # just changed to 20
-    P = 2 * NN
-    Q = 2 * NN
+    beta = b/a
+    NN = int(10 + 2*k*a*beta) # just changed to 20
+    P = 2*NN
+    Q = 2*NN
 
     p,q = symbols('p,q')
-    M_matrix = Matrix.zeros(NN+1,NN+1)
-    b_matrix = Matrix.zeros(NN+1,1)
+    M_matrix = Matrix.zeros(NN+1, NN+1)
+    b_matrix = Matrix.zeros(NN+1, 1)
 
     for m in tqdm(range(0, NN+1)):
         eq13227_rightside = (conjugate(Bouwkamp(k*b, m, p, b, a))/(p + 1)) * (a/b)**(2*p)
-        b_matrix[m] = summation(eq13227_rightside,(p,0,P)).evalf(precision)
-        for n in range(0,NN+1):
-            rightside_term_numerator = conjugate(Bouwkamp(k*b,n,m,b,a)) * Bouwkamp(k*b, n, m,b,a)
+        b_matrix[m] = -summation(eq13227_rightside,(p,0,P)).evalf(precision)
+        for n in range(0, NN+1):
+            # for the indexing we're intentionally deviating from 13.226 and going with
+            # that of the code snippet.
+            rightside_term_numerator = conjugate(Bouwkamp(k*b,m,p,b,a)) * Bouwkamp(k*b,n,q,b,a)
             rightside_term_denominator = p + q + 1
-            rightside_term = rightside_term_numerator / rightside_term_denominator
+            rightside_term = rightside_term_numerator/rightside_term_denominator
 
             summation_over_q = summation(rightside_term,(q,0,Q))
             M_matrix[m,n] = summation(summation_over_q, (p,0,P)).evalf(precision)
@@ -131,7 +137,7 @@ if __name__ == '__main__':
     directivity = np.zeros(angles.size)
     for i,theta in enumerate(angles):
         d_theta, d_0 = D_disc_in_finite_open_baffle(theta, k, a, b, An)
-        directivity[i] = dB(abs(d_theta)/abs(d_0)) +6
+        directivity[i] = dB(abs(d_theta)/abs(d_0)) + 40
 
     plt.figure()
     a0 = plt.subplot(111, projection='polar')

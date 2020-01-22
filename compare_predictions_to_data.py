@@ -20,6 +20,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
  OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import numpy as np
+import pandas as pd
 
 def calculate_model_and_data_error(real_data, predictions, **kwargs):
     """ This function compares and calculates the error between model prediction
@@ -45,7 +47,7 @@ def calculate_model_and_data_error(real_data, predictions, **kwargs):
     prediction_error : output format depends on the exact error function used.
     """
 
-    prediction_error = kwargs.get('error_function', sum_absolute)(real_data, predictions)
+    prediction_error = kwargs.get('error_function', sum_absolute_error)(real_data, predictions)
     return(prediction_error)
 
 
@@ -56,12 +58,16 @@ def sum_absolute_error(real_data, predictions):
 
     sum_absolute_error = Sum(real_data - prediction)
 
-
     """
+    if not check_if_angles_are_same(real_data, predictions):
+        raise ValueError('The theta values are not the same between data and predictions - please check.')
 
-    pass
+    # subtract and calculate sum absolute error
+    error = predictions['pred_relative_pressure'] - real_data['obs_relative_pressure']
+    sum_absolute_error = np.sum(np.abs(error))
+    return sum_absolute_error
 
-def dbeam_by_dtheta(real_data, predictions):
+def dbeam_by_dtheta_error(real_data, predictions):
     '''
     Calculates the first order derivative of the beamshape with reference to
     the angle of emission.
@@ -78,10 +84,26 @@ def dbeam_by_dtheta(real_data, predictions):
     -------
     error_dbeam_by_dtheta
 
-
     '''
 
 
+def check_if_angles_are_same(real_data, predictions):
+    ''' Check to make sure that the real data and
+    predictions are of the same emission angles
+
+    Parameters
+    ---------
+    real_data
+    predictions
+
+    Returns
+    -------
+    angles_same: Boolean.
+                 True if the 'theta' is the same, False otherwise.
+
+    '''
+    angles_same = real_data['theta'].equals(predictions['theta'])
+    return(angles_same)
 
 
 

@@ -156,7 +156,7 @@ def calc_mSQ_for_given_m(k, b, m, q, M=200):
 a_value = 1
 b_value = 8*a_value
 k_value = np.pi/2
-M = 120
+M = 50
 Q = M
 
 
@@ -268,6 +268,57 @@ tau_m_mp_np = np.array(tau_m_MP.tolist())
 
 ## open piston in finite baffle:
 
+def disk_in_finite_baffle(theta, k, **kwargs):
+    """ function to calculate the directivity of a closed piston in a finite baffle as per
+    Mellow and Kaerkkkaeinen, JASA 2005 equantion 67
+
+    Parameters
+    -----------
+    theta: float in radians.
+            Angle of emission, where 0 radians is on-axis, and increasing values are
+            increasingly off-axis.
+    k: float>0.
+        wavenumber.
+
+    Keyword Arguments
+    -----------------
+    a : float>0.
+        Piston radius
+    b : b>a
+        Baffle radius.
+    tau_m : ?? dimensions
+        coefficients obtained by solving equation 47.
+
+    Note to self:
+    the multiplication term is *INSIDE* the summation!!!
+
+    The algebra for this function has been checked by TBR and GD on 17/1/2020
+    over google hangouts
+    """
+    # TERM 1 with the kasintheta fraction
+    a = kwargs['a']
+    b = kwargs['b']
+
+    # TERM 2 with the summation
+    m = np.arange(0, tau_m.size)
+    summation_over_m_values = np.zeros(m.size, dtype=np.complex)
+    kb_sintheta = k*b*np.sin(theta)
+    two_by_kbsintheta = mpf(2/kb_sintheta)
+    # calculate values over each m
+    for each_m in m:
+        part1 = tau_m[each_m]*gamma(each_m+2.5)*two_by_kbsintheta**(each_m+1.5)
+        part2 = besselj(each_m+1.5, kb_sintheta).evalf()
+        summation_over_m_values[each_m] = part1[0]*part2
+
+    term2 = k*b*(b**2/a**2)*np.cos(theta)*np.sum(summation_over_m_values)
+
+    D_theta = -term2 # there is a typo in the paper -- it should be 2*J1(kasin(theta))
+    D_zero = k*b*(b**2/a**2)*np.sum(tau_m)
+
+    return D_theta, D_zero
+
+
+
 
 #######
 def closed_piston_in_finite_baffle(theta, k, **kwargs):
@@ -301,13 +352,13 @@ def closed_piston_in_finite_baffle(theta, k, **kwargs):
     a = kwargs['a']
     b = kwargs['b']
     ka_sintheta = k*a*np.sin(theta)
-    term1 = besselj(1, ka_sintheta).evalf()/ka_sintheta
+    term1 = 2*besselj(1, ka_sintheta).evalf()/ka_sintheta
 
     # TERM 2 with the summation
     m = np.arange(0, tau_m.size)
     summation_over_m_values = np.zeros(m.size, dtype=np.complex)
     kb_sintheta = k*b*np.sin(theta)
-    two_by_kbsintheta = np.complex(2/kb_sintheta)
+    two_by_kbsintheta = mpf(2/kb_sintheta)
     # calculate values over each m
     for each_m in m:
         part1 = tau_m[each_m]*gamma(each_m+2.5)*two_by_kbsintheta**(each_m+1.5)
@@ -316,27 +367,37 @@ def closed_piston_in_finite_baffle(theta, k, **kwargs):
 
     term2 = k*b*(b**2/a**2)*np.cos(theta)*np.sum(summation_over_m_values)
 
-    D_theta = 2*term1 - term2 # there is a typo in the paper -- it should be 2*J1(kasin(theta))
+    D_theta = 0.5*(term1 - term2) # there is a typo in the paper -- it should be 2*J1(kasin(theta))
     D_zero = 0.5*(1 - k*b*(b**2/a**2)*np.sum(tau_m))
 
     return D_theta, D_zero
 
-all_thetas = np.arange(0.001, 2*np.pi, 0.01)
-d_theta_values = np.zeros(all_thetas.size, dtype=np.complex)
+######### --- calculating the values and plotting the directivity function
+all_thetas = np.arange(0.001, np.pi, 0.01)
+d_theta_values_closed_finite = np.zeros(all_thetas.size, dtype=np.complex)
+d_theta_values_open_finite = np.zeros(all_thetas.size, dtype=np.complex)
 
 print('calculating the beamshape now....')
 for i, theta in enumerate(tqdm(all_thetas)):
-    d_theta_values[i], d_zero = closed_piston_in_finite_baffle(theta,
+    d_theta_values_closed_finite[i], d_zero_closed = closed_piston_in_finite_baffle(theta,
                                                        k=k_value, a=a_value,b=b_value,
                                                        tau_m=tau_m_mp_np)
 
-directivity = np.float64((np.abs(d_theta_values)/np.abs(d_zero)))
+    d_theta_values_open_finite[i], d_zero_open = disk_in_finite_baffle(theta,
+                                                                       k=k_value, a=a_value, b=b_value,
+                                                                       tau_m=tau_m_mp_np)
+
+directivity_closed = np.float64((np.abs(d_theta_values_closed_finite)/np.abs(d_zero_closed)))
+directivity_open = np.float64((np.abs(d_theta_values_open_finite)/np.abs(d_zero_open)))
+
 dB = lambda X : 20*np.log10(X)
 
 plt.figure()
 ax = plt.subplot(111, projection='polar')
 ax.set_theta_zero_location('E')
-plt.plot(all_thetas, dB(directivity))
+plt.plot(all_thetas, dB(directivity_closed))
+plt.plot(all_thetas, dB(directivity_open))
+
 ax.set_rgrids([-30,-20,-10,0,10,20], angle=60)
 ax.set_ylim(-40,20)
 #ax.set_xticks(np.linspace(0,2*np.pi,24))
