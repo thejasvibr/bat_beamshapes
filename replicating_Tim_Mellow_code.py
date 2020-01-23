@@ -1,23 +1,32 @@
 from time import time
-import matplotlib.pyplot as plt
 import numpy as np
-from sympy import I, summation, gamma, besselj, factorial, sqrt, pi, Sum, lambdify
-from sympy import KroneckerDelta, conjugate, symbols, Matrix, cos, sin, log, N
+import matplotlib.pyplot as plt
+from mpmath import lu_solve, qr_solve, residual, log
+from sympy import I, summation, Sum, gamma, besselj, factorial, sqrt, pi, lambdify
+from sympy import KroneckerDelta, conjugate, symbols, Matrix, cos, sin, N
 from tqdm import tqdm
+from joblib import Parallel, delayed
 
 k, beta, NN, P, Q, n, m, p, q, r = symbols('k, beta, NN, P, Q, n, m, p, q, r')
-a, b = symbols('a, b')
 
-beta = (b/a).evalf()
-NN = (10 + 2*k*a*beta).evalf()
-P = 2*NN.evalf()
-Q = 2*NN.evalf()
+a, b = symbols('a, b')
+dB = lambda X : 20*log(abs(X),10)
+precision = 300
+
+k_value = 1
+b_value = 2
+a_value = 1
+
+beta = b / a
+NN = int(10 + 2 * k_value * b_value)  # made it <10 instead of 10 !! instead of a*beta
+P = 2*NN
+Q = 2*NN
 
 # equation 13.218
 kronecker = N(KroneckerDelta(r, 1))
-numerator_Streng = gamma(r/2 - 1/2 +kronecker)
+numerator_Streng = gamma(r/2 - 1/2 + kronecker)
 denominator_Streng = gamma(r/2+1)*gamma(r/2-m-1/2)*gamma(r/2+n-m+1)
-Streng = N(numerator_Streng/denominator_Streng, 300)
+Streng = N(numerator_Streng/denominator_Streng, precision)
 calc_Streng = lambdify(('n','m','r'), Streng, modules='sympy')
 
 # diff between lambdified and evalf with subs -- a dramatic 10-20 time decrease!
@@ -27,24 +36,113 @@ calc_Streng = lambdify(('n','m','r'), Streng, modules='sympy')
 # equation 13.217
 ka = k*a
 term1 = -I*sqrt(pi)*gamma(n+5/2)*(1/factorial(m)**2)
-summation_function = calc_Streng(n,m,r)*(-I*ka/2)**r
-summation_term = summation(summation_function, (r, 0, 2*NN))
-n_B_m = N(term1*summation_term, 300)
+function_to_be_summed = Sum(calc_Streng(n,m,r)*(-I*ka/2)**r, (r, 0, NN)).doit()
+n_B_m = N(term1*function_to_be_summed, precision)
 
-calc_Bouwkamp = lambdify(('k','a','n','m','r'), n_B_m, modules='sympy')
+calc_Bouwkamp = lambdify(('k','a','n','m'), n_B_m, modules='sympy')
 
 # comparing the drop in calculation times after lambdifying
-# start = time(); [calc_Bouwkamp(1,1,0,0,0) for i in range(100)]; print(time()-start)
-# start = time(); [n_B_m.evalf(subs={'k':1,'a':1,'r':0, 'm':0, 'n':0}) for i in range(100)]; print(time()-start)
+# start = time(); [calc_Bouwkamp(1,1,0,0) for i in range(100)]; print(time()-start)
+# start = time(); [n_B_m.evalf(subs={'k':1,'a':1, 'm':0, 'n':0}) for i in range(100)]; print(time()-start)
 
+print('13.226....')
 # equation 13.226
-
 # calculates the M term for one value in the matrix
-numerator_Mmn = conjugate(calc_Bouwkamp(k,b,p,m,r))*calc_Bouwkamp(k,b,n,q,r)
-denomnator_Mmn = p + q + 1
-sumover_p_M_m_n = summation(numerator_Mmn/denomnator_Mmn, (p, 0, P.evalf()))
-M_m_n = summation(sumover_p_M_m_n, (q,0,Q.evalf()))
-calc_M_m_n = lambdify( ('k','b','m','n','r'), M_m_n, modules='sympy')
+def calc_M_m_n(args):
+    k_value, b_value, m_value, n_value, P, Q = args
+    numerator_Mmn = conjugate(calc_Bouwkamp(k_value, b_value,m_value,p))*calc_Bouwkamp(k_value, b_value,n_value,q)
+    denomnator_Mmn = p + q + 1
+    sumover_p_M_m_n = summation(numerator_Mmn/denomnator_Mmn, (p, 0, P)).evalf(precision)
+    M_m_n = summation(sumover_p_M_m_n, (q,0,Q)).evalf(precision)
+    return M_m_n
+
+b_m_left = conjugate(calc_Bouwkamp(k,b,m,p))/(p+1)
+b_m_right = (a/b)**(2*p)
+b_m = lambdify(('k','b','a','m','P'), -summation(b_m_left*b_m_right, (p,0,P)))
+
+def calc_D_theta(theta, k_value, a_value, b_value, An):
+    '''Implementing Equation 13.252
+
+    Parameters
+    ----------
+    theta
+    k_value
+    a_value
+    b_value
+    An
+    NN
+
+    Returns
+    -------
+
+    '''
+
+    D_theta_inf_baffle = besselj(1,k_value*a_value*sin(theta))/(k_value*a_value*sin(theta))
+
+    summation_terms = Matrix.zeros(NN+1,1)
+    for n_index in range(0, len(An)):
+        summation_term_left = (An[n_index]*gamma(n_index+5/2)*(2/(k_value*b_value*sin(theta)))**2+3/2)
+        summation_term_right = besselj(n_index+3/2, k_value*b_value*sin(theta))
+        summation_terms[n_index] = summation_term_left*summation_term_right
+    D_theta_open_finite_baffle = k_value*b_value*0.5*cos(theta)*sum(summation_terms)
+
+    D_theta = D_theta_inf_baffle + D_theta_open_finite_baffle
+
+    return D_theta.evalf()
+
+def calc_D_0(k_value, b_value,An):
+    '''
+
+    Parameters
+    ----------
+    k_value
+    b_value
+    An
+
+    Returns
+    -------
+
+    '''
+
+    D_0 = 0.5*(1 + k_value*b_value*sum(An))
+    return D_0
 
 
+if __name__ == '__main__':
 
+    M_matrix = Matrix.zeros(NN + 1, NN + 1)
+    params = []
+    for m_v in range(0, NN + 1):
+        print('\n n loop...')
+        for n_v in range(0, NN + 1):
+            params.append((k_value, b_value, m_v, n_v, P, Q))
+
+    print('now calculating M_m_n matrix..')
+    M_values = Parallel(n_jobs=4, verbose=1)(delayed(calc_M_m_n)(param) for param in tqdm(params))
+
+    i = 0
+    for m_v in range(0, NN + 1):
+        for n_v in range(0, NN + 1):
+            M_matrix[m_v, n_v] = M_values[i]
+            i += 1
+
+    b_matrix = Matrix.zeros(NN + 1, 1)
+    print('now calculate  b_m matrix')
+    for m_v in tqdm(range(0, NN + 1)):
+        b_matrix[m_v] = b_m(k_value, b_value, a_value, m_v, P)
+
+    print('... now solving for An matrix')
+    An = lu_solve(M_matrix, b_matrix)
+    Anq = qr_solve(M_matrix, b_matrix)
+
+    print('...now calculating beam shapes')
+    angles = np.linspace(0, 2*np.pi, 1000)
+    directivity = np.zeros(angles.size)
+    for i,theta in enumerate(tqdm(angles)):
+        d_theta = calc_D_theta(theta, k_value, a_value, b_value, An)
+        d_zero = calc_D_0(k_value, b_value, An)
+        directivity[i] = abs(d_theta)/abs(d_zero)
+
+    plt.figure()
+    a0 = plt.subplot(111, projection='polar')
+    a0.plot(angles, 20*np.log10(directivity))
