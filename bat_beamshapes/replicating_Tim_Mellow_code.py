@@ -71,8 +71,9 @@ def calc_M_m_n(args, precision=300):
 
 b_m_left = conjugate(calc_Bouwkamp(k,b,m,p))/(p+1)
 b_m_right = (a/b)**(2*p)
-b_m = lambdify(('k','b','a','m','P'), -summation(b_m_left*b_m_right, (p,0,P)),
-               modules='sympy')
+b_m = lambdify(('k','b','a','m','P'), -summation(b_m_left*b_m_right, (p,0,P)))
+#               modules='sympy')
+
 
 def calc_D_theta(theta, k_value, a_value, b_value, An, precision=300):
     '''Implementing Equation 13.252

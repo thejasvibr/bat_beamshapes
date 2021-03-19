@@ -29,6 +29,30 @@ from sympy import besselj, symbols, hankel2, legendre, sin, cos, summation, I, o
 from sympy import Abs, lambdify
 
 
+def simple_cardiod(theta,**kwargs):
+    '''
+    From Giuggioli et al. 2015 : (A+2)(cos(theta)-1)
+
+    Parameters
+    ----------
+    theta : np.array
+        Angles in radians
+    A : float>0, optional
+        Asymmetry parameter. Defaults to 7.3 as in Giuggioli et al. 2015.
+        
+    Returns
+    -------
+    rel_onaxis
+
+    References
+    ----------
+    Giuggioli, L., McKetterick, T. J., & Holderied, M. (2015).
+    Delayed response and biosonar perception explain movement coordination
+    in trawling bats. PLoS Comput Biol, 11(3), e1004089.
+    '''
+    rel_onaxis = (kwargs.get('A',7.3)+2)*(np.cos(theta)-1)
+    return rel_onaxis
+
 
 def piston_in_infinite_baffle(theta, k, **kwargs):
     '''
