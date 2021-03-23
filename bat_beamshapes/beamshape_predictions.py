@@ -50,9 +50,25 @@ def simple_cardiod(theta,**kwargs):
     Delayed response and biosonar perception explain movement coordination
     in trawling bats. PLoS Comput Biol, 11(3), e1004089.
     '''
-    rel_onaxis = (kwargs.get('A',7.3)+2)*(np.cos(theta)-1)
+    rel_onaxis = (kwargs.get('A',7.3))*(np.cos(theta)-1)
     return rel_onaxis
 
+def omnidirn_model(theta,**kwargs):
+    '''
+
+    Parameters
+    ----------
+    theta : TYPE
+        DESCRIPTION.
+    **kwargs : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    '''
+    return np.tile(0, theta.size)
 
 def piston_in_infinite_baffle(theta, k, **kwargs):
     '''

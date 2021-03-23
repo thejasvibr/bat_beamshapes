@@ -15,7 +15,7 @@ import numpy as np
 import scipy.spatial as spatial
 from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
-from bat_beamshapes.beamshape_predictions import simple_cardiod
+from bat_beamshapes.beamshape_predictions import simple_cardiod, omnidirn_model
 
      
 def calc_relangle(a,b,c):
@@ -38,7 +38,9 @@ def calc_relangle(a,b,c):
 
     '''
     theta = np.arctan2(c[1]-b[1],c[0]-b[0])-np.arctan2(a[1]-b[1],a[0]-b[0])
-    return theta 
+    if theta<0:
+        theta  += 2*np.pi
+    return theta
 
 def angle_bet_bat_and_mic(batpos, micpos, call_direction=0):
     '''Outputs the 2D angle between the xy-axis, the bat
@@ -47,6 +49,10 @@ def angle_bet_bat_and_mic(batpos, micpos, call_direction=0):
     The angle calculated is the internal angle created
     by 3 points: a point in line with the call direction, 
     the bat itself, and the microphone position. 
+    
+    IMPORTANT: The call_direction is expected as angles reported in radians
+    in an CCW direction. The OUTPUT however is reported as relative off-axis
+    angle in a CW direction. 
     
     Parameters
     ----------
@@ -59,14 +65,15 @@ def angle_bet_bat_and_mic(batpos, micpos, call_direction=0):
     Returns
     -------
     rel_angle : Nx1 np.array
-        The relative angle in radians
+        The relative angle in radians. The relative angle is reported increasing
+        in a clock-wise fashion. 
     
     '''
     call_vector = np.concatenate((batpos,[0])).flatten()
-    call_vector[1] += 1
+    call_vector[0] += 1
     # now rotate the call_vector in the call direction
-    rotmat = R.from_euler('z',call_direction)
-    call_vector = rotmat.apply(call_vector)[:-1]
+    addn_arrow = np.array([np.cos(call_direction),np.sin(call_direction)])
+    call_vector = batpos + addn_arrow
     
     rel_angle = np.apply_along_axis(calc_relangle,1,micpos,batpos,call_vector)
     return rel_angle
@@ -97,7 +104,8 @@ def calc_mic_level_nobeamshape(sl,batposition,micpositions,refdist=1):
     miclevels = sl - 20*np.log10(r_mic/refdist)
     return miclevels
 
-beamshapename_and_model = {'cardiod':simple_cardiod}
+beamshapename_and_model = {'cardiod':simple_cardiod,
+                           'omnidirn':omnidirn_model}
 
 
 def sim_miclevel_beamshape(sl, call_direction,
@@ -153,12 +161,20 @@ if __name__=='__main__':
                               [2,0.75],
                               [-1,-1]])
     bat_position = np.array([0,0.0])
-    angles = angle_bet_bat_and_mic(bat_position, mic_positions)
+    call_dirn = np.radians(225)
+    angles = angle_bet_bat_and_mic(bat_position, mic_positions, call_dirn)
+    print(np.round(np.degrees(angles),2))
     #%%
     plt.figure()
     plt.plot(bat_position[0],bat_position[1],'*')
     plt.plot(mic_positions[:,0],mic_positions[:,1],'*')
-    plt.arrow(bat_position[0],bat_position[1],0,0.5,width=0.01)
+    for num,each in enumerate(mic_positions):
+        plt.annotate(str(num),each)
+        
+    r = 0.1
+    plt.arrow(bat_position[0],bat_position[1],
+                          r*np.cos(call_dirn),
+                          r*np.sin(call_dirn),width=0.01)
     
     #%% Showing the effect of the asymmetry parameter
     thetas = np.linspace(0,2*np.pi,100)
