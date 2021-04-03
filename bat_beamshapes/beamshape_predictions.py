@@ -100,7 +100,7 @@ def piston_in_infinite_baffle(theta, k, **kwargs):
         rp_theta = np.abs(numerator/ka_sintheta)
     except:
         rp_theta = 0
-    return(rp_theta)
+    return rp_theta
 
 
 ##### Vibrating cap on sphere
@@ -160,11 +160,19 @@ def vibrating_cap_of_sphere(theta, k, **kwargs):
 
 if __name__ == '__main__':
     thetas = np.arange(0.0, 2 * np.pi, 0.01)
-    q = np.array([vibrating_cap_of_sphere(theta, 2000, R=0.01, theta_0=np.pi/8) for theta in thetas], dtype='float64')
+        
+    freq = 5*10**3
+    wavelen = 330/freq
+    kv = 2*np.pi/wavelen
+    Rv = 0.1
+    ka = 3
+    a = ka/kv
+    alpha = np.arcsin(a/Rv)
+    q = np.array([vibrating_cap_of_sphere(thetav, kv, R=Rv, theta_0=alpha) for thetav in thetas], dtype='float64')
 
     plt.figure()
     ax = plt.subplot(111, projection='polar')
-    ax.set_theta_zero_location('N')
+    ax.set_theta_zero_location('E')
     ax.plot(thetas, 20 * np.log10(q))
-
+    plt.ylim(-30,0);plt.yticks([0,-20,-40])
 
