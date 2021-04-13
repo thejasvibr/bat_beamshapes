@@ -1,0 +1,50 @@
+
+-- command to change directores  )cd ~/Documents/research-repos/bat_beamshapes/bat_beamshapes/workshop --
+-- Module which implements the piston in a sphere Chp 12, Mello&Beranek 2012---
+
+-- alpha: the 'aperture' of the piston in radians --
+-- R: radius of the sphere in m --
+-- NN: index for summations and matrix shape specfication --
+-- the formula for NN is from Tim Mellow's Mathematica notebook--
+
+ka := 5
+R := a/sin(alpha)
+r1 := R*cos(alpha)/cos(theta)
+NN :=  3 --12 + 2*ka/sin(alpha)--
+
+--eqn 12.106 --
+
+-- spherical bessel function-- 
+sphBessel(n,z) == besselJ(n+0.5,z)*sqrt(%pi/(2*z))
+-- spherical neumann function --
+sphNeumann(n,z) == besselY(n+0.5,z)*sqrt(%pi/(2*z))
+-- 
+-- 2) define spherical hankel function of 2nd kind --
+sphHankel2(n,z) == sphBessel(n,z) - %i*sphNeumann(n,z)
+
+one_imn_term(m,n) == ((n*sphHankel2(n-1,k*r1)-(n+1)*sphHankel2(n+1,k*r1))*legendreP(n,cos(theta))*cos(theta) + n*(n+1)*sphHankel2(n,k*r1)*((legendreP(n-1,cos(theta))-legendreP(n+1,cos(theta)))/k*r1))*legendreP(m,cos(theta))*(r1^2/R^2)*tan(theta) 
+
+imn_terms := [[one_imn_term(m,n) for m in 1..NN] for n in 1..NN]
+
+
+ -- imn_mat := [[ integrate(imn_term(m,n,k,r1,R,theta),theta=0..alpha)  for m in 1..NN] for n in 1..NN] -- 
+
+
+
+
+-- eqn 12.107 --
+all_kmns := matrix[[legendreP(n,cos(theta))*legendreP(m,cos(theta))*sin(theta) for m in 1..NN] for n in 1..NN ]
+
+kmns_mat := [ [integrate(row(all_kmns,m).n, theta=alpha..%pi, "noPole") for m in 1..NN] for n in 1..NN]
+
+-- eqn 12.1081 --
+all_Lms := [legendreP(m,cos(theta))*(r1^2/R^2) for m in 1..NN]
+Lm_mat :=  [ integrate(expression, theta=0..alpha,"noPole") for expression in all_Lms]
+
+
+
+
+
+
+
+

@@ -1,0 +1,29 @@
+-- This script has examples for certain things that I'd like to do --
+
+++ Numerical integration/quadrature 
+++ Let's integrate a familiar function and get the value out. 
+
+sin_integ := integrate(sin(x),x=0..%pi)
+sin_integ
+
+++ Now, let's integrate the same function, but this time 
+++ numerically. The inbuilt numerical quadrature routines
+++ require multiple values, as they split the evaluation
+++ interval adaptively till the convergence criteria are
+++ met (either absolute acceptable error, or relative error)
+
+abs_error := 0.001
+rel_error := 0.95
+initial_intervals := 50
+min_intervals := 10
+max_intervals := 100
+
+-- define the function --
+some_function(x) == sin(x)
+
+num_integ := aromberg(some_function,0,%pi,abs_error_
+                        ,rel_error,min_intervals,max_intervals,initial_intervals)
+num_integ
+++ We can see the results of the numerical integration. The results are stored in 
+++ a 'record' type object -- which is kind of like a Python dictionary. We access
+++ the values to check how much 
