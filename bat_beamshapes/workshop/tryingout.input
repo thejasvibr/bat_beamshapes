@@ -1,0 +1,7 @@
+-- this file contains FriCAS code--
+
+Nv := 100
+
+r1 := R*cos(alpha)/cos(theta)
+
+Lm := [integrate(legendreP(m, cos(theta)), theta=0..alpha) for m in 1..Nv]
