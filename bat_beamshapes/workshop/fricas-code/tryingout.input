@@ -1,9 +1,16 @@
 -- this file contains FriCAS code--
 
 -- An example of initiating a matrix and setting values in a loop 
-NN := 10
+NN := 5
 mymat : Matrix (Complex(DoubleFloat)) := new (NN ,NN ,0)
+mymat2 : Matrix (Complex(DoubleFloat)) := new (NN ,NN ,0)
 
 for m in 1..NN repeat 
     for n in 1..NN repeat
-     setelt!(mymat, m,n, m*n)
+     mymat(m,n) := m*n
+     mymat2(m,n) := m+n
+
+
+
+-- example creating a Table OR TwoDimensionalArray with functions in it 
+-- stored according to the matrix m, n

@@ -33,8 +33,6 @@ R := numeric(R)::DF;
 r1 := R*cos(alpha)/cos(theta);
 NN :=  3 ;--12 + 2*ka/sin(alpha)--
 
-max_error := 1.0e-16 -- need to see if this is enough in the future.
-
 -- I couldn't find inbuilt spherical bessel's functions, and so had to make custom functions 
 
 -- spherical bessel function-- 
@@ -61,14 +59,16 @@ one_imn_term(m: P, n: P, theta: DF): CDF ==
     r1 := R*cos(alpha)/cos(theta)
     (alternate_hankels(n,theta)+alternate_legendres(m,theta))*legendretan(m,theta)
 
+
+
+-- integrate from 0..alpha 
+
+max_error := 1.0e-17 -- need to see if this is enough in the future.
+max_recursion := 100
+
+-- for m in 0..NN
 intg_imn_m1n2(theta: DF): CDF == one_imn_term(1,2,theta)
-
--- Check that the output for the Imn term works
-
-intg_imn_m1n2(0.2)
-
--- integrate from 0..alpha with low error level: this gets stuck
-low_error_quad := ad_gauss(intg_imn_m1n2, 0, alpha, max_error, 100) 
+low_error_quad := ad_gauss(intg_imn_m1n2, 0, alpha, max_error, max_recursion) 
 
 
 
