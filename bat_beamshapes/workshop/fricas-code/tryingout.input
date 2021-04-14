@@ -1,7 +1,9 @@
 -- this file contains FriCAS code--
 
-Nv := 100
+-- An example of initiating a matrix and setting values in a loop 
+NN := 10
+mymat : Matrix (Complex(DoubleFloat)) := new (NN ,NN ,0)
 
-r1 := R*cos(alpha)/cos(theta)
-
-Lm := [integrate(legendreP(m, cos(theta)), theta=0..alpha) for m in 1..Nv]
+for m in 1..NN repeat 
+    for n in 1..NN repeat
+     setelt!(mymat, m,n, m*n)
