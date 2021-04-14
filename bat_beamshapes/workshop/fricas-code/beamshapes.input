@@ -1,15 +1,22 @@
 -- Module which implements the piston in a sphere Chp 12, Mellow & Beranek 2012---
+-- )cd ~/Documents/research-repos/bat_beamshapes/bat_beamshapes/workshop/fricas-code/
 -- This script was improved greatly by the comments of Ralf Hemmecke and inputs from 
 -- Waldek Hebbisch. 
+-- )clear all 
 )version
-setFormat!(FormatMathJax)$JFriCASSupport
+-- setFormat!(FormatMathJax)$JFriCASSupport
+
+
+-- load the gaussian quadrature routine
+)read a_gaussianquad
+
+
 Z ==> Integer
 N ==> NonNegativeInteger
 P ==> PositiveInteger
 DF ==> DoubleFloat
 CDF ==> Complex DF
 F ==> Float
-
 
 -- alpha: the 'aperture' of the piston in radians --
 -- R: radius of the sphere in m --
@@ -26,7 +33,9 @@ R := numeric(R)::DF;
 r1 := R*cos(alpha)/cos(theta);
 NN :=  3 ;--12 + 2*ka/sin(alpha)--
 
---eqn 12.106 --
+max_error := 1.0e-16 -- need to see if this is enough in the future.
+
+-- I couldn't find inbuilt spherical bessel's functions, and so had to make custom functions 
 
 -- spherical bessel function-- 
 sphBessel(n: P,z: DF): CDF == besselJ(n+0.5,z)*sqrt(%pi/(2*z));
@@ -35,17 +44,14 @@ sphNeumann(n: P, z: DF): CDF == besselY(n+0.5,z)*sqrt(%pi/(2*z));
 
 sphHankel2(n: Z, z: DF): CDF == sphBessel(n,z) - %i*sphNeumann(n,z);
 
--- break down the Imn term into parts, and make smaller functions out of theem 
 
-alternate_hankels(n: P,theta: DF): CDF == 
-	r1 := R*cos(alpha)/cos(theta)
-	hankels_difference := n*sphHankel2(n-1,k*r1) - (n+1)*sphHankel2(n+1,k*r1)
-    hankels_difference*legendreP(n,cos(theta))*cos(theta)
+alternate_hankels(n: P,theta: DF): CDF ==   
+    r1 := R*cos(alpha)/cos(theta)
+    legendreP(n::N,cos(theta))*cos(theta) *( (n-1)*sphHankel2((n-1)::Z,k*r1)  - (n+1)*sphHankel2(n+1,k*r1) )
 
 alternate_legendres(n: P, theta: DF): CDF ==
-	r1 := R*cos(alpha)/cos(theta)
-	legendre_difference := legendreP((n-1)::N,cos(theta))-legendreP(n+1::N,cos(theta))
-    n*(n+1)*sphHankel2(n,k*r1)*(legendre_difference)/(k*r1)
+    r1 := R*cos(alpha)/cos(theta)
+    n*(n+1)*sphHankel2(n,k*r1)*(legendreP((n-1)::N,cos(theta))-legendreP(n+1,cos(theta)))/(k*r1)
 
 legendretan(m: P, theta: DF): CDF ==
     r1 := R*cos(alpha)/cos(theta)
@@ -55,22 +61,14 @@ one_imn_term(m: P, n: P, theta: DF): CDF ==
     r1 := R*cos(alpha)/cos(theta)
     (alternate_hankels(n,theta)+alternate_legendres(m,theta))*legendretan(m,theta)
 
-
 intg_imn_m1n2(theta: DF): CDF == one_imn_term(1,2,theta)
 
 -- Check that the output for the Imn term works
 
--- intg_imn_m1n2(0.2)
-
--- load the gaussian quadrature routine
-
--- )read a_gaussianquad
-
--- integrate from 0..alpha with high error level 
---- high_error_quad := ad_gauss(intg_imn_m1n2, 0, alpha, 1.0e-15, 50)
+intg_imn_m1n2(0.2)
 
 -- integrate from 0..alpha with low error level: this gets stuck
--- low_error_quad := ad_gauss(intg_imn_m1n2, 0, alpha, 1.0e-50, 100)--
+low_error_quad := ad_gauss(intg_imn_m1n2, 0, alpha, max_error, 100) 
 
 
 
