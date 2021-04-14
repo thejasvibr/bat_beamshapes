@@ -1,45 +1,87 @@
+-- Module which implements the piston in a sphere Chp 12, Mellow & Beranek 2012---
+-- This script was improved greatly by the comments of Ralf Hemmecke and inputs from 
+-- Waldek Hebbisch. 
+)version
+setFormat!(FormatMathJax)$JFriCASSupport
+Z ==> Integer
+N ==> NonNegativeInteger
+P ==> PositiveInteger
+DF ==> DoubleFloat
+CDF ==> Complex DF
+F ==> Float
 
--- command to change directores  )cd ~/Documents/research-repos/bat_beamshapes/bat_beamshapes/workshop --
--- Module which implements the piston in a sphere Chp 12, Mello&Beranek 2012---
 
 -- alpha: the 'aperture' of the piston in radians --
 -- R: radius of the sphere in m --
 -- NN: index for summations and matrix shape specfication --
 -- the formula for NN is from Tim Mellow's Mathematica notebook--
 
-ka := 5
-R := a/sin(alpha)
-r1 := R*cos(alpha)/cos(theta)
-NN :=  3 --12 + 2*ka/sin(alpha)--
+freq := 50000;
+k := 2*%pi/(330/freq);
+ka := 5 ;
+a := ka/k;
+alpha := %pi/3;
+R:= a/sin(alpha);
+R := numeric(R)::DF;
+r1 := R*cos(alpha)/cos(theta);
+NN :=  3 ;--12 + 2*ka/sin(alpha)--
 
 --eqn 12.106 --
 
 -- spherical bessel function-- 
-sphBessel(n,z) == besselJ(n+0.5,z)*sqrt(%pi/(2*z))
+sphBessel(n: P,z: DF): CDF == besselJ(n+0.5,z)*sqrt(%pi/(2*z));
 -- spherical neumann function --
-sphNeumann(n,z) == besselY(n+0.5,z)*sqrt(%pi/(2*z))
--- 
--- 2) define spherical hankel function of 2nd kind --
-sphHankel2(n,z) == sphBessel(n,z) - %i*sphNeumann(n,z)
+sphNeumann(n: P, z: DF): CDF == besselY(n+0.5,z)*sqrt(%pi/(2*z));
 
-one_imn_term(m,n) == ((n*sphHankel2(n-1,k*r1)-(n+1)*sphHankel2(n+1,k*r1))*legendreP(n,cos(theta))*cos(theta) + n*(n+1)*sphHankel2(n,k*r1)*((legendreP(n-1,cos(theta))-legendreP(n+1,cos(theta)))/k*r1))*legendreP(m,cos(theta))*(r1^2/R^2)*tan(theta) 
+sphHankel2(n: Z, z: DF): CDF == sphBessel(n,z) - %i*sphNeumann(n,z);
 
-imn_terms := [[one_imn_term(m,n) for m in 1..NN] for n in 1..NN]
+-- break down the Imn term into parts, and make smaller functions out of theem 
+
+alternate_hankels(n: P,theta: DF): CDF == 
+	r1 := R*cos(alpha)/cos(theta)
+	hankels_difference := n*sphHankel2(n-1,k*r1) - (n+1)*sphHankel2(n+1,k*r1)
+    hankels_difference*legendreP(n,cos(theta))*cos(theta)
+
+alternate_legendres(n: P, theta: DF): CDF ==
+	r1 := R*cos(alpha)/cos(theta)
+	legendre_difference := legendreP((n-1)::N,cos(theta))-legendreP(n+1::N,cos(theta))
+    n*(n+1)*sphHankel2(n,k*r1)*(legendre_difference)/(k*r1)
+
+legendretan(m: P, theta: DF): CDF ==
+    r1 := R*cos(alpha)/cos(theta)
+    legendreP(m,cos(theta))*(r1^2/R^2)*tan(theta)
+
+one_imn_term(m: P, n: P, theta: DF): CDF == 
+    r1 := R*cos(alpha)/cos(theta)
+    (alternate_hankels(n,theta)+alternate_legendres(m,theta))*legendretan(m,theta)
 
 
- -- imn_mat := [[ integrate(imn_term(m,n,k,r1,R,theta),theta=0..alpha)  for m in 1..NN] for n in 1..NN] -- 
+intg_imn_m1n2(theta: DF): CDF == one_imn_term(1,2,theta)
 
+-- Check that the output for the Imn term works
+
+-- intg_imn_m1n2(0.2)
+
+-- load the gaussian quadrature routine
+
+-- )read a_gaussianquad
+
+-- integrate from 0..alpha with high error level 
+--- high_error_quad := ad_gauss(intg_imn_m1n2, 0, alpha, 1.0e-15, 50)
+
+-- integrate from 0..alpha with low error level: this gets stuck
+-- low_error_quad := ad_gauss(intg_imn_m1n2, 0, alpha, 1.0e-50, 100)--
 
 
 
 -- eqn 12.107 --
-all_kmns := matrix[[legendreP(n,cos(theta))*legendreP(m,cos(theta))*sin(theta) for m in 1..NN] for n in 1..NN ]
+-- all_kmns := matrix[[legendreP(n,cos(theta))*legendreP(m,cos(theta))*sin(theta) for m in 1..NN] for n in 1..NN ]
 
-kmns_mat := [ [integrate(row(all_kmns,m).n, theta=alpha..%pi, "noPole") for m in 1..NN] for n in 1..NN]
+-- kmns_mat := [ [integrate(row(all_kmns,m).n, theta=alpha..%pi, "noPole") for m in 1..NN] for n in 1..NN]
 
 -- eqn 12.1081 --
-all_Lms := [legendreP(m,cos(theta))*(r1^2/R^2) for m in 1..NN]
-Lm_mat :=  [ integrate(expression, theta=0..alpha,"noPole") for expression in all_Lms]
+-- all_Lms := [legendreP(m,cos(theta))*(r1^2/R^2) for m in 1..NN]
+-- Lm_mat :=  [ integrate(expression, theta=0..alpha,"noPole") for expression in all_Lms]
 
 
 
