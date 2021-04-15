@@ -1,5 +1,14 @@
 -- this file contains FriCAS code--
 
+)clear all
+
+Z ==> Integer
+N ==> NonNegativeInteger
+P ==> PositiveInteger
+DF ==> DoubleFloat
+CDF ==> Complex DF
+F ==> Float
+
 -- An example of initiating a matrix and setting values in a loop 
 NN := 5
 mymat : Matrix (Complex(DoubleFloat)) := new (NN ,NN ,0)
@@ -14,3 +23,15 @@ for m in 1..NN repeat
 
 -- example creating a Table OR TwoDimensionalArray with functions in it 
 -- stored according to the matrix m, n
+multiparamfunc(rowind:N,colind:N,theta:DF) : DF == (rowind+colind)*theta
+
+indexvals := [jj::N for jj in 0..4]
+all_anonfuncs := [multiparamfunc(i,j,theta) for i in indexvals for j in indexvals]
+
+q := 0
+for i in 0..4 repeat
+    for j in 0..4 repeat
+        q := q+1        
+--        anonfunc(theta) == multiparmfunc(i::P,j::P,theta)
+
+--        output(anonfunc(0.2))

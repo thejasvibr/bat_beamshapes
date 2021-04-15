@@ -2,7 +2,8 @@
 -- )cd ~/Documents/research-repos/bat_beamshapes/bat_beamshapes/workshop/fricas-code/
 -- This script was improved greatly by the comments of Ralf Hemmecke and inputs from 
 -- Waldek Hebbisch. 
--- )clear all 
+
+)clear all 
 )version
 -- setFormat!(FormatMathJax)$JFriCASSupport
 
@@ -27,7 +28,7 @@ freq := 50000;
 k := 2*%pi/(330/freq);
 ka := 5 ;
 a := ka/k;
-alpha := %pi/3;
+alpha := %pi/3::DF;
 R:= a/sin(alpha);
 R := numeric(R)::DF;
 r1 := R*cos(alpha)/cos(theta);
@@ -43,32 +44,40 @@ sphNeumann(n: P, z: DF): CDF == besselY(n+0.5,z)*sqrt(%pi/(2*z));
 sphHankel2(n: Z, z: DF): CDF == sphBessel(n,z) - %i*sphNeumann(n,z);
 
 
-alternate_hankels(n: P,theta: DF): CDF ==   
+alternate_hankels(n: N,theta: DF): CDF ==   
     r1 := R*cos(alpha)/cos(theta)
     legendreP(n::N,cos(theta))*cos(theta) *( (n-1)*sphHankel2((n-1)::Z,k*r1)  - (n+1)*sphHankel2(n+1,k*r1) )
 
-alternate_legendres(n: P, theta: DF): CDF ==
+alternate_legendres(n: N, theta: DF): CDF ==
     r1 := R*cos(alpha)/cos(theta)
     n*(n+1)*sphHankel2(n,k*r1)*(legendreP((n-1)::N,cos(theta))-legendreP(n+1,cos(theta)))/(k*r1)
 
-legendretan(m: P, theta: DF): CDF ==
+legendretan(m: N, theta: DF): CDF ==
     r1 := R*cos(alpha)/cos(theta)
     legendreP(m,cos(theta))*(r1^2/R^2)*tan(theta)
 
-one_imn_term(m: P, n: P, theta: DF): CDF == 
+one_imn_term(m: N, n: N, theta: DF): CDF == 
     r1 := R*cos(alpha)/cos(theta)
     (alternate_hankels(n,theta)+alternate_legendres(m,theta))*legendretan(m,theta)
 
 
 
--- integrate from 0..alpha 
+-- integrate from Imn 0..alpha  for each m,n
 
-max_error := 1.0e-17 -- need to see if this is enough in the future.
+max_error := 1.0e-16 -- need to see if this is enough in the future.
 max_recursion := 100
 
--- for m in 0..NN
-intg_imn_m1n2(theta: DF): CDF == one_imn_term(1,2,theta)
-low_error_quad := ad_gauss(intg_imn_m1n2, 0, alpha, max_error, max_recursion) 
+imn_mat : Matrix(Complex(DoubleFloat)) := new (NN+1,NN+1,0)
+
+output(".................starting Imn matrix......")
+nn_index := [ ind::N for ind in 0..NN]
+for i in nn_index repeat
+    for j in nn_index repeat
+        output("...starting")
+        output(i)
+        output(j)
+        intg_imn(theta: DF): CDF == one_imn_term(i::N,j::N,theta)
+        imn_mat(i+1,j+1) := ad_gauss(intg_imn, 0, alpha, max_error, max_recursion) 
 
 
 
