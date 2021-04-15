@@ -37,16 +37,16 @@ NN :=  3 ;--12 + 2*ka/sin(alpha)--
 -- I couldn't find inbuilt spherical bessel's functions, and so had to make custom functions 
 
 -- spherical bessel function-- 
-sphBessel(n: P,z: DF): CDF == besselJ(n+0.5,z)*sqrt(%pi/(2*z));
+sphBessel(n: N,z: DF): CDF == besselJ(n+0.5,z)*sqrt(%pi/(2*z));
 -- spherical neumann function --
-sphNeumann(n: P, z: DF): CDF == besselY(n+0.5,z)*sqrt(%pi/(2*z));
+sphNeumann(n: N, z: DF): CDF == besselY(n+0.5,z)*sqrt(%pi/(2*z));
 
-sphHankel2(n: Z, z: DF): CDF == sphBessel(n,z) - %i*sphNeumann(n,z);
+sphHankel2(n: N, z: DF): CDF == sphBessel(n,z) - %i*sphNeumann(n,z);
 
 
 alternate_hankels(n: N,theta: DF): CDF ==   
     r1 := R*cos(alpha)/cos(theta)
-    legendreP(n::N,cos(theta))*cos(theta) *( (n-1)*sphHankel2((n-1)::Z,k*r1)  - (n+1)*sphHankel2(n+1,k*r1) )
+    legendreP(n::N,cos(theta))*cos(theta) *( (n-1)*sphHankel2((n-1)::N,k*r1)  - (n+1)*sphHankel2(n+1,k*r1) )
 
 alternate_legendres(n: N, theta: DF): CDF ==
     r1 := R*cos(alpha)/cos(theta)
@@ -70,14 +70,14 @@ max_recursion := 100
 imn_mat : Matrix(Complex(DoubleFloat)) := new (NN+1,NN+1,0)
 
 output(".................starting Imn matrix......")
-nn_index := [ ind::N for ind in 0..NN]
-for i in nn_index repeat
-    for j in nn_index repeat
+nn_index := [0,1,2,3]
+for i in 1..#nn_index repeat
+    for j in 1..#nn_index repeat
         output("...starting")
         output(i)
         output(j)
-        intg_imn(theta: DF): CDF == one_imn_term(i::N,j::N,theta)
-        imn_mat(i+1,j+1) := ad_gauss(intg_imn, 0, alpha, max_error, max_recursion) 
+        anon(th) == one_imn_term(nn_index.i::N,nn_index.j::N,th)
+        imn_mat(i+1,j+1) := ad_gauss(anon, 0.0::DF, alpha::DF, max_error, max_recursion) 
 
 
 

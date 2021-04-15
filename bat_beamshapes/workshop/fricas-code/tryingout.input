@@ -26,12 +26,11 @@ for m in 1..NN repeat
 multiparamfunc(rowind:N,colind:N,theta:DF) : DF == (rowind+colind)*theta
 
 indexvals := [jj::N for jj in 0..4]
-all_anonfuncs := [multiparamfunc(i,j,theta) for i in indexvals for j in indexvals]
+--all_anonfuncs := [multiparamfunc(i,j,theta) for i in indexvals for j in indexvals]
 
 q := 0
 for i in 0..4 repeat
     for j in 0..4 repeat
         q := q+1        
---        anonfunc(theta) == multiparmfunc(i::P,j::P,theta)
-
+        anonfunc(th) == multiparamfunc(i::P,j::P,th)
 --        output(anonfunc(0.2))
