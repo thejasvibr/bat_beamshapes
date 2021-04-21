@@ -27,8 +27,9 @@ author = 'Thejasvi Beleyur'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-]
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.napoleon',
+				'sphinx.ext.viewcode','recommonmark','sphinx.ext.mathjax',
+				'sphinx_gallery.gen_gallery']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -80,8 +81,8 @@ autodoc_member_order = 'bysource'
 # sphinx gallery
 from sphinx_gallery.sorting import FileNameSortKey
 sphinx_gallery_conf = {
-     'examples_dirs': ['../../examples', '../../examples_detailed', '../../accuracy'],   # path to your example scripts
-     'gallery_dirs': ['gallery_dir', 'gallery_detailed', 'gallery_accuracy'],  # path to where to save gallery generated output
+     'gallery_dirs' : ['gallery_examples'],
+     'examples_dirs': ['../../examples'],  # path to where to save gallery generated output
 	 'image_scrapers': ('matplotlib'),
 	 'within_subsection_order': FileNameSortKey
 						}

@@ -55,7 +55,10 @@ plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
 plt.xticks(np.arange(0,2*np.pi,np.pi/6))
 plt.savefig(f'ka-{np.round(float(ka),2)}_dps={mpmath.mp.dps}.png')
 
-
+#%%
+#.. image:: ../_static/ka-6.31_dps=100.png
+#  :width: 400
+#  :alt: bat beamshape
 
 # %%
 # References
