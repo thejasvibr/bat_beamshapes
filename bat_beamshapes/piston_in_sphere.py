@@ -3,7 +3,7 @@
 """
 TODO: 
     1. IMPLEMENT SOME SORT OF CACHING/MEMOIZATION to prevent recalculation of
-    old parameter values. 
+    old parameter values for M, b and  a matrices.
 
 Code that calculates piston in a sphere. 
 This model is described in Chapter 12 of Beranek & Mellow 2012, 
@@ -42,7 +42,7 @@ x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r
 from sympy import N, cse
 dps = 50; mpmath.mp.dps = dps # default digit precision set to 50
 
-from special_functions import sph_hankel2
+from bat_beamshapes.special_functions import sph_hankel2
 
 r1 = (R*cos(alpha))/cos(theta)
 
@@ -109,12 +109,37 @@ mmn_hankels_func = lambdify([n,k,R], mmn_hankels,'mpmath')
 
 
 def compute_Mmn(params):
+    '''
+    Keyword Arguments
+    ----------
+    alpha : 0<mpmath/float<pi
+        half-aperture value in radians
+    k : mpmath/float>0
+        wavenumber
+    a : mpmath/float>0
+        Radius of piston 
+
+    Returns
+    -------
+    M_matrix: mpmath.matrix
+        NxN matrix with N defined by the heuristic formula
+        12 + 2*ka/sin(alpha)
+    
+    See Also
+    --------
+    compute_b
+    compute_a
+    '''
     Nv = 12 + int(2*params['ka']/sin(params['alpha']))
     M_matrix = mpmath.matrix(Nv,Nv)
+    params['R'] = mpmath.fdiv(params['a'], mpmath.sin(params['alpha']))
+    params['ka'] = mpmath.fmul(params['k'], params['a'])
+    
     for i in tqdm.trange(Nv):
         for j in range(Nv):
             params['m'],params['n'] = i,j
-            Imn_value = Imn_func(params['m'], params['n'],params['k'],params['R'],params['alpha'])
+            Imn_value = Imn_func(params['m'], params['n'],params['k'],
+                                 params['R'],params['alpha'])
             Kmn_value = Kmn_func(params['m'],params['n'],params['alpha'])
             numerator_hankels = mmn_hankels_func(j,params['k'],params['R'])
             numerator = Imn_value+ numerator_hankels*Kmn_value
@@ -123,6 +148,25 @@ def compute_Mmn(params):
     return M_matrix
 
 def compute_b(params):
+    '''
+    Keyword Arguments
+    -----------------
+    k
+    a 
+    alpha
+    
+    Returns
+    -------
+    b_matrix : N x 1 
+        The size of the matrix is given by the heuristic
+        described in ```compute_M```
+    See Also
+    --------
+    compute_M
+    compute_a
+    
+    '''
+    params['ka'] = mpmath.fmul(params['k'], params['a'])
     Nv = 12 + int(2*params['ka']/sin(params['alpha']))
     b_matrix = mpmath.matrix(Nv,1)
     for each_m in range(Nv):
@@ -130,6 +174,24 @@ def compute_b(params):
     return b_matrix 
 
 def compute_a(M_mat, b_mat):
+    '''
+    Keyword Arguments
+    -----------------
+    M_mat : N x N mpmath.matrix
+    b_mat : N x 1 mpmath.matrix
+    
+    Returns
+    -------
+    a_matrix : N x 1 
+        The size of the matrix is given by the heuristic
+        described in ```compute_M```. This is the A_{n}
+        used in the summations. 
+
+    See Also
+    --------
+    compute_M
+    compute_b
+    '''
     a_matrix = mpmath.inverse(M_mat)*b_mat
     return a_matrix
 
@@ -163,20 +225,7 @@ def relative_directionality_db(angle,k_v,R_v,alpha_v,An):
     rel_level = 20*mpmath.log10(abs(off_axis/on_axis))
     return rel_level
 
-def check_input_validity(params):
-    '''
-    '''
-    a = params['ka']/params['k']
-    if type(a) == mpmath.ctx_mp_python.mpf:
-        a_as_expected = a == params['R']*mpmath.sin(params['alpha'])
-    else:
-        a_as_expected = a == params['R']*np.sin(params['alpha'])
-    if not a_as_expected:
-        raise ValueError('a != R*sin(alpha), please check the input values')
-    
-    
-
-def directionality(angles, params):
+def piston_in_sphere_directionality(angles, params):
     '''
     Calculates relative directionality dB (D(theta)/D(0))
     of a piston in a rigid sphere.
@@ -195,7 +244,7 @@ def directionality(angles, params):
             R : mpmath.mpf>0
                 Radius of sphere
             alpha: 0<mpmath.mpf<pi
-                Angular aperture of sphere. 
+                Half-angular aperture of sphere. 
     
     Returns 
     -------
@@ -213,7 +262,7 @@ def directionality(angles, params):
         
     
     '''
-    check_input_validity(params)
+
     Mmatrix = compute_Mmn(params)
     bmatrix = compute_b(params)
     amatrix = compute_a(Mmatrix, bmatrix)
@@ -230,29 +279,24 @@ def directionality(angles, params):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    frequency = 50*10**3 # kHz
-    vsound = 330 # m/s
+    frequency = mpmath.mpf(50*10**3) # kHz
+    vsound = mpmath.mpf(330) # m/s
     wavelength = vsound/frequency
-    alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
+    alpha_value = mpmath.pi/4 # 60 degrees --> pi/3
     k_value = 2*mpmath.pi/(wavelength)
-    ka = 5
+    ka = mpmath.mpf(5)
     a_value = ka/k_value 
     R_value = a_value/mpmath.sin(alpha_value)  # m
     paramv = {}
     paramv['R'] = R_value
     paramv['alpha'] = alpha_value
     paramv['k'] = k_value
-    paramv['ka'] = ka
+    paramv['a'] = a_value
     
     angles = mpmath.linspace(0,mpmath.pi,100)
-    beamshape = directionality(angles, paramv)
+    beamshape = piston_in_sphere_directionality(angles, paramv)
     plt.figure()
     a0 = plt.subplot(111, projection='polar')
     plt.plot(angles, beamshape)
     plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
     plt.xticks(np.arange(0,2*np.pi,np.pi/6))
-    
-    
-
-
-
