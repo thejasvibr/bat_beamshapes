@@ -5,7 +5,7 @@ from mpmath import lu_solve, qr_solve, residual, log, mp
 from sympy import I, summation, Sum, gamma, besselj, factorial, sqrt, pi, lambdify
 from sympy import KroneckerDelta, conjugate, symbols, Matrix, cos, sin, N
 from tqdm import tqdm
-from joblib import Parallel, delayed
+# from joblib import Parallel, delayed
 
 k, beta, NN, P, Q, n, m, p, q, r = symbols('k, beta, NN, P, Q, n, m, p, q, r')
 mp.dps = 300
