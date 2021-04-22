@@ -76,7 +76,7 @@ master_doc = 'index'
 autodoc_member_order = 'bysource'
 
 # Add a logo
-# html_logo = '../itsfm_logo.png'
+html_logo = '_static/beamshapes_logo.png'
 
 # sphinx gallery
 from sphinx_gallery.sorting import FileNameSortKey

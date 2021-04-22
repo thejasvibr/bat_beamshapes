@@ -1,0 +1,10 @@
+numpy
+scipy 
+matplotlib 
+sympy
+mpmath
+tqdm 
+recommonmark 
+sphinx==3.5.3
+sphinx_gallery==0.8.2
+sphinx_rtd_theme
