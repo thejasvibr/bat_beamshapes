@@ -1,7 +1,10 @@
+
+gmpy2
 numpy
 pandas
 scipy 
 matplotlib 
+symengine
 sympy
 mpmath
 tqdm 
