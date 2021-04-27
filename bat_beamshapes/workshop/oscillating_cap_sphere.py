@@ -20,16 +20,15 @@ n, z,k,R,alpha,theta = symbols('n z k R alpha theta')
 
 # equation 12.59 
 # split the big parenthesis into 3 parts (j/sph_hankel, cos(theta) term and the summation)
-kR = k*R
-d_theta_term1 = I/(2*sph_hankel2.subs({'n':1, 'z':kR})) 
+d_theta_term1 = I/(2*sph_hankel2.subs({'n':1, 'z':k*R})) 
 
 d_theta_term2_num =  3*(1-cos(alpha)**3)*cos(theta)
-d_theta_term2_denom = (sin(alpha)**2)*(sph_hankel2.subs({'n':0, 'z':kR})-2*sph_hankel2.subs({'n':2, 'z':kR}))
+d_theta_term2_denom = (sin(alpha)**2)*(sph_hankel2.subs({'n':0, 'z':k*R})-2*sph_hankel2.subs({'n':2, 'z':k*R}))
 d_theta_term2 = d_theta_term2_num/d_theta_term2_denom
 print('1')
-P_1ncosalpha = legendre_mvz.subs({'m':1, 'v':n,'z':cos(theta)})
+P_1ncosalpha = legendre_mvz.subs({'m':1, 'v':n,'z':cos(theta)}).doit()
 dtheta_t3_num = (I**(n+1))*((2*n+1)**2)*(sin(alpha)*legendre(n,cos(alpha)) + cos(alpha)*P_1ncosalpha)
-dtheta_t3_denom = (n-1)*(n+2)*sin(alpha)*(n*sph_hankel2.subs({'n':n-1, 'z':kR})-(n+1)*sph_hankel2.subs({'n':n+1, 'z':kR}))
+dtheta_t3_denom = (n-1)*(n+2)*sin(alpha)*(n*sph_hankel2.subs({'n':n-1, 'z':k*R})-(n+1)*sph_hankel2.subs({'n':n+1, 'z':k*R}))
 dtheta_t3_oneterm = (dtheta_t3_num/dtheta_t3_denom)*legendre(n, cos(theta))
 
 
@@ -50,27 +49,63 @@ def dtheta_t3_func(k_v,R_v,alpha_v,theta_v):
     
     version_with_freen = dtheta_t3_oneterm.subs({'k':k_v, 'R':R_v,
                                                  'alpha':alpha_v,
+                                                  'theta': theta_v,
+                                                  })
+    freen_func = lambdify([n],version_with_freen, 'mpmath')
+    return mpmath.nsum(freen_func, [2,mpmath.inf])
+
+
+def d_theta(kv,Rv,alphav,thetav):
+    brackets_term1 = d_theta_t1_func(kv,Rv,alphav,thetav)
+    brackets_term2 = d_theta_t2_func(kv,Rv,alphav,thetav)
+    brackets_term3 = dtheta_t3_func(kv,Rv,alphav,thetav)
+    final_d_theta= (2/kv**2*Rv**2)*(brackets_term1+brackets_term2+brackets_term3)
+    return final_d_theta
+
+#%% In eqn. 12.61, term 2 differs by the absence of a cos(theta)
+d_0_term2_num =  3*(1-cos(alpha)**3)
+d_0_term2 = d_0_term2_num/d_theta_term2_denom
+d_0_t2_func = lambdify([k,R,alpha,theta], d_0_term2, 'mpmath')
+
+
+#%% term 3 of eqn. 12.61 doesn't have a Pn(cos(theta)) at the end. 
+d_0_t3_oneterm = dtheta_t3_num/dtheta_t3_denom
+def d_0_t3_func(k_v,R_v,alpha_v,theta_v):
+    
+    version_with_freen = d_0_t3_oneterm.subs({'k':k_v, 'R':R_v,
+                                                 'alpha':alpha_v,
                                                   'theta': theta_v})
     
     return mpmath.nsum(lambdify([n],version_with_freen, 'mpmath'), [2,mpmath.inf])
 
 
-#d_theta = lambdify([k,R,alpha,theta], d_theta,'mpmath')
+def d_zero(kv,Rv,alphav,thetav=0):
+    brackets_term1 = d_theta_t1_func(kv,Rv,alphav,thetav)
+    brackets_term2 = d_0_t2_func(kv,Rv,alphav,thetav)
+    brackets_term3 = d_0_t3_func(kv,Rv,alphav,thetav)
+    final_d_0 = (2/kv**2*Rv**2)*(brackets_term1+brackets_term2+brackets_term3)
+    return final_d_0
 
-def d_theta(k,R,alpha,theta):
-    brackets_term1 = d_theta_t1_func(k,R,alpha,theta)
-    brackets_term2 = d_theta_t2_func(k,R,alpha,theta)
-    brackets_term3 = dtheta_t3_func(k,R,alpha,theta)
-    final_d_theta= (2/k**2*R**2)*(brackets_term1+brackets_term2+brackets_term3)
-    return final_d_theta
-    
+
+
+
+
+
 
 if __name__=='__main__':
+    import numpy as np 
+    import matplotlib.pyplot as plt
     k_v = 2*mpmath.pi/(mpmath.mpf(330.0)/mpmath.mpf(50000))
     R_v = mpmath.mpf(0.01)
     alpha_v = mpmath.pi/10
-    theta_v = 0.0
+    theta_v = mpmath.pi/3
     
     #dtheta_t3_func(k_v, R_v, alpha_v, theta_v)
-    print(d_theta(k_v, R_v, alpha_v, theta_v))
-    
+    angles = mpmath.linspace(0,mpmath.pi,15)
+    at_angles = mpmath.matrix(1,len(angles))
+    for i, angle in enumerate(angles):
+        at_angles[i] = d_theta(k_v, R_v, alpha_v, angle)
+    # atangles = np.asanyarray(nnp.)
+    # plt.figure()
+    # a0 = plt.subplot(111, projection='polar')
+    # plt.plot(np.array(angles), at_angles)
