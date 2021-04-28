@@ -12,7 +12,7 @@ from gmpy2 import *
 from symengine import * 
 import mpmath
 mpmath.mp.dps = 50
-from sympy import expand,symbols, Sum,summation, I, cos, sin, legendre, oo
+from sympy import expand,symbols, Sum,summation, I, cos, sin, legendre, oo,zoo
 from sympy import lambdify,pi
 from bat_beamshapes.special_functions import sph_hankel2, legendre_mvz
 
@@ -25,8 +25,7 @@ d_theta_term1 = I/(2*sph_hankel2.subs({'n':1, 'z':k*R}))
 d_theta_term2_num =  3*(1-cos(alpha)**3)*cos(theta)
 d_theta_term2_denom = (sin(alpha)**2)*(sph_hankel2.subs({'n':0, 'z':k*R})-2*sph_hankel2.subs({'n':2, 'z':k*R}))
 d_theta_term2 = d_theta_term2_num/d_theta_term2_denom
-print('1')
-P_1ncosalpha = legendre_mvz.subs({'m':1, 'v':n,'z':cos(theta)}).doit()
+P_1ncosalpha = legendre_mvz.subs({'m':1, 'v':n,'z':cos(alpha)}).doit()
 dtheta_t3_num = (I**(n+1))*((2*n+1)**2)*(sin(alpha)*legendre(n,cos(alpha)) + cos(alpha)*P_1ncosalpha)
 dtheta_t3_denom = (n-1)*(n+2)*sin(alpha)*(n*sph_hankel2.subs({'n':n-1, 'z':k*R})-(n+1)*sph_hankel2.subs({'n':n+1, 'z':k*R}))
 dtheta_t3_oneterm = (dtheta_t3_num/dtheta_t3_denom)*legendre(n, cos(theta))
@@ -34,7 +33,6 @@ dtheta_t3_oneterm = (dtheta_t3_num/dtheta_t3_denom)*legendre(n, cos(theta))
 
 
 #d_theta_term3 = Sum(expand(dtheta_t3_oneterm), (n,2,oo))
-print('2')
 #d_theta = 2/(k**2*R**2)*(d_theta_term1 + d_theta_term2 + d_theta_term3)
 
 
@@ -95,17 +93,26 @@ def d_zero(kv,Rv,alphav,thetav=0):
 if __name__=='__main__':
     import numpy as np 
     import matplotlib.pyplot as plt
-    k_v = 2*mpmath.pi/(mpmath.mpf(330.0)/mpmath.mpf(50000))
-    R_v = mpmath.mpf(0.01)
-    alpha_v = mpmath.pi/10
-    theta_v = mpmath.pi/3
+    wavelength = (mpmath.mpf(330.0)/mpmath.mpf(50000))
+    ka = 10
+    k_v = 2*mpmath.pi/wavelength
+    a_v = ka/k_v
+    alpha_v = mpmath.pi/3
+    R_v = a_v/sin(alpha_v) #mpmath.mpf(0.01)
     
-    #dtheta_t3_func(k_v, R_v, alpha_v, theta_v)
-    angles = mpmath.linspace(0,mpmath.pi,15)
+    angles = mpmath.linspace(0,mpmath.pi,50)
     at_angles = mpmath.matrix(1,len(angles))
     for i, angle in enumerate(angles):
         at_angles[i] = d_theta(k_v, R_v, alpha_v, angle)
-    # atangles = np.asanyarray(nnp.)
-    # plt.figure()
-    # a0 = plt.subplot(111, projection='polar')
-    # plt.plot(np.array(angles), at_angles)
+    on_axis = d_zero(k_v, R_v, alpha_v, angle)
+    rato = [20*mpmath.log10(abs(each/on_axis)) for each in at_angles]
+    
+    plt.figure()
+    a0 = plt.subplot(111, projection='polar')
+    plt.plot(np.array(angles), rato)
+    plt.ylim(-40,10);plt.yticks(np.arange(-40,20,10))
+    plt.xticks(np.arange(0,2*np.pi,np.pi/6))
+    import pandas as pd
+    df = pd.read_csv('fig12-17.csv')
+    plt.plot(np.radians(df['deg']), df['rel_db_0deg'],'*',
+             label='ground-truth, Fig. 12-17')
