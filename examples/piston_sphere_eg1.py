@@ -1,5 +1,7 @@
 """
-Example to show the calculation of a piston in a sphere.
+Piston in a rigid sphere: the bat version
+=========================================
+
 """
 import bat_beamshapes
 import matplotlib.pyplot as plt
@@ -8,9 +10,6 @@ mpmath.mp.dps = 50
 import numpy as np 
 
 
-#%%
-# Simple Example: Piston in a rigid sphere
-# ========================================
 
 #%% 
 # Parametrising piston diameter with 'gape height'

@@ -9,15 +9,20 @@ Beamshapes: generate beamshapes for multiple models
 Introduction
 ~~~~~~~~~~~~
 The `beamshapes` (currently called `bat_beamshapes`) package implements 
-non-trivial sound radiation models (piston in a sphere, piston in a closed circular baffle, etc.)
-. Users can generate the beamshape pattern of their model of interest from any of 
-these models. Since the beamshape calculation can be computationally intensive, 
-the package also comes with a set of pre-calculated examples. 
+non-classical sound radiation models (piston in a sphere, cap in a sphere, 
+piston in a closed circular baffle, etc.).
+
+While there are many sound emission models in the literature, there aren't
+that many openly available computational implementations. `bat_beamshapes` 
+covers this gap by providing a set of models where you can generate predictions
+by providing the relevant parameters through a function call.
+
 
 Who is this useful for? 
 ~~~~~~~~~~~~~~~~~~~~~~~
 Acousticians and bio-acousticians looking to assess model-fits or perform 
-parameter estimation on microphone array data. 
+parameter estimation on their sound sources. Check out more on the how
+to use this package in the examples page. 
 
 
 .. toctree::

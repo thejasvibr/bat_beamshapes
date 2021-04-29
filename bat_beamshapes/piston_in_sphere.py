@@ -244,7 +244,7 @@ def piston_in_sphere_directionality(angles, params):
             R : mpmath.mpf>0
                 Radius of sphere
             alpha: 0<mpmath.mpf<pi
-                Half-angular aperture of sphere. 
+                Half-angular aperture of piston. 
     
     Returns 
     -------
