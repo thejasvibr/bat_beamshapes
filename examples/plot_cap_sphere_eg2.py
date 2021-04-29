@@ -9,6 +9,7 @@ from mpmath import sin
 import numpy as np 
 import pandas as pd
 import matplotlib.pyplot as plt
+import bat_beamshapes
 from bat_beamshapes import cap_in_sphere_directionality
 
 # %% 
