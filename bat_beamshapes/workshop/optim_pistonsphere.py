@@ -12,7 +12,7 @@ import bat_beamshapes.piston_in_sphere as pins
 from joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 import mpmath
-mpmath.mp.dps = 80
+mpmath.mp.dps = 50
 import numpy as np 
 import tqdm
 
@@ -30,28 +30,10 @@ params = {}
 params['R'] = R
 params['alpha'] = alpha
 params['k'] = k
-params['ka'] = ka
+#params['ka'] = ka
 params['a'] = a
 
-#onlyparams = {[]}
 
-aucalc = params['R']*mpmath.sin(params['alpha'])
-
-
-
-# angles = mpmath.linspace(0,mpmath.pi,100)
-# beamshape = bat_beamshapes.piston_in_sphere_directionality(angles, params)
-# plt.figure()
-# a0 = plt.subplot(111, projection='polar')
-# plt.plot(angles, beamshape)
-# plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
-# plt.xticks(np.arange(0,2*np.pi,np.pi/6))
-
-
-
-# i,j = 3,3
-# params['m'],params['n'] = i,j
-# # pins.compute_Mmn(params)
 # %% 
 %%time 
 
@@ -65,30 +47,14 @@ Imn_value = pins.Imn_func(params['m'], params['n'],params['k'], params['R'],para
 # %%time 
 # numerator_hankels = pins.mmn_hankels_func(j,params['k'],params['R'])
 
-# #%%
-# numerator = Imn_value+ numerator_hankels*Kmn_value
-# denom = 2*params['n']+1
-
-
-
-# #%% 
-# # replicting the joblib example 
-from joblib import parallel_backend
+#%%
+import sympy
+from sympy import symbols, legendre, sin, cos, tan, summation, I, diff, pi, sqrt
+from sympy import Matrix, besselj, bessely, Piecewise
+from sympy import  lambdify, integrate, expand,Integral
+import tqdm
 from joblib import Parallel, delayed
-from joblib import wrap_non_picklable_objects
 import time
-
-# @delayed
-# @wrap_non_picklable_objects
-# def func_async_wrapped(i,*args): 
-#     return 2 * i
-
-# large_list = list(range(1000000))
-
-# t_start = time.time()
-# Parallel(n_jobs=2)(func_async_wrapped(21, large_list) for _ in range(1))
-# print("With pickle from stdlib and wrapper: {:.3f}s"
-#       .format(time.time() - t_start))
 
 #%% 
 from sympy import symbols, sin, lambdify
@@ -101,19 +67,6 @@ def imn_joblib(**args):
     output = pins.Imn_func(**mpmath_args)
     backto_str = str(output)
     return backto_str
-    
-
-
-# def joblib_hjh_wrapper(xas_str):
-#     inval_as_mpf = mpmath.mpf(xas_str)
-#     mpmathout = hjh(inval_as_mpf)
-#     return str(mpmathout)
-
-# t_start = time.time()
-# Parallel(n_jobs=2, backend='multiprocessing')(joblib_hjh_wrapper(each) for each in invals_str)
-# print("With pickle from stdlib and wrapper: {:.3f}s"
-#       .format(time.time() - t_start))
-
 
 imn_vals = {'m':mpmath.mpf(params['m']),
             'n':params['n'],
@@ -123,6 +76,10 @@ imn_vals = {'m':mpmath.mpf(params['m']),
 
 def args_to_str(**args):
     return {key: str(value) for key,value in args.items()}
+
+def args_to_mpmath(**args):
+    return {key: mpmath.mpmathify(value) for key,value in args.items()}
+
 
 imn_strvals = args_to_str(**imn_vals)
 # %% 
@@ -142,7 +99,68 @@ uty = Parallel(n_jobs=4, backend='multiprocessing')(delayed(imn_joblib)(**each) 
 print("With pickle from stdlib and wrapper: {:.3f}s"
       .format(time.time() - t_start))
 
+#%%
 
-# #%%
+%%time 
+def calc_one_Mmn_term(**params):
+    '''
+    '''
+    Imn_value = pins.Imn_func(params['m'], params['n'],params['k'],
+                         params['R'],params['alpha'])
+    Kmn_value = pins.Kmn_func(int(params['m']),int(params['n']),params['alpha'])
+    numerator_hankels = pins.mmn_hankels_func(params['n'],params['k'],params['R'])
+    numerator = Imn_value+ numerator_hankels*Kmn_value
+    denom = 2*params['n']+1
+    return numerator/denom
+
+params_str = args_to_str(**params)
+
+def parallel_calc_one_Mmn_term(**args):
+    mpmath_args = args_to_mpmath(**args)
+    output = calc_one_Mmn_term(**mpmath_args)
+    backto_str = str(output)
+    return backto_str
+
+
+
+params = {}
+params['R'] = R
+params['alpha'] = alpha
+params['k'] = k
+#params['ka'] = ka
+params['a'] = a
+params['m'] = 10
+params['n'] = 10
+paramst_str = args_to_str(**params)
+paramst_mpm  = args_to_mpmath(**paramst_str)
+
+#pins.Kmn_func(int(paramst_mpm['m']),int(paramst_mpm['n']),paramst_mpm['alpha'])
+#pins.mmn_hankels_func(paramst_mpm['n'],paramst_mpm['k'],paramst_mpm['R'])
+parallel_calc_one_Mmn_term(**paramst_str)
 
 #%%
+# This is what the function call should look like 
+
+import copy
+
+Nv = 20
+multi_paramsets = []
+for i in range(Nv):
+    for j in range(Nv):
+        this_paramset = copy.deepcopy(params)
+        this_paramset['m'] = i
+        this_paramset['n'] = j
+        multi_paramsets.append(this_paramset)
+#%%
+%%time 
+multi_paramset_str = [args_to_str(**each) for each in multi_paramsets]
+
+M_mn_out = Parallel(n_jobs=-1, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
+
+#M_mn_matrix = format_to_matrix(M_mn_out)
+
+
+
+
+
+

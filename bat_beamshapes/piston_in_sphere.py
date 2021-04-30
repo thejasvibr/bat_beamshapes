@@ -39,7 +39,6 @@ from sympy import Matrix, besselj, bessely, Piecewise
 from sympy import  lambdify, integrate, expand,Integral
 import tqdm
 x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r1 R theta,y,z')
-from sympy import N, cse
 dps = 50; mpmath.mp.dps = dps # default digit precision set to 50
 
 from bat_beamshapes.special_functions import sph_hankel2
@@ -106,7 +105,6 @@ b_func = lambdify([m,alpha], b,'mpmath') # eqn. 12.104
 # %% 
 mmn_hankels = n*sph_hankel2.subs({'n':n-1,'z':k*R})-(n+1)*sph_hankel2.subs({'n':n+1,'z':k*R})
 mmn_hankels_func = lambdify([n,k,R], mmn_hankels,'mpmath')
-
 
 def compute_Mmn(params):
     '''
