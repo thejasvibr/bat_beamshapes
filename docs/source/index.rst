@@ -32,6 +32,15 @@ to use this package in the examples page.
       gallery_examples/index.rst
 
 
+Contributors
+~~~~~~~~~~~~
+Thejasvi Beleyur (maintainer)
+Gaurav Dhariwal
+
+Acknowledgements
+~~~~~~~~~~~~~~~~
+Many thanks to Tim Mellow for sharing Mathematic code to help with porting to Python!
+
 
 Indices and tables
 ==================
