@@ -121,8 +121,27 @@ def parallel_calc_one_Mmn_term(**args):
     backto_str = str(output)
     return backto_str
 
-
-
+def format_Mmn_to_matrix(string_list):
+    '''
+    Parameters
+    ----------
+    string_list : list
+        List with string versions of mpmath.mpc numbers. 
+    Returns
+    -------
+    Mmn_matrix: mpmath.matrix
+        A matrix with nxn, where n= sqrt(list entries) shape.
+    '''
+    # convert all list entries to mpc
+    mmn_entries = [mpmath.mpmathify(each) for each in string_list]
+    # re-format into a matrix
+    Nv = int(mpmath.sqrt(len(string_list)))
+    Mmn_matrix = mpmath.matrix(Nv,Nv)
+    indices = [(row,col) for row in range(Nv) for col in range(Nv)] 
+    for (row, col), value in zip(indices, mmn_entries):
+        Mmn_matrix[row,col] = value
+    return Mmn_matrix
+#%% 
 params = {}
 params['R'] = R
 params['alpha'] = alpha
@@ -154,10 +173,8 @@ for i in range(Nv):
 #%%
 %%time 
 multi_paramset_str = [args_to_str(**each) for each in multi_paramsets]
-
 M_mn_out = Parallel(n_jobs=-1, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
-
-#M_mn_matrix = format_to_matrix(M_mn_out)
+M_mn_matrix = format_Mmn_to_matrix(M_mn_out)
 
 
 
