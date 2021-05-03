@@ -9,6 +9,7 @@ back -- which can then in term be converted to mpmath objects.
 #%%
 import bat_beamshapes
 import bat_beamshapes.piston_in_sphere as pins
+import copy
 from joblib import Parallel, delayed
 import matplotlib.pyplot as plt
 import mpmath
@@ -35,11 +36,11 @@ params['a'] = a
 
 
 # %% 
-%%time 
+#%%time 
 
-params['m'] = 10
-params['n'] = 10
-Imn_value = pins.Imn_func(params['m'], params['n'],params['k'], params['R'],params['alpha'])
+# params['m'] = 10
+# params['n'] = 10
+# Imn_value = pins.Imn_func(params['m'], params['n'],params['k'], params['R'],params['alpha'])
 # #%%
 # %%time 
 # Kmn_value = pins.Kmn_func(params['m'],params['n'],params['alpha'])
@@ -58,21 +59,21 @@ import time
 
 #%% 
 from sympy import symbols, sin, lambdify
-x = symbols('x')
+# x = symbols('x')
 
-hjh = lambdify([x], sin(x)*x**2, 'mpmath')
+# hjh = lambdify([x], sin(x)*x**2, 'mpmath')
 
-def imn_joblib(**args):
-    mpmath_args = {key: mpmath.mpmathify(value) for key,value in args.items()}
-    output = pins.Imn_func(**mpmath_args)
-    backto_str = str(output)
-    return backto_str
+# def imn_joblib(**args):
+#     mpmath_args = {key: mpmath.mpmathify(value) for key,value in args.items()}
+#     output = pins.Imn_func(**mpmath_args)
+#     backto_str = str(output)
+#     return backto_str
 
-imn_vals = {'m':mpmath.mpf(params['m']),
-            'n':params['n'],
-            'k': params['k'],
-            'R': params['R'],
-            'alpha': params['alpha']}
+# imn_vals = {'m':mpmath.mpf(params['m']),
+#             'n':params['n'],
+#             'k': params['k'],
+#             'R': params['R'],
+#             'alpha': params['alpha']}
 
 def args_to_str(**args):
     return {key: str(value) for key,value in args.items()}
@@ -81,27 +82,27 @@ def args_to_mpmath(**args):
     return {key: mpmath.mpmathify(value) for key,value in args.items()}
 
 
-imn_strvals = args_to_str(**imn_vals)
+# imn_strvals = args_to_str(**imn_vals)
 # %% 
 # non-parallelised
 
-%%time 
-for each in range(4):
-    pins.Imn_func(**imn_vals)
+# %%time 
+# for each in range(4):
+#     pins.Imn_func(**imn_vals)
     
 #%% 
 
-paramset = [imn_strvals]*4
+# paramset = [imn_strvals]*4
 
-t_start = time.time()
+# t_start = time.time()
 
-uty = Parallel(n_jobs=4, backend='multiprocessing')(delayed(imn_joblib)(**each) for each in paramset)
-print("With pickle from stdlib and wrapper: {:.3f}s"
-      .format(time.time() - t_start))
+# uty = Parallel(n_jobs=4, backend='multiprocessing')(delayed(imn_joblib)(**each) for each in paramset)
+# print("With pickle from stdlib and wrapper: {:.3f}s"
+#       .format(time.time() - t_start))
 
 #%%
 
-%%time 
+# %%time 
 def calc_one_Mmn_term(**params):
     '''
     '''
@@ -141,9 +142,34 @@ def format_Mmn_to_matrix(string_list):
     for (row, col), value in zip(indices, mmn_entries):
         Mmn_matrix[row,col] = value
     return Mmn_matrix
+
+def compute_Mmn_parallel(params):
+    '''
+    '''
+    params['ka'] = mpmath.fmul(params['k'], params['a'])
+    Nv = 12 + int(2*params['ka']/sin(params['alpha']))
+    M_matrix = mpmath.matrix(Nv,Nv)
+    params['R'] = mpmath.fdiv(params['a'], mpmath.sin(params['alpha']))
+    
+    
+    # create multiple paramsets with changing m,n
+    multi_paramsets = []
+    for i in range(Nv):
+        for j in range(Nv):
+            this_paramset = copy.deepcopy(params)
+            this_paramset['m'] = i
+            this_paramset['n'] = j
+            multi_paramsets.append(this_paramset)
+            
+    multi_paramset_str = [args_to_str(**each) for each in multi_paramsets]
+    M_mn_out = Parallel(n_jobs=-1, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
+    M_matrix = format_Mmn_to_matrix(M_mn_out)
+    return M_matrix
+    
+
 #%% 
 params = {}
-params['R'] = R
+
 params['alpha'] = alpha
 params['k'] = k
 #params['ka'] = ka
@@ -160,22 +186,24 @@ parallel_calc_one_Mmn_term(**paramst_str)
 #%%
 # This is what the function call should look like 
 
-import copy
 
-Nv = 20
-multi_paramsets = []
-for i in range(Nv):
-    for j in range(Nv):
-        this_paramset = copy.deepcopy(params)
-        this_paramset['m'] = i
-        this_paramset['n'] = j
-        multi_paramsets.append(this_paramset)
+
+# Nv = 20
+# multi_paramsets = []
+# for i in range(Nv):
+#     for j in range(Nv):
+#         this_paramset = copy.deepcopy(params)
+#         this_paramset['m'] = i
+#         this_paramset['n'] = j
+#         multi_paramsets.append(this_paramset)
 #%%
 %%time 
-multi_paramset_str = [args_to_str(**each) for each in multi_paramsets]
-M_mn_out = Parallel(n_jobs=-1, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
-M_mn_matrix = format_Mmn_to_matrix(M_mn_out)
 
+# multi_paramset_str = [args_to_str(**each) for each in multi_paramsets]
+# M_mn_out = Parallel(n_jobs=-1, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
+# M_mn_matrix = format_Mmn_to_matrix(M_mn_out)
+
+compute_Mmn_parallel(params)
 
 
 

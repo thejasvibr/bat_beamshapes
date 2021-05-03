@@ -28,7 +28,9 @@ Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
 Academic Press.
 
 """
+import copy
 from gmpy2 import *
+from joblib import Parallel, delayed 
 import mpmath
 from mpmath import mpf
 import numpy as np
@@ -39,9 +41,10 @@ from sympy import Matrix, besselj, bessely, Piecewise
 from sympy import  lambdify, integrate, expand,Integral
 import tqdm
 x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r1 R theta,y,z')
-dps = 50; mpmath.mp.dps = dps # default digit precision set to 50
+dps = 150; mpmath.mp.dps = dps # default digit precision set to 50
 
 from bat_beamshapes.special_functions import sph_hankel2
+from bat_beamshapes.utilities import args_to_mpmath, args_to_str
 
 r1 = (R*cos(alpha))/cos(theta)
 
@@ -108,6 +111,9 @@ mmn_hankels_func = lambdify([n,k,R], mmn_hankels,'mpmath')
 
 def compute_Mmn(params):
     '''
+    Obsolete function -- not in use -- here only for historical reference. 
+    See computer_Mmn_parallel
+    
     Keyword Arguments
     ----------
     alpha : 0<mpmath/float<pi
@@ -128,10 +134,11 @@ def compute_Mmn(params):
     compute_b
     compute_a
     '''
+    params['ka'] = mpmath.fmul(params['k'], params['a'])
     Nv = 12 + int(2*params['ka']/sin(params['alpha']))
     M_matrix = mpmath.matrix(Nv,Nv)
     params['R'] = mpmath.fdiv(params['a'], mpmath.sin(params['alpha']))
-    params['ka'] = mpmath.fmul(params['k'], params['a'])
+    
     
     for i in tqdm.trange(Nv):
         for j in range(Nv):
@@ -144,6 +151,71 @@ def compute_Mmn(params):
             denom = 2*params['n']+1
             M_matrix[params['m'],params['n']] = numerator/denom
     return M_matrix
+
+### parallel zone 
+def calc_one_Mmn_term(**params):
+    '''
+    '''
+    Imn_value = Imn_func(params['m'], params['n'],params['k'],
+                         params['R'],params['alpha'])
+    Kmn_value = Kmn_func(int(params['m']),int(params['n']),params['alpha'])
+    numerator_hankels = mmn_hankels_func(params['n'],params['k'],params['R'])
+    numerator = Imn_value+ numerator_hankels*Kmn_value
+    denom = 2*params['n']+1
+    return numerator/denom
+
+def parallel_calc_one_Mmn_term(**args):
+    mpmath_args = args_to_mpmath(**args)
+    output = calc_one_Mmn_term(**mpmath_args)
+    backto_str = str(output)
+    return backto_str
+
+def format_Mmn_to_matrix(string_list):
+    '''
+    Parameters
+    ----------
+    string_list : list
+        List with string versions of mpmath.mpc numbers. 
+    Returns
+    -------
+    Mmn_matrix: mpmath.matrix
+        A matrix with nxn, where n= sqrt(list entries) shape.
+    '''
+    # convert all list entries to mpc
+    mmn_entries = [mpmath.mpmathify(each) for each in string_list]
+    # re-format into a matrix
+    Nv = int(mpmath.sqrt(len(string_list)))
+    Mmn_matrix = mpmath.matrix(Nv,Nv)
+    indices = [(row,col) for row in range(Nv) for col in range(Nv)] 
+    for (row, col), value in zip(indices, mmn_entries):
+        Mmn_matrix[row,col] = value
+    return Mmn_matrix
+
+def compute_Mmn_parallel(params):
+    '''
+    '''
+    params['ka'] = mpmath.fmul(params['k'], params['a'])
+    Nv = 12 + int(2*params['ka']/sin(params['alpha']))
+    M_matrix = mpmath.matrix(Nv,Nv)
+    params['R'] = mpmath.fdiv(params['a'], mpmath.sin(params['alpha']))
+    
+    
+    # create multiple paramsets with changing m,n
+    multi_paramsets = []
+    for i in range(Nv):
+        for j in range(Nv):
+            this_paramset = copy.deepcopy(params)
+            this_paramset['m'] = i
+            this_paramset['n'] = j
+            multi_paramsets.append(this_paramset)
+            
+    multi_paramset_str = [args_to_str(**each) for each in multi_paramsets]
+    num_cores = int(params.get('num_cores',-1))
+    M_mn_out = Parallel(n_jobs=num_cores, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
+    M_matrix = format_Mmn_to_matrix(M_mn_out)
+    return M_matrix
+
+#####
 
 def compute_b(params):
     '''
@@ -223,7 +295,7 @@ def relative_directionality_db(angle,k_v,R_v,alpha_v,An):
     rel_level = 20*mpmath.log10(abs(off_axis/on_axis))
     return rel_level
 
-def piston_in_sphere_directionality(angles, params):
+def piston_in_sphere_directionality(angles, params, parallel=False):
     '''
     Calculates relative directionality dB (D(theta)/D(0))
     of a piston in a rigid sphere.
@@ -243,7 +315,10 @@ def piston_in_sphere_directionality(angles, params):
                 Radius of sphere
             alpha: 0<mpmath.mpf<pi
                 Half-angular aperture of piston. 
-    
+            num_cores : 1>=int, optionals
+                The number of cores to be used for the Mmn matrix computation. 
+                Defaults to all cores if not specificed.
+
     Returns 
     -------
     directionality : list
@@ -260,8 +335,7 @@ def piston_in_sphere_directionality(angles, params):
         
     
     '''
-
-    Mmatrix = compute_Mmn(params)
+    Mmatrix = compute_Mmn_parallel(params)
     bmatrix = compute_b(params)
     amatrix = compute_a(Mmatrix, bmatrix)
     
@@ -280,7 +354,7 @@ if __name__ == '__main__':
     frequency = mpmath.mpf(50*10**3) # kHz
     vsound = mpmath.mpf(330) # m/s
     wavelength = vsound/frequency
-    alpha_value = mpmath.pi/4 # 60 degrees --> pi/3
+    alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
     k_value = 2*mpmath.pi/(wavelength)
     ka = mpmath.mpf(5)
     a_value = ka/k_value 
@@ -293,8 +367,17 @@ if __name__ == '__main__':
     
     angles = mpmath.linspace(0,mpmath.pi,100)
     beamshape = piston_in_sphere_directionality(angles, paramv)
+    #beamshape_nonpll = piston_in_sphere_directionality(angles, paramv, False)
+    
+    import pandas as pd
+    df = pd.read_csv('workshop/ka5_piston_in_sphere.csv')
+    
     plt.figure()
     a0 = plt.subplot(111, projection='polar')
-    plt.plot(angles, beamshape)
+    plt.plot(angles, beamshape, label='parallel')
+    #plt.plot(angles, beamshape_nonpll, label='serial')
     plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
     plt.xticks(np.arange(0,2*np.pi,np.pi/6))
+    # load digitised textbook data
+    
+    plt.plot(np.radians(df['angle_deg']), df['rel_db'], '*')
