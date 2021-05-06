@@ -1,38 +1,46 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
-TODO: 
-    
-    1. IMPLEMENT SOME SORT OF CACHING/MEMOIZATION to prevent recalculation of
-    old parameter values for M, b and  a matrices.
+Troubleshooting piston in a sphere
+==================================
+> For ka>3 the calculations show values that deviate from the 
+textbook groundtruth by 2-5 dB -- which is not ignorable!!
+> I suspected the problem may come from:
+    * low mpmath.mp.dps (decimal places) -- changing from 50-400 had no
+    effects, which is odd
+    * low N (matrix size/number of terms calculcated) -- changing from 
+    baseline of 12+f(ka) --> 15+f(ka) had no effect
+    * the directionality calculations were done with numpy pre 5th may, 
+    and then changed to mpmath backend --> no effect. 
 
-ISSUES:
-    1. ka>3 is not so great, even with dps of 300! Why? Does calculating 
-        more terms help, or is this an issue with the integration?
+> 2021-06-05: I now suspect the problem lies perhaps with the quadrature 
+terms. What if the quadrature is not 'accurate' enough? Here I'll test this idea
+    * Some points to support this idea. The default quadrature method behind
+    mpmath.quad is the 'tanh-sinh' algorithm. Instead of directly lambdifying 
+    the Imn term into a standard mpmath.quad function I 'manually' made a 
+    quadrature function for it to manipulate the options. 
+    * For dps 200. Using the default 'tanh-sinh' leads to an estimated error 
+    of e-203, while using 'gauss-legendre' leads to an estimated error of e-382. 
+    Perhaps this is where the error is arising from. I noticed the integration 
+    error increases with increasing m,n values. Perhaps this is why for bigger ka's, 
+    (ka>3), the predictions get messier than for small ka's? There is at least 
+    a connection here. 
 
-Code that calculates piston in a sphere. 
-This model is described in Chapter 12 of Beranek & Mellow 2012, 
-and parts of it are based on the Mathematica code provided by 
-Tim Mellow. 
+Results with Imn - gauss-legendre flavour
+-----------------------------------------
+
+* The Imn term is not really the issue -- HOWEVER, using gauss-legendre reduces
+run-time by 1/2!!, which is fantastic. 
 
 
-Parameters
-----------
-alpha : 0<float<pi
-    The 'gape'/'aperture' of the piston. The half-angle it occupies 
-    in radians. 
-k : float>0
-    Wavenumber, 2*pi/wavelength
-a : 
-
-
-
-References
-----------
-Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
-Academic Press.
+TO FOLLOW UP
+------------
+> The other point of errors is the Lm term. What about there, does the exact
+quadrature algorithm make a difference here? 
 
 """
+
+#%%
+
+
 import copy
 from gmpy2 import *
 from joblib import Parallel, delayed 
@@ -47,7 +55,7 @@ from sympy import  lambdify, integrate, expand,Integral
 from sympy import HadamardProduct as HP
 import tqdm
 x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r1 R theta,y,z')
-dps = 50;
+dps = 100;
 mpmath.mp.dps = dps
 
 from bat_beamshapes.special_functions import sph_hankel2
@@ -55,6 +63,7 @@ from bat_beamshapes.utilities import args_to_mpmath, args_to_str
 
 r1 = (R*cos(alpha))/cos(theta)
 
+mpmath.quad
 
 #%%
 # equation 12.106
@@ -70,8 +79,17 @@ whole_postterm = legendre(m,cos(theta))*(r1**2/R**2)*tan(theta)
 
 Imn_term = (Imn_pt1 + Imn_pt2)*whole_postterm 
 Imn = Integral(Imn_term,(theta,0,alpha))
-Imn_term_func = lambdify([m,n,k,R,alpha,theta], Imn_term, 'mpmath')
-Imn_func = lambdify([m,n,k,R,alpha],Imn,'mpmath') 
+Imn_term_func = lambdify([m,n,k,R,alpha, theta], Imn_term, 'mpmath')
+# Imn_func = lambdify([m,n,k,R,alpha],Imn,'mpmath') 
+
+def Imn_func(mv,nv,kv,Rv,alphav):
+    '''
+    eqn. 12.106
+    The 'gauss-legendre' quadrature method is used here as it provides 
+    more accurate output, even with increasing m&n indices. 
+    '''
+    return mpmath.quad(lambda thetav: Imn_term_func(mv,nv,kv,Rv,alphav, thetav),
+                       (0,alphav), method='gauss-legendre')
 
 
 
@@ -385,8 +403,8 @@ if __name__ == '__main__':
     
     
     import pandas as pd
-    df = pd.read_csv('workshop/ka5_piston_in_sphere.csv')
-    df2 = pd.read_csv('tests/piston_in_sphere_fig12-23.csv')
+    df = pd.read_csv('./ka5_piston_in_sphere.csv')
+    df2 = pd.read_csv('../tests/piston_in_sphere_fig12-23.csv')
     ka5 = df2[df2['ka']==ka_val]
     
     
@@ -417,8 +435,9 @@ if __name__ == '__main__':
     plt.plot(angles, beamshape,'-*',label='calculated') # calculated
     plt.plot(angles, beamshape-ka5['relonaxis_db'],'-*',label='error') # relative error
     plt.yticks(np.arange(-36,4,2))
-    plt.grid();plt.legend()
+    plt.grid();plt.legend();plt.title('gauss-legendre')
 # plt.savefig(f'ka{ka_val}_pistoninasphere_error.png')
+
     error = beamshape-ka5['relonaxis_db']
     median_error = np.median(np.abs(error))
     avg_error = np.mean(np.abs(error))
