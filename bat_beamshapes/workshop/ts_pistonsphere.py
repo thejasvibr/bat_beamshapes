@@ -31,11 +31,52 @@ Results with Imn - gauss-legendre flavour
 run-time by 1/2!!, which is fantastic. 
 
 
-TO FOLLOW UP
-------------
-> The other point of errors is the Lm term. What about there, does the exact
+Quadrture of the Lm term
+========================
+The other point of errors is the Lm term. What about there, does the exact
 quadrature algorithm make a difference here? 
 
+Here too, the choice of quadrature algorithm makes a difference. 'tanh-sinh' gives
+higher estimated error terms for any given dps.
+
+|Algorithm  | Error | dps   |
+|-----------|-------|-------|
+| tanh-sinh | e-74  | 250   |
+| tanh-sinh | e-304 | 300   |
+| gauss-leg.| e-76  | 250   |
+| gauss-leg.| e-316 | 300   |
+
+Broadly-speaking, the level of 'detail' (degree) that is applied during quadrature is proportional 
+to the binary/decimal precision set for the code. For whatever reason, I couldn't
+bring down the error term down by altering the 'maxdegree' argument of the 
+`mpmath.quad` function. Either way, for now the estimated error has been brought
+down. Hopefully this should do?
+
+
+Results with Lm term
+--------------------
+Apparently the prediction-calculation mismatch doesn't have to do with the Lm term's
+integration either!! The same errors appear. 
+
+
+Is it a `dps` related issue? (2021-05-07)
+=========================================
+
+
+| dps  | mismatch occurs? |
+|------|------------------|
+| 300  | yes              |
+| 500  | yes              |
+| 1000 | yes              | 
+
+
+The mismatch still occurs no matter the actual `dps` - which is odd. 
+The bottle-neck must thus be somewhere after the M and b matrix -- is it in 
+the `a` term? Perhaps the inverse being calculated is using a fast-but-dirty approach?
+
+Is it the calculation of the `a` matrix? 
+========================================
+Try lu_solve and qr_solve - one of them is more inaccurate than the other. 
 """
 
 #%%
@@ -49,13 +90,13 @@ from mpmath import mpf
 import numpy as np
 from symengine import * 
 import sympy
-from sympy import symbols, legendre, sin, cos, tan, summation,Sum, I, diff, pi, sqrt
-from sympy import Matrix, besselj, bessely, Piecewise
-from sympy import  lambdify, integrate, expand,Integral
+from sympy import symbols, legendre, sin, cos, tan, Sum, I, diff, pi, sqrt
+from sympy import Matrix, Piecewise
+from sympy import  lambdify, expand, Integral
 from sympy import HadamardProduct as HP
 import tqdm
 x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r1 R theta,y,z')
-dps = 100;
+dps = 1000;
 mpmath.mp.dps = dps
 
 from bat_beamshapes.special_functions import sph_hankel2
@@ -63,7 +104,6 @@ from bat_beamshapes.utilities import args_to_mpmath, args_to_str
 
 r1 = (R*cos(alpha))/cos(theta)
 
-mpmath.quad
 
 #%%
 # equation 12.106
@@ -119,14 +159,43 @@ Kmn_func = lambdify([m,n,alpha],Kmn,'mpmath')
 # equation 12.108
 Lm_expr = legendre(m,cos(theta))*(r1**2/R**2)*tan(theta)
 Lm = Integral(Lm_expr, (theta,0,alpha))
-Lm_func = lambdify([m, R, alpha], Lm, 'mpmath')
+#Lm_func = lambdify([m, R, alpha], Lm, 'mpmath')
+Lm_term = lambdify([m,R,alpha,theta], Lm_expr,'mpmath')
+
+import matplotlib.pyplot as plt
+mv = 5
+Rv = 0.1
+alphav = mpmath.pi/2.5
+angles = mpmath.linspace(0,alphav,100)
+# plt.figure()
+# plt.plot([ Lm_term(mv,Rv, alphav, each) for each in angles ])
+
+
+def Lm_func(mv,Rv,alphav):
+    '''
+    eqn. 12.106
+    The 'gauss-legendre' quadrature method is used here as it provides 
+    more accurate output, even with increasing m&n indices. 
+    '''
+    return mpmath.quad(lambda thetav: Lm_term(mv,Rv,alphav, thetav),
+                       (0,alphav),
+                       method='gauss-legendre')
+
+#print(Lm_func(mv, Rv, alphav))
 
 
 #%%
 # b matrix
 b = -I*Lm
-b_func = lambdify([m,alpha], b,'mpmath') # eqn. 12.104
+# b_func = lambdify([m,alpha], b,'mpmath') # eqn. 12.104
 
+# new b_func 
+def b_func(mv, Rv, alphav):
+    '''
+    b = -I*Lm
+    '''
+    Lm_value = Lm_func(mv,Rv,alphav) # Integral wrt theta
+    return -mpmath.j*Lm_value
 
 #%% 
 # Setting up the matrices 
@@ -249,8 +318,8 @@ def compute_b(params):
     '''
     Keyword Arguments
     -----------------
-    k
-    a 
+    m
+    R
     alpha
     
     Returns
@@ -268,7 +337,7 @@ def compute_b(params):
     Nv = calc_N(params) #12 + int(2*params['ka']/sin(params['alpha']))
     b_matrix = mpmath.matrix(Nv,1)
     for each_m in range(Nv):
-        b_matrix[each_m,:] = b_func(each_m, params['alpha'])
+        b_matrix[each_m,:] = b_func(each_m, params['R'], params['alpha'])
     return b_matrix 
 
 def compute_a(M_mat, b_mat):
