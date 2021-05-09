@@ -96,7 +96,14 @@ will switch it the the user's  preference
 Does changing the `N` help?
 =============================
 Changing the N equation from 12+2*() --> 12+3*() didn't change the plot much. 
-I'm wondering i'
+
+Does setting the D(theta) and D(0) to |D(theta)| and |D(0)| help?
+=================================================================
+In Tim Mellow's Mathematica code, the values are 'abs-ed' before 
+division'  --- NO DIFFERENCE!
+
+Try out mpmath.matrices.linalg -- improve_solution?
+===================================================
 
 """
 
@@ -154,7 +161,6 @@ def Imn_func(mv,nv,kv,Rv,alphav):
 
 
 
-
 #%%
 # equation 12.107
 Kmn_expr = legendre(n, cos(theta))*legendre(m, cos(theta))*sin(theta) # the integrl of this expression 
@@ -183,15 +189,6 @@ Lm = Integral(Lm_expr, (theta,0,alpha))
 #Lm_func = lambdify([m, R, alpha], Lm, 'mpmath')
 Lm_term = lambdify([m,R,alpha,theta], Lm_expr,'mpmath')
 
-#import matplotlib.pyplot as plt
-#mv = 5
-#Rv = 0.1
-#alphav = mpmath.pi/2.5
-#angles = mpmath.linspace(0,alphav,100)
-# plt.figure()
-# plt.plot([ Lm_term(mv,Rv, alphav, each) for each in angles ])
-
-
 def Lm_func(mv,Rv,alphav):
     '''
     eqn. 12.106
@@ -201,6 +198,14 @@ def Lm_func(mv,Rv,alphav):
     return mpmath.quad(lambda thetav: Lm_term(mv,Rv,alphav, thetav),
                        (0,alphav),
                        method='gauss-legendre')
+
+
+# what does the Lm term plot like? 
+# #%% 
+# lm_theta = lambda mv, thetav: Lm_term(mv, paramv['R'],paramv['alpha'], thetav)
+# thet = mpmath.linspace(0, paramv['alpha'],50)
+# plt.figure()
+# plt.plot(thet, [lm_theta(55, each) for each in thet])
 
 #%%
 # b matrix
@@ -224,48 +229,6 @@ mmn_hankels_func = lambdify([n,k,R], mmn_hankels,'mpmath')
 def calc_N(params):
     return int(12 + 2*params['ka']/sin(params['alpha']))
 
-def compute_Mmn(params):
-    '''
-    Obsolete function -- not in use -- here only for historical reference. 
-    See computer_Mmn_parallel
-    
-    Keyword Arguments
-    ----------
-    alpha : 0<mpmath/float<pi
-        half-aperture value in radians
-    k : mpmath/float>0
-        wavenumber
-    a : mpmath/float>0
-        Radius of piston 
-
-    Returns
-    -------
-    M_matrix: mpmath.matrix
-        NxN matrix with N defined by the heuristic formula
-        12 + 2*ka/sin(alpha)
-    
-    See Also
-    --------
-    compute_b
-    compute_a
-    '''
-    params['ka'] = mpmath.fmul(params['k'], params['a'])
-    Nv = calc_N(params)# 12 + int(2*params['ka']/sin(params['alpha']))
-    M_matrix = mpmath.matrix(Nv,Nv)
-    params['R'] = mpmath.fdiv(params['a'], mpmath.sin(params['alpha']))
-    
-    
-    for i in tqdm.trange(Nv):
-        for j in range(Nv):
-            params['m'],params['n'] = i,j
-            Imn_value = Imn_func(params['m'], params['n'],params['k'],
-                                 params['R'],params['alpha'])
-            Kmn_value = Kmn_func(params['m'],params['n'],params['alpha'])
-            numerator_hankels = mmn_hankels_func(j,params['k'],params['R'])
-            numerator = Imn_value+ numerator_hankels*Kmn_value
-            denom = 2*params['n']+1
-            M_matrix[params['m'],params['n']] = numerator/denom
-    return M_matrix
 
 ### parallel zone 
 def calc_one_Mmn_term(**params):
@@ -313,7 +276,6 @@ def compute_Mmn_parallel(params):
     Nv = calc_N(params)#12 + int(2*params['ka']/sin(params['alpha']))
     M_matrix = mpmath.matrix(Nv,Nv)
 
-    print(f'comp Mmn pll dps: {mpmath.mp.dps}')
     
     # create multiple paramsets with changing m,n
     multi_paramsets = []
@@ -351,7 +313,6 @@ def compute_b(params):
     compute_a
     
     '''
-    print(f'B solve dps:{mpmath.mp.dps} ')
     params['ka'] = mpmath.fmul(params['k'], params['a'])
     Nv = calc_N(params) #12 + int(2*params['ka']/sin(params['alpha']))
     b_matrix = mpmath.matrix(Nv,1)
@@ -378,9 +339,7 @@ def compute_a(M_mat, b_mat):
     compute_M
     compute_b
     '''
-    print(f'Pre solve dps:{mpmath.mp.dps} ')
     a_matrix = mpmath.lu_solve(M_mat, b_mat)
-    print(f'Post solve dps:{mpmath.mp.dps} ')
     return a_matrix
 #%%
 def d_theta(angle,k_v,R_v,alpha_v,An):
@@ -397,7 +356,7 @@ def d_theta(angle,k_v,R_v,alpha_v,An):
     #part2 = np.sum(np.apply_along_axis(lambda X: X[0]*X[1]*X[2], 1, part2_matrix))
     part2 = sum(part2_matrix)
     rel_level = lambdify([], -part1*part2, 'mpmath')
-    return rel_level()
+    return abs(rel_level())
 
 def d_zero(k_v,R_v,alpha_v,An):
     num = 4 
@@ -407,7 +366,7 @@ def d_zero(k_v,R_v,alpha_v,An):
     jn_matrix = mpmath.matrix([I**f for f in range(N_v)])
     part2 = sum(HP(An, jn_matrix).doit())
     rel_level = lambdify([], -part1*part2, 'mpmath')
-    return rel_level()
+    return abs(rel_level())
 
 def relative_directionality_db(angle,k_v,R_v,alpha_v,An):
     off_axis = d_theta(angle,k_v,R_v,alpha_v,An)
@@ -456,7 +415,6 @@ def piston_in_sphere_directionality(angles, params, parallel=False):
     
     '''
     Mmatrix = compute_Mmn_parallel(params)
-    print(f'post Mmat dps: {mpmath.mp.dps}')
     bmatrix = compute_b(params)
     amatrix = compute_a(Mmatrix, bmatrix)
     
@@ -479,7 +437,7 @@ if __name__ == '__main__':
     wavelength = vsound/frequency
     alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
     k_value = 2*mpmath.pi/(wavelength)
-    ka_val = 5
+    ka_val = 3
     print(f'Starting piston in sphere for ka={ka_val}')
     ka = mpmath.mpf(ka_val)
     a_value = ka/k_value 
@@ -521,6 +479,7 @@ if __name__ == '__main__':
     # load digitised textbook data
     plt.plot(angles, ka5['relonaxis_db'], '*', label='actual')
     plt.savefig(f'ka{ka_val}_pistoninasphere.png')
+    plt.legend()
     # Also compare the error between prediction and textbook values
     
     plt.figure()
@@ -537,12 +496,18 @@ if __name__ == '__main__':
     max_error = np.max(np.float32(np.abs(error)))
     print(median_error, max_error)
     
-# # %% 
-#     an_candidate = mpmath.lu_solve(Mmn,bm)
-#     res_mat = mpmath.residual(Mmn, an_candidate, bm)
-#     res = mpmath.norm(res_mat)
-#     print(res)
 
-# # %%     
-#     an_candidate, res = mpmath.qr_solve(Mmn,bm)
-#     print(res)
+# %% 
+    an_candidate = mpmath.lu_solve(Mmn,bm)
+    res_mat = mpmath.residual(Mmn, an_candidate, bm)
+    res = mpmath.norm(res_mat)
+    print(res)
+
+# %%     
+    an_candidate, res = mpmath.qr_solve(Mmn,bm)
+    print(res)
+#%% 
+    an_candidate = mpmath.inverse(Mmn)*bm
+    res_mat = mpmath.residual(Mmn, an_candidate, bm)
+    res = mpmath.norm(res_mat)
+    print(res)
