@@ -74,6 +74,24 @@ I'm realising there is some effect of *N*, the number of terms used to get the b
 While the overall effect of increasing N for ka=3 is weak (an decrease of ~0.2 dB max|error|,
 and decrease of 0.7 dB of mean|error|), the LUsolve residuals dramatically increase 2-3 orders. 
 
-This tells me there may be issues with the numerical integration in general. Perhaps the numerical integration gets more messy with 
+This tells me there may be issues with the numerical integration in general. Perhaps the numerical integration gets more messy with N terms.
+
+
+Also -- WHAT ABOUT (PY)-FLINT. Check out  this [page](https://fredrikj.net/blog/2018/11/announcing-python-flint-0-2/), and this [one](https://fredrikj.net/python-flint/index.html)?
+
+
+Issues faced while installing Flint
+> first need to install MPIR. Downloaded source from Github.
+    * the ```./configure``` command didn't work because the previous steps weren't complete -- needed to run ```autoreconf -i``` and then the ./configure 
+> Also don't forget you have to install GMP+ MPFR too. 
+
+One thing I realised is the installation flow for 'source' installations is 
+> ./configure
+> make 
+> make check 
+> make install --> this step typically needs permissions, and so `sudo make install` with 
+the password prompt is what is actually needed. 
+
+
 
 
