@@ -529,7 +529,7 @@ if __name__ == '__main__':
     #%%
     
     
-    mpmath.mp.dps = 100
+    mpmath.mp.dps = 150
 
     angles = mpmath.matrix(np.radians(ka5['angle_deg'])) #mpmath.linspace(0,mpmath.pi,100)
     An, Mmn, bm = piston_in_sphere_directionality(angles, paramv)
@@ -580,18 +580,18 @@ if __name__ == '__main__':
 # %%
     plt.figure()
     a0 = plt.subplot(111, projection='polar')
-    plt.plot(angles, beamshape, '-*',label='calculated')
+    plt.plot(angles, beamshape, '*',label='calculated')
     #plt.plot(angles, beamshape_nonpll, label='serial')
     plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
     plt.xticks(np.arange(0,2*np.pi,np.pi/6))
     # load digitised textbook data
-    plt.plot(angles, ka5['relonaxis_db'], '*', label='actual')
+    plt.plot(angles, ka5['relonaxis_db'], 'g^', label='actual')
     plt.savefig(f'ka{ka_val}_pistoninasphere.png')
     plt.legend()
     # Also compare the error between prediction and textbook values
-    
+#%%
     plt.figure()
-    plt.plot(np.degrees(np.float32(angles)), ka5['relonaxis_db'],'-',label='ground truth') # textbook
+    plt.plot(np.degrees(np.float32(angles)), ka5['relonaxis_db'],'*',label='ground truth') # textbook
     plt.plot(np.degrees(np.float32(angles)), beamshape,'-*',label='calculated') # calculated
     plt.plot(np.degrees(np.float32(angles)), beamshape-ka5['relonaxis_db'],'-*',label='error') # relative error
     plt.yticks(np.arange(-36,4,2))
