@@ -92,6 +92,16 @@ One thing I realised is the installation flow for 'source' installations is
 > make install --> this step typically needs permissions, and so `sudo make install` with 
 the password prompt is what is actually needed. 
 
+Installing python-flint with ```pip``` failed. Installing python-flint from Git source failed. Installing with Conda -- This worked!!! 
+
+### What it's like to use py-flint
+
+> Incredibly fast !!! eg. show the example of the Lm integral (eqn. 12.018) for a dps=500, it happens nearly instantaneously in py-flint, while with mpmath it takes 10's of seconds. 
+
+16:21 - I'm getting different values for P'm(cos(alpha)) between my Flint implementation using eqn. 12.98 and the native legendre_p(n,z).diff(z) version from sympy. 
+
+16:44 -- and that's because there's a typo in eqn. 12.98 --> it should be sin(theta)^2 instead of sin(theta)
+
 
 
 
