@@ -59,7 +59,7 @@ Apparently the prediction-calculation mismatch doesn't have to do with the Lm te
 integration either!! The same errors appear. 
 
 
-Is it a `dps` related issue? (2021-05-07)
+Is it a `dps` related issue? (2021-05-07 and 2021-05-10)
 =========================================
 
 
@@ -93,9 +93,6 @@ Setting the dps once more to 100-300 in the '__main__' part of the module
 will switch it the the user's  preference
 
 
-Does changing the `N` help?
-=============================
-Changing the N equation from 12+2*() --> 12+3*() didn't change the plot much. 
 
 Does setting the D(theta) and D(0) to |D(theta)| and |D(0)| help?
 =================================================================
@@ -104,6 +101,23 @@ division'  --- NO DIFFERENCE!
 
 Try out mpmath.matrices.linalg -- improve_solution?
 ===================================================
+importing improve_solution isn't so straightforward, perhaps on purpose. 
+Needed to check the tests to see hwo to import it. 
+
+>>> from mpmath import *
+>>> new_an = mp.improve_solution(Mmn, An, bm, maxsteps=10)
+
+but, the `new_an` had the same residual as the old An, and the function 
+didn't make any difference.
+
+Does changing the `N` help?
+=============================
+Changing the N equation from 12+2*() --> 12+3*() didn't change the plot much. 
+
+There is some relation, and hopefully this will lead me to the source of the 
+error. 
+
+| ka  | Mean(|error|), dB | Max(error), dB| An residual | 0
 
 """
 
@@ -150,6 +164,7 @@ Imn = Integral(Imn_term,(theta,0,alpha))
 Imn_term_func = lambdify([m,n,k,R,alpha, theta], Imn_term, 'mpmath')
 # Imn_func = lambdify([m,n,k,R,alpha],Imn,'mpmath') 
 
+#%%
 def Imn_func(mv,nv,kv,Rv,alphav):
     '''
     eqn. 12.106
@@ -157,9 +172,29 @@ def Imn_func(mv,nv,kv,Rv,alphav):
     more accurate output, even with increasing m&n indices. 
     '''
     return mpmath.quad(lambda thetav: Imn_term_func(mv,nv,kv,Rv,alphav, thetav),
-                       (0,alphav), method='gauss-legendre')
+                       (0,alphav),
+                       method='gauss-legendre')
+
+# mpmath.mp.dps = 300
+# errors = []
+# nns =  [1,5,50]
+# for eachm in tqdm.tqdm(nns):
+#     for eachn in nns:
+#         out, err= Imn_func(eachm,eachn, paramv['k'],paramv['R'],paramv['alpha'])
+#         errors.append(err)
+# print(errors)
+
+# angles = mpmath.linspace(0, paramv['alpha'],100)
+# imn_vals = [ (Imn_term_func(20,5,paramv['k'],paramv['R'],paramv['alpha'],ang)) for ang in angles]
+
+# plt.figure()
+# plt.plot(np.degrees(np.float32(angles)), [each.real for each in imn_vals], label='real')
+# plt.plot(np.degrees(np.float32(angles)), [each.imag for each in imn_vals], label='imag')
+# plt.legend()
 
 
+#%% 
+    
 
 #%%
 # equation 12.107
@@ -172,12 +207,15 @@ num_legendre_term2 = legendre(n,cos(alpha))*legendre_1stderiv.subs({'n':m,'z':co
 eqn70_mnoteqn = sin(alpha)*(num_legendre_term1-num_legendre_term2)/(m*(m+1)-n*(n+1))
 
 # when m==n
+# substituting 'j' for 'index' 
+# because j is also used for sqrt(-1) all through the book!!
 summn_funcn = legendre(index,cos(alpha))*(legendre(index,cos(alpha))*cos(alpha)-legendre(index+1,cos(alpha)))
-# substituting 'j' for 'index' because j is also used for sqrt(-1) all through the book!!
 
 meqn_sumterm = 2*Sum(summn_funcn, (index,1,m-1))
 eqn70_meqn = (1+ cos(alpha)*legendre(m,cos(alpha))**2 + meqn_sumterm)/(2*m+1)
-Kmn = Piecewise((eqn70_mnoteqn,m>n),(eqn70_mnoteqn,m<n), (eqn70_meqn,True), )
+Kmn = Piecewise((eqn70_mnoteqn,m>n),
+                (eqn70_mnoteqn,m<n),
+                (eqn70_meqn,True), )
 Kmn_func = lambdify([m,n,alpha],Kmn,'mpmath')
 
 
@@ -196,16 +234,23 @@ def Lm_func(mv,Rv,alphav):
     more accurate output, even with increasing m&n indices. 
     '''
     return mpmath.quad(lambda thetav: Lm_term(mv,Rv,alphav, thetav),
-                       (0,alphav),
+                       mpmath.linspace(0,alphav,2),
                        method='gauss-legendre')
 
 
-# what does the Lm term plot like? 
+# mpmath.mp.dps = 300
+# errors = []
+# nns =  [1,5,50]
+# for eachm in nns:
+#     out, err= Lm_func(eachm,0.01,mpmath.pi/3)
+#     errors.append(err)
+# print(errors)
+# # what does the Lm term plot like? 
 # #%% 
 # lm_theta = lambda mv, thetav: Lm_term(mv, paramv['R'],paramv['alpha'], thetav)
-# thet = mpmath.linspace(0, paramv['alpha'],50)
+# thet = mpmath.linspace(0, mpmath.pi/3,50)
 # plt.figure()
-# plt.plot(thet, [lm_theta(55, each) for each in thet])
+# plt.plot(np.degrees(np.float32(thet)), [lm_theta(25, each) for each in thet])
 
 #%%
 # b matrix
@@ -227,8 +272,20 @@ mmn_hankels = n*sph_hankel2.subs({'n':n-1,'z':k*R})-(n+1)*sph_hankel2.subs({'n':
 mmn_hankels_func = lambdify([n,k,R], mmn_hankels,'mpmath')
 
 def calc_N(params):
-    return int(12 + 2*params['ka']/sin(params['alpha']))
-
+    '''
+    Decides the number of terms to run calculations for. 
+    
+    Keyword Arguments
+    -----------------
+    trend : 
+    
+    Returns 
+    -------
+    num_N : int
+    
+    '''
+    num_N = params.get('trend', int(12+2*params['ka']/sin(params['alpha'])))
+    return num_N
 
 ### parallel zone 
 def calc_one_Mmn_term(**params):
@@ -347,19 +404,16 @@ def d_theta(angle,k_v,R_v,alpha_v,An):
     N_v = An.rows
     denom  = (k_v**2)*(R_v**2)*mpmath.sin(alpha_v)**2
     part1 = num/denom
-    #jn_matrix = np.array([1j**f for f in range(N_v)])
     jn_matrix = mpmath.matrix([I**f for f in range(N_v)])
     legendre_matrix = mpmath.matrix([legendre(n_v, mpmath.cos(angle)) for n_v in range(N_v)])
-    #part2_matrix = np.column_stack((An, jn_matrix, legendre_matrix))
     Anjn = HP(An,jn_matrix).doit()
     part2_matrix = HP(Anjn,legendre_matrix).doit() 
-    #part2 = np.sum(np.apply_along_axis(lambda X: X[0]*X[1]*X[2], 1, part2_matrix))
     part2 = sum(part2_matrix)
     rel_level = lambdify([], -part1*part2, 'mpmath')
     return abs(rel_level())
 
 def d_zero(k_v,R_v,alpha_v,An):
-    num = 4 
+    num = 4
     N_v = An.rows
     denom  = (k_v**2)*(R_v**2)*mpmath.sin(alpha_v)**2
     part1 = num/denom
@@ -374,7 +428,7 @@ def relative_directionality_db(angle,k_v,R_v,alpha_v,An):
     rel_level = 20*mpmath.log10(abs(off_axis/on_axis))
     return rel_level
 
-def piston_in_sphere_directionality(angles, params, parallel=False):
+def piston_in_sphere_directionality(angles, params):
     '''
     Calculates relative directionality dB (D(theta)/D(0))
     of a piston in a rigid sphere.
@@ -394,14 +448,14 @@ def piston_in_sphere_directionality(angles, params, parallel=False):
                 Radius of sphere
             alpha: 0<mpmath.mpf<pi
                 Half-angular aperture of piston. 
-            num_cores : 1>=int, optionals
+            num_cores : int, optional
                 The number of cores to be used for the Mmn matrix computation. 
-                Defaults to all cores if not specificed.
+                Defaults to using all cores.
 
     Returns 
     -------
     directionality : list
-        List with relative directionalities in 20log10 dB. 
+        List with relative directionalities in  dB. 
         The number of items is equal to the number of angles.
 
     Notes
@@ -430,14 +484,15 @@ def piston_in_sphere_directionality(angles, params, parallel=False):
     return amatrix, Mmatrix, bmatrix
 
 if __name__ == '__main__':
+    #%% 
     import matplotlib.pyplot as plt
     mpmath.mp.dps = 100
-    frequency = mpmath.mpf(50*10**3) # kHz
+    frequency = mpmath.mpf(25*10**3) # kHz
     vsound = mpmath.mpf(330) # m/s
     wavelength = vsound/frequency
     alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
     k_value = 2*mpmath.pi/(wavelength)
-    ka_val = 3
+    ka_val = 5
     print(f'Starting piston in sphere for ka={ka_val}')
     ka = mpmath.mpf(ka_val)
     a_value = ka/k_value 
@@ -447,6 +502,8 @@ if __name__ == '__main__':
     paramv['alpha'] = alpha_value
     paramv['k'] = k_value
     paramv['a'] = a_value
+    paramv['trend'] = int(10+2*paramv['k']*paramv['a']/mpmath.sin(paramv['alpha']))
+    
 
     
     
@@ -455,59 +512,87 @@ if __name__ == '__main__':
     df2 = pd.read_csv('../tests/piston_in_sphere_fig12-23.csv')
     ka5 = df2[df2['ka']==ka_val]
     
+    #%%
+    #int(5+2*paramv['k']*paramv['a']/mpmath.sin(paramv['alpha'])),
+    #int(10+2*paramv['k']*paramv['a']/mpmath.sin(paramv['alpha'])),
+    #int(20+2*paramv['k']*paramv['a']/mpmath.sin(paramv['alpha']))
     
-    angles = mpmath.matrix(np.radians(ka5['angle_deg'])) #mpmath.linspace(0,mpmath.pi,100)
-# angles = mpmath.linspace(0,mpmath.pi, 10)
-    An, Mmn, bm = piston_in_sphere_directionality(angles, paramv)
-    # beamshape_nonpll = piston_in_sphere_directionality(angles, paramv, False)
-    directionality = []
-    dzero_value = d_zero(paramv['k'],paramv['R'],
-                              paramv['alpha'], An)
-    dtheta_values = []
-    for angle_v in angles:
-        dtheta_values.append(d_theta(angle_v, paramv['k'],paramv['R'],
-                                          paramv['alpha'], An))
     
-    beamshape = [20*mpmath.log10(abs(each/dzero_value)) for each in dtheta_values]
-# %%
-    plt.figure()
-    a0 = plt.subplot(111, projection='polar')
-    plt.plot(angles, beamshape, '-*',label='calculated')
-    #plt.plot(angles, beamshape_nonpll, label='serial')
-    plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
-    plt.xticks(np.arange(0,2*np.pi,np.pi/6))
-    # load digitised textbook data
-    plt.plot(angles, ka5['relonaxis_db'], '*', label='actual')
-    plt.savefig(f'ka{ka_val}_pistoninasphere.png')
-    plt.legend()
-    # Also compare the error between prediction and textbook values
+    for decimalprec in [50, 100, 200]:
+        for Ntrend in [11,16,26]:
+                                                               
+            paramv['trend'] = Ntrend
     
-    plt.figure()
-    plt.plot(np.degrees(np.float32(angles)), ka5['relonaxis_db'],'-',label='ground truth') # textbook
-    plt.plot(np.degrees(np.float32(angles)), beamshape,'-*',label='calculated') # calculated
-    plt.plot(np.degrees(np.float32(angles)), beamshape-ka5['relonaxis_db'],'-*',label='error') # relative error
-    plt.yticks(np.arange(-36,4,2))
-    plt.grid();plt.legend();plt.title('gauss-legendre')
-# plt.savefig(f'ka{ka_val}_pistoninasphere_error.png')
-# %%
-    error = beamshape-ka5['relonaxis_db']
-    median_error = np.float(np.median(np.abs(error)))
-    avg_error = np.mean(np.abs(error))
-    max_error = np.max(np.float32(np.abs(error)))
-    print(median_error, max_error)
+            mpmath.mp.dps = decimalprec
     
+            angles = mpmath.matrix(np.radians(ka5['angle_deg'])) #mpmath.linspace(0,mpmath.pi,100)
+            An, Mmn, bm = piston_in_sphere_directionality(angles, paramv)
+            directionality = []
+            dzero_value = d_zero(paramv['k'],paramv['R'],
+                                      paramv['alpha'], An)
+            dtheta_values = []
+            for angle_v in angles:
+                dtheta_values.append(d_theta(angle_v, paramv['k'],paramv['R'],
+                                                  paramv['alpha'], An))
+            
+            beamshape = [20*mpmath.log10(abs(each/dzero_value)) for each in dtheta_values]
 
-# %% 
-    an_candidate = mpmath.lu_solve(Mmn,bm)
-    res_mat = mpmath.residual(Mmn, an_candidate, bm)
-    res = mpmath.norm(res_mat)
-    print(res)
+            beamshape_df = pd.DataFrame(data={'deg':np.degrees(np.float32(angles)),
+                                              'd0dthet':np.float32(beamshape)})
+        
+
+            error = beamshape-ka5['relonaxis_db']
+            mean_error = np.float(np.mean(np.abs(error)))
+            max_error = np.max(np.float32(np.abs(error)))
+            matrixsolve_error = mpmath.norm(mpmath.residual(Mmn, An, bm))
+            
+            print(f'Decimal precision: {decimalprec} \n Ntrend: {Ntrend}')
+            print(f'Matrix solve error : {matrixsolve_error }')
+            print(f'Mean abs error: {mean_error}, max error: {max_error}\n')
+            
+
+# # %% 
+#     an_candidate = mpmath.lu_solve(Mmn,bm)
+#     res_mat = mpmath.residual(Mmn, an_candidate, bm)
+#     res = mpmath.norm(res_mat)
+#     print(f'matrix error is: {np.float64(res)}')
 
 # %%     
-    an_candidate, res = mpmath.qr_solve(Mmn,bm)
-    print(res)
-#%% 
-    an_candidate = mpmath.inverse(Mmn)*bm
-    res_mat = mpmath.residual(Mmn, an_candidate, bm)
-    res = mpmath.norm(res_mat)
-    print(res)
+    # an_candidate, res = mpmath.qr_solve(Mmn,bm)
+    # print(res)
+# #%% 
+#     an_candidate = mpmath.inverse(Mmn)*bm
+#     res_mat = mpmath.residual(Mmn, an_candidate, bm)
+#     res = mpmath.norm(res_mat)
+#     print(res)
+# # %% Improving the solution iteratively 
+    # from mpmath import *
+    # new_Ax = mp.improve_solution(Mmn, An, bm, maxsteps=3)
+    # new_res = mpmath.norm(mpmath.residual(Mmn, new_Ax, bm))
+    # print(new_res)
+
+# # %%
+#     plt.figure()
+#     a0 = plt.subplot(111, projection='polar')
+#     plt.plot(angles, beamshape, '-*',label='calculated')
+#     #plt.plot(angles, beamshape_nonpll, label='serial')
+#     plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
+#     plt.xticks(np.arange(0,2*np.pi,np.pi/6))
+#     # load digitised textbook data
+#     plt.plot(angles, ka5['relonaxis_db'], '*', label='actual')
+#     plt.savefig(f'ka{ka_val}_pistoninasphere.png')
+#     plt.legend()
+#     # Also compare the error between prediction and textbook values
+    
+#     plt.figure()
+#     plt.plot(np.degrees(np.float32(angles)), ka5['relonaxis_db'],'-',label='ground truth') # textbook
+#     plt.plot(np.degrees(np.float32(angles)), beamshape,'-*',label='calculated') # calculated
+#     plt.plot(np.degrees(np.float32(angles)), beamshape-ka5['relonaxis_db'],'-*',label='error') # relative error
+#     plt.yticks(np.arange(-36,4,2))
+#     plt.grid();plt.legend();plt.title('gauss-legendre')
+# # plt.savefig(f'ka{ka_val}_pistoninasphere_error.png')
+
+#     plt.figure()
+#     a0 = plt.subplot(111, projection='polar')
+#     plt.plot(np.float32(angles), beamshape-ka5['relonaxis_db'])
+

@@ -42,7 +42,7 @@ textbook groundtruth by 2-5 dB -- which is not ignorable!!
     * the directionality calculations were done with numpy pre 5th may, 
     and then changed to mpmath backend --> no effect. 
 
-> 2021-06-05: I now suspect the problem lies perhaps with the quadrature 
+> 2021-05-65: I now suspect the problem lies perhaps with the quadrature 
 terms. What if the quadrature is not 'accurate' enough? Here I'll test this idea
     * Some points to support this idea. The default quadrature method behind
     mpmath.quad is the 'tanh-sinh' algorithm. Instead of directly lambdifying 
@@ -60,5 +60,20 @@ The exact quadrature algorithm used seems to play a big difference.
 *The Imn term quadrature algorithm is NOT the problem* -- though choosing gauss-legendre
 reduced execution time by 1/2!!!!
 
-s
+2021-05-06: Despite troubleshooting for so long on the piston in a sphere, I"m not having any luck understanding where the issue is coming from. 
+
+At this point I have two options:
+* stick with the piston in a sphere, but run all calculations with ka <= 3 
+OR
+* continue to troubleshoot with SAGE. 
+* The challenge here is basically that 
+
+
+2021-05-12:
+I'm realising there is some effect of *N*, the number of terms used to get the beamshape. 
+While the overall effect of increasing N for ka=3 is weak (an decrease of ~0.2 dB max|error|,
+and decrease of 0.7 dB of mean|error|), the LUsolve residuals dramatically increase 2-3 orders. 
+
+This tells me there may be issues with the numerical integration in general. Perhaps the numerical integration gets more messy with 
+
 
