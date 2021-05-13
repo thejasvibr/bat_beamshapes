@@ -5,6 +5,7 @@ Oscillating cap of a sphere
 """
 
 import mpmath
+mpmath.mp.dps = 50
 from mpmath import sin 
 import numpy as np 
 import pandas as pd
@@ -42,4 +43,10 @@ plt.plot(np.radians(df['deg']), df['rel_db_0deg'],'*',
          label='Beranek & Mellow 2012') 
 # Data digitised from figure 12.17 using WebPlotDigitizer (Ankit Rohatgi)
 plt.legend()
-    
+plt.savefig(f'capsphere_ka-{np.round(float(ka),2)}_dps={mpmath.mp.dps}.png')
+
+
+#%%
+#.. image:: ../_static/capsphere_ka-10.0_dps=50.png
+#  :width: 400
+#  :alt: cap of a sphere

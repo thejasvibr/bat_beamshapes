@@ -1,19 +1,34 @@
 '''
 Re-working of piston in a sphere using python-Flint
+The model is implemented from Beranek & Mellow 2012 Chp. 12. Equation numer
 
-It seemed like there might be an issue with the numerical routines in 
-mpmath - and so this is trying to see if there's a chance this package
-can overcome the problems
+See Fig. 12.22 in Beranek & Mellow 2012 to place the parameters in context.
 
-The model is implemented from Beranek & Mellow 2012 Chp. 12
-All equations refer to those there.
+Parameters
+----------
+    k : wavenumber (2pi/wavelength)
+    a : radius of piston 
+    alpha : half-angle of piston in radians
+    R : radius of sphere 
+
+Attention
+---------
+Please check to make sure that a= Rsin(alpha). The code does not verify this 
+at all - and takes in all user input straight as it is. 
+
+References
+----------
+Beranek & Mellow 2012, Acoustics: Sound Fields and Transducers, Academic Press
 
 '''
 #%%
+
+from joblib import Parallel, delayed
 import flint 
 from flint import ctx
 import tqdm
-ctx.dps = 150
+from flint_parallelisation import conv_acb_to_str, conv_str_acb, interchange_params_and_str
+ctx.dps = 100
 cos = flint.acb.cos
 sin = flint.acb.sin
 tan = flint.acb.tan
@@ -23,6 +38,15 @@ acb = flint.acb
 acb_mat = flint.acb_mat
 good = flint.good
 integral = flint.acb.integral
+
+#%% 
+
+def conv_acb_to_int(X):
+    try:
+        int_out = int(float(X.abs_upper()))
+    except:
+        int_out = int(float(str(X.abs_upper())))
+    return int_out
 
 #%%
 ## !! ATTENTION -- the FLINT legendre has diff conventions than the 
@@ -44,6 +68,12 @@ def pprime_cosalpha(n, alpha):
     denominator = (1+2*n)*(-sin(alpha)**2)
     return -numerator/denominator
 
+#%% Calculating N -  using the formula from T. Mellow's code.
+def calc_defaultNN(param):
+    ka = param['k']*param['a']
+    return conv_acb_to_int(12+2*ka/sin(param['alpha']))
+
+
 #%%
 r1 = lambda theta,alpha,R : R*cos(alpha)/cos(theta) 
 
@@ -57,7 +87,7 @@ def Lm_func(mv, alphav):
     only_theta_lm = lambda theta, a : legendre_p(mv, cos(theta))*((cos(alphav)/cos(theta))**2)*tan(theta)
     return integral(only_theta_lm, acb(0.0), alphav)
 
-# %% eqn 12.107 solution for the Kmn integral 
+# %% eqn 12.107 solution for the Kmn integral - See eqn. 70 in Appendix II
 def m_noteq_n(alpha,m,n):
     term1 = legendre_p(m,cos(alpha))*pprime_cosalpha(n, alpha)
     term2 = legendre_p(n, cos(alpha))*pprime_cosalpha(m, alpha)
@@ -86,7 +116,7 @@ def kmn_func(alpha,m,n):
         output = m_eq_n(alpha, m, n)
     return output
 
-#%% eqn. 12.06
+#%% eqn. 12.106
 alternate_hankels = lambda n,kr1 : n*sph_hankel2(n-1, kr1) - (n+1)*sph_hankel2(n+1, kr1)
 
 
@@ -115,17 +145,22 @@ def calc_one_Mmn_term(param):
     denominator = 2*n + 1 
     return numerator/denominator
 
-#%%
-def conv_acb_to_int(X):
-    try:
-        int_out = int(float(X.abs_upper()))
-    except:
-        int_out = int(float(str(X.abs_upper())))
-    return int_out
+def calc_one_Mmn_term_pll(param):
+    '''
+    Wrapper to calculate one Mmn term in a parallel loop
+    '''
+    # convert from string to acb
+    param_acb = interchange_params_and_str(param, to_str=False)
+    # obtain output
+    one_Mmn_term = calc_one_Mmn_term(param_acb)
+    # convert back to string
+    one_Mmn_term_str = conv_acb_to_str(one_Mmn_term)
+    return one_Mmn_term_str
 
+
+#%%
 def make_Mmn(param):
-    ka = params['k']*params['a']
-    NN = param.get('NN', conv_acb_to_int(12+2*ka/sin(param['alpha'])))
+    NN = param.get('NN', calc_defaultNN(param))
     Mmn_matrix = acb_mat(NN,NN)
     for mm in tqdm.trange(NN):
         for nn in range(NN):
@@ -133,11 +168,39 @@ def make_Mmn(param):
             param['n'] = nn
             Mmn_matrix[mm,nn] = calc_one_Mmn_term(param)
     return Mmn_matrix
+
+def make_Mmn_pll(param):
+    '''
+    Parallel version of make_Mmn
+    '''
+    NN = param.get('NN', calc_defaultNN(param))
+    Mmn_matrix = acb_mat(NN,NN)
+    n_cores = param.get('n_cores', -1)
+    
+    Mmn_as_str = []
+    params_as_str = {}
+    
+    for mm in range(NN):
+        for nn in range(NN):
+            param['m'] = acb(mm)
+            param['n'] = acb(nn)
+            params_as_str[(mm,nn)] = interchange_params_and_str(param,
+                                                                to_str=True)
+   
+    # run parallel calc
+    Mmn_as_str = Parallel(n_jobs=n_cores, backend='multiprocessing')(delayed(calc_one_Mmn_term_pll)(paramset)   for position, paramset in tqdm.tqdm(params_as_str.items()))
+    Mmn_acb = [conv_str_acb(each) for each in Mmn_as_str]
+    
+    entry_num = 0
+    for rowpos in range(NN):
+        for colpos in range(NN):
+            Mmn_matrix[rowpos,colpos] = Mmn_acb[entry_num]
+            entry_num += 1 
+    return Mmn_matrix
 #%%
 
 def make_bm(param):
-    ka = params['k']*params['a']
-    NN = param.get('NN', conv_acb_to_int(12+2*ka/sin(param['alpha'])))
+    NN = param.get('NN', calc_defaultNN(param))
     bm_mat = acb_mat(NN,1)
     
     alpha = param['alpha']
@@ -184,10 +247,43 @@ def directionality(thetas, An, param):
         ratios.append(ratio)
     return ratios
 
+def piston_in_sphere_directionality(thetas, param,**kwargs):
+    '''
+
+    Parameters
+    ----------
+    thetas : list with acb entries
+        List with angles in radians.
+    param : dictionary
+        See 'parameters' in module description above.
+    
+    Keyword Arguments
+    -----------------
+    An : optional, acb_mat
+        A complex matrix from a previous calculation. 
+        Using this saves time for repeated use. 
+
+    Returns
+    -------
+    An : acb_mat
+        The 'An' term required for calculating directionalities.
+    dB_directionality : np.array
+        Array with 20log10(on-axis/off-axis) values. 
+    '''
+    An = kwargs.get('An', None)
+    if An is None:
+        mmn_mat  = make_Mmn_pll(param)
+        b_mat = make_bm(param)
+        An = mmn_mat.solve(b_mat)
+    
+    ratios = directionality(thetas, An, param)
+    dB_directionality = 20*np.log10(np.float32(ratios))
+    return An, dB_directionality
+
 #%%
 if __name__ == '__main__':
     import numpy as np 
-    ka = acb(0.1)
+    ka = acb(1)
     kv = 2*pi/(330.0/50000.0)
     av = ka/kv
     alphav = pi/3
@@ -197,9 +293,10 @@ if __name__ == '__main__':
               'alpha': alphav,
               'R': Rv}
     print(f'The DPS is: {ctx.dps}')
-    mmn_mat = make_Mmn(params)
-    b_mat = make_bm(params)
-    an = mmn_mat.solve(b_mat)
-    #%%
-    ratios = directionality([pi*0, pi/6,pi/4, pi/2, pi], an, params)
-    dbratios = 20*np.log10(np.float32(ratios))
+    #mmn_mat = make_Mmn(params)
+    angles = [pi*0, pi/6, pi/4, pi/2, pi]
+    an, dbdirn = piston_in_sphere_directionality(angles, params)
+    
+    print(dbdirn)
+    # %% 
+    _, dbdirn2 = piston_in_sphere_directionality(angles, params, An=an)

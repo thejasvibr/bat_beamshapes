@@ -136,7 +136,7 @@ def cap_in_sphere_directionality(angles, params):
     hasn't been checked this numerically. It seems like it should work though.
     
     '''
-    if params['alpha'] >= mpmath.pi:
+    if params['alpha'] >= mpmath.pi/2.0:
         warnings.warn('The validity of this function for alpha>= pi/2 has not \
                       been checked. Proceed with caution.')
 
