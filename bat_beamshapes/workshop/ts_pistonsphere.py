@@ -529,7 +529,7 @@ if __name__ == '__main__':
     #%%
     
     
-    mpmath.mp.dps = 150
+    mpmath.mp.dps = 25
 
     angles = mpmath.matrix(np.radians(ka5['angle_deg'])) #mpmath.linspace(0,mpmath.pi,100)
     An, Mmn, bm = piston_in_sphere_directionality(angles, paramv)

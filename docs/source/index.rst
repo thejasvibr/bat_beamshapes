@@ -17,7 +17,18 @@ that many (AFAIK, any?) openly available computational implementations. `bat_bea
 covers this gap by providing a set of models where you can generate predictions
 by providing the relevant parameters through a function call.
 
+Models implemented
+~~~~~~~~~~~~~~~~~~
 
+* Piston in a sphere (speed optimisation underway)
+* Oscillating cap of a sphere 
+
+Models to be implemented
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Piston in a finite closed baffle 
+* Rectangular cap of a sphere 
+* Any others of potential relevance?
 
 Who is this useful for? 
 ~~~~~~~~~~~~~~~~~~~~~~~

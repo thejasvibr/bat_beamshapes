@@ -22,6 +22,7 @@ arb = flint.arb
 acb = flint.acb
 acb_mat = flint.acb_mat
 good = flint.good
+integral = flint.acb.integral
 
 #%%
 ## !! ATTENTION -- the FLINT legendre has diff conventions than the 
@@ -33,19 +34,15 @@ besselj = lambda n,z : acb.bessel_j(z, n) # opposite order of mpmath!
 bessely = lambda n,z : acb.bessel_y(z, n)
 sph_besselj = lambda n,z : acb.sqrt(pi/(2*z))*besselj(n+acb(0.5),z)
 sph_bessely = lambda n,z : acb.sqrt(pi/(2*z))*bessely(n+acb(0.5),z)
-
 sph_hankel2 = lambda n,z : sph_besselj(n, z) - 1j*sph_bessely(n,z)
 
 #%%
 # P-prime-cos(alpha) in Appendix II eqn.70 and NOT in eqn. 12.98 in 2012edn.
-
 def pprime_cosalpha(n, alpha):
     legendre_term = legendre_p(n-1,cos(alpha))-legendre_p(n+1,cos(alpha))
     numerator = n*(n+1)*legendre_term
     denominator = (1+2*n)*(-sin(alpha)**2)
     return -numerator/denominator
-
-integral = flint.acb.integral
 
 #%%
 r1 = lambda theta,alpha,R : R*cos(alpha)/cos(theta) 
@@ -187,13 +184,10 @@ def directionality(thetas, An, param):
         ratios.append(ratio)
     return ratios
 
-
 #%%
-
-
 if __name__ == '__main__':
     import numpy as np 
-    ka = acb(10)
+    ka = acb(0.1)
     kv = 2*pi/(330.0/50000.0)
     av = ka/kv
     alphav = pi/3
@@ -207,5 +201,5 @@ if __name__ == '__main__':
     b_mat = make_bm(params)
     an = mmn_mat.solve(b_mat)
     #%%
-    ratios = directionality([pi*0, pi/6,pi/4, pi/2,pi], an, params)
+    ratios = directionality([pi*0, pi/6,pi/4, pi/2, pi], an, params)
     dbratios = 20*np.log10(np.float32(ratios))

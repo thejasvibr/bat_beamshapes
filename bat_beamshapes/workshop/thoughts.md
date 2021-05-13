@@ -97,10 +97,12 @@ Installing python-flint with ```pip``` failed. Installing python-flint from Git 
 ### What it's like to use py-flint
 
 > Incredibly fast !!! eg. show the example of the Lm integral (eqn. 12.018) for a dps=500, it happens nearly instantaneously in py-flint, while with mpmath it takes 10's of seconds. 
-
+2021-05-12
 16:21 - I'm getting different values for P'm(cos(alpha)) between my Flint implementation using eqn. 12.98 and the native legendre_p(n,z).diff(z) version from sympy. 
 
 16:44 -- and that's because there's a typo in eqn. 12.98 --> it should be sin(theta)^2 instead of sin(theta)
+
+22:52 : FLINT is really, really fast now that I think of it. For dps=150, and ka=10 the Flint version of the code runs in ~9.5mins while the parallelised mpmath version takes about that long!!
 
 
 
