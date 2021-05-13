@@ -43,6 +43,7 @@ plt.plot(np.radians(df['deg']), df['rel_db_0deg'],'*',
          label='Beranek & Mellow 2012') 
 # Data digitised from figure 12.17 using WebPlotDigitizer (Ankit Rohatgi)
 plt.legend()
+
 plt.savefig(f'capsphere_ka-{np.round(float(ka),2)}_dps={mpmath.mp.dps}.png')
 
 

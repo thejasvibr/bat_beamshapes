@@ -11,6 +11,16 @@ References
 ==========
 Chp. 13, Beranek, L., & Mellow, T. (2019). Acoustics: Sound Fields, Transducers and 
 Vibration. Academic Press.
+
+
+Troubleshooting
+===============
+2021-05-13 : 
+    > Unable to run the summation on eqn. 13.217 because the Gamma term goes to 0 every 
+    now and then, which creates poles. The gamma function has poles at 0 and negative
+    integers. The summation term needs to skip these points. Is this what's happening in the 
+    Mathematica code? (somewhat related : https://mathematica.stackexchange.com/questions/148203/how-to-elegantly-tell-mathematica-where-are-the-poles-of-an-integrand)
+    > 
 """
 
 from gmpy2 import *
@@ -19,42 +29,53 @@ import mpmath
 #mpmath.mp.dps = 15
 from sympy import expand,symbols, Sum,summation, I, cos, sin, legendre, besselj
 from sympy import conjugate,sqrt,  lambdify,pi, factorial, gamma, KroneckerDelta
-from sympy import oo
-a, b, B, m, n, p, P, q, Q, r, z,k,R,alpha,theta = symbols('a b B m n p P q Q r z k R alpha theta')
+from sympy import oo, Piecewise
+
+a, b, B, m, n, p, P, q, Q, z,k,R,alpha,theta = symbols('a b B m n p P q Q z k R alpha theta')
 A_n, N = symbols('A_n, N')
-NN = symbols('NN')
+r = symbols('r')
+NN = symbols('NN', integer=True)
 ka = k*a
 kb =  k*b
 beta = b/a
-NN = 10 +2*ka*beta
 
-# The 'streng' portion of the Bouwkamp-Streng term
+
+
+#%% The 'streng' portion of the Bouwkamp-Streng term
 #eqn 13.218
-numerator_n_S_mr = gamma(r/2 - 1/2 + KroneckerDelta(r,1)) 
-denominator_n_S_mr  = gamma(r/2 +1)*gamma(r/2-m-1/2)*gamma(r/2+n-m+1)
-n_S_mr = numerator_n_S_mr/denominator_n_S_mr
+numerator_n_S_mr = gamma(r*0.5 - 0.5 + KroneckerDelta(r,1)) 
+denominator_n_S_mr  = gamma(r*0.5 +1)*gamma(0.5*r-m-0.5)*gamma(r*0.5 + n - m +1)
+n_S_mr = Piecewise((numerator_n_S_mr/denominator_n_S_mr, 
 
+nsmr_func = lambdify([m,n,r], n_S_mr,'mpmath')
 
-
+#%% 
 # here the term is treated as nBm(z)
 # eqn. 13.217, 13.218
-S_sumterm = Sum( n_S_mr*(-I*ka/2)**r  ,(r, 0, oo))
+S_sumterm = Sum( n_S_mr*(-I*ka/2)**r  ,(r, 0, 2*NN))
+ssum_f = lambdify([m,n,k,a], S_sumterm)
+ssum_f(1,1,30.0,0.1)
+#%%
 n_B_mka = -I*sqrt(pi)*gamma(n+ 5/2)*(1/(factorial(m)**2))*S_sumterm
-                                      
+
+nbmka_f = lambdify([m,n,k,a], n_B_mka, 'mpmath')
+                                    
 # eqn 13.231 for B term
 m_B_p_kb = n_B_mka.subs({'n':m, 'm':p,'ka':kb})
 
 
-
+#%% 
 # eqn. 13.226
 n_B_q_kb = n_B_mka.subs({'m':n, 'n':q, 'ka':kb})
 term_13_226 = (conjugate(m_B_p_kb)*n_B_q_kb)/(p+q+1)
 M_mn = Sum(term_13_226, (q,0,Q),(p,0,P))
 
+#%% 
 # eqn. 13.227
-b_matrix = Sum(conjugate(m_B_p_kb)*(a/b)**(2*p),  (p,0,P))
 
-
+b_term = - Sum((conjugate(m_B_p_kb)/(p+1))*(a/b)**(2*p),  (p,0,20))
+bterm_func = lambdify([a,b,k,m,n], b_term)
+#%% 
 # piston in an infinite baffle portion
 eq13_252_pt1 = besselj(1, ka*sin(theta))/( ka*sin(theta))
 # piston in a finite open baffle portion
