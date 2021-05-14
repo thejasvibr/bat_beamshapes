@@ -13,9 +13,14 @@ non-classical sound radiation models (piston in a sphere, cap in a sphere,
 piston in a closed circular baffle, etc.).
 
 While there are many sound emission models in the literature, there aren't
-that many (AFAIK, any?) openly available computational implementations. `bat_beamshapes` 
+that many (AFAIK, any?) openly available computational implementations. `beamshapes` 
 covers this gap by providing a set of models where you can generate predictions
 by providing the relevant parameters through a function call.
+
+
+Also, check out a general introduction to the concepts of the package :doc:`here <general_intro>`.
+
+
 
 Models implemented
 ~~~~~~~~~~~~~~~~~~
@@ -38,23 +43,32 @@ to use this package in the examples page.
 
 
 Package under active development
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This package is relatively young, and changing dynamically. Things may
 break fairly often if you are installing from the GitHub repo directly.
 A stable release will hopefully be out by the end of May 2021 or 
 beginning of June 2021. Stay tuned!!
 
+
+.. toctree::
+      :maxdepth: 3
+      :caption: Concepts
+    
+      ./general_intro.rst
+
 .. toctree::
       :maxdepth: 4
-      :caption: Examples
+      :caption: Use Cases
 
       gallery_examples/index.rst
-
+      
 
 Contributors
 ~~~~~~~~~~~~
 Thejasvi Beleyur (maintainer)
+
 Gaurav Dhariwal
+
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~

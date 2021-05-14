@@ -8,7 +8,7 @@ version_number = bat_beamshapes.__version__
 
 setup(name='bat_beamshapes',
      version=version_number,
-     description='Bat beamshape modelling',
+     description='Acoustic beamshape modelling for various sources',
      long_description=open('README.md').read(),
      long_description_content_type="text/markdown",
      url='https://github.com/thejasvibr/bat_beamshapes.git',
