@@ -24,7 +24,7 @@ Also, check out a general introduction to the concepts of the package :doc:`here
 
 Models implemented
 ~~~~~~~~~~~~~~~~~~
-
+* Piston in an infinite baffle 
 * Piston in a sphere (speed optimisation underway)
 * Oscillating cap of a sphere 
 
