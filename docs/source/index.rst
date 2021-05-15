@@ -28,10 +28,12 @@ Models implemented
 * Piston in a sphere (speed optimisation underway)
 * Oscillating cap of a sphere 
 
+Models under implementation 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Piston in a finite closed baffle  
+
 Models to be implemented
 ~~~~~~~~~~~~~~~~~~~~~~~~
-
-* Piston in a finite closed baffle 
 * Rectangular cap of a sphere 
 * Any others of potential relevance?
 
