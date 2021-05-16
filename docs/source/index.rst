@@ -3,23 +3,26 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Beamshapes: generate beamshapes for multiple models
-===================================================
+Beamshapes: directivity patterns for multiple emitter models
+============================================================
 
 Introduction
 ~~~~~~~~~~~~
-The `beamshapes` (currently called `bat_beamshapes`) package implements 
-non-classical sound radiation models (piston in a sphere, cap in a sphere, 
-piston in a closed circular baffle, etc.).
+The `beamshapes` (currently called `bat_beamshapes`) package implements the 
+directivity functions (:math:`\frac{D_{\theta}}{D_{0}}`) of various sound radiation models (piston in a sphere, cap in a sphere, piston in a closed circular baffle, etc.).
 
 While there are many sound emission models in the literature, there aren't
-that many (AFAIK, any?) openly available computational implementations. `beamshapes` 
-covers this gap by providing a set of models where you can generate predictions
-by providing the relevant parameters through a function call.
+any (AFAIK) openly available computational implementations. `beamshapes` 
+covers this gap.
+
+Check out a general introduction to the concepts of the package :doc:`here <general_intro>`.
 
 
-Also, check out a general introduction to the concepts of the package :doc:`here <general_intro>`.
-
+Who is this useful for? 
+~~~~~~~~~~~~~~~~~~~~~~~
+Acousticians and bio-acousticians looking to assess model-fits or perform 
+parameter estimation on their sound sources. Check out more on the how
+to use this package in the :doc:`examples <gallery_examples/index>`. 
 
 
 Models implemented
@@ -36,12 +39,6 @@ Models to be implemented
 ~~~~~~~~~~~~~~~~~~~~~~~~
 * Rectangular cap of a sphere 
 * Any others of potential relevance?
-
-Who is this useful for? 
-~~~~~~~~~~~~~~~~~~~~~~~
-Acousticians and bio-acousticians looking to assess model-fits or perform 
-parameter estimation on their sound sources. Check out more on the how
-to use this package in the examples page. 
 
 
 Package under active development

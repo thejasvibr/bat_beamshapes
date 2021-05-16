@@ -1,27 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Radiation from a point source on a sphere
-=========================================
+Point source on a sphere
+========================
 An infinitesimally oscillating on the surface of a sphere. Useful where the 
 source is very small in comparison to the sphere.
-
-Parameters
-----------
-    k : float > 0 
-        Wavenumber
-    R : float > 0
-        Radius of sphere
-
+   
 
 References 
 ----------
-* Chp. 12, secn. 12.5,  Beranek & Mellow 2012
+Chp 12, secn. 12.5, Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
+Academic Press.
 
 """
 
 from sympy import symbols, legendre, lambdify, I, Sum, cos
 from bat_beamshapes.special_functions import sph_hankel2
+from bat_beamshapes.utilities import dB
 
 k, R, n, theta, NN, kR = symbols('k R n theta NN kR')
 costheta = cos(theta)
@@ -45,6 +40,26 @@ d_zero_func = lambdify([k,R,NN],d_zero)
 
 def point_source_on_a_sphere_directionality(angles, param, parallel=False):
     '''
+        
+    Parameters
+    ----------
+        angles : list/array-like
+            The angles for which the directionality is to be calculated. 
+            All angles in radians.
+
+        param: dictionary 
+            With the following keys and entries:
+                k : float > 0 
+                    Wavenumber
+                R : float > 0
+                    Radius of sphere
+    
+    Returns 
+    -------
+    _ : None
+    dtheta_by_d0 : np.array
+        20log10(D_theta/D_0)
+             
     '''
     kv, Rv = [param[each] for each in ['k','R']]
     NNv = param.get('NN', int(10+2*kv*Rv)) # trial formula - need to see if it matches w textbook
@@ -53,8 +68,8 @@ def point_source_on_a_sphere_directionality(angles, param, parallel=False):
     offaxis_values = []
     for angle in angles:
         offaxis_values.append(abs(d_theta_func(angle, kv, Rv, NNv)))
-    onbyoff_ratio = [each/onaxis_value for each in offaxis_values]
-    return None , onbyoff_ratio
+    dtheta_by_d0 = dB(np.abs(np.array(offaxis_values))/np.abs(onaxis_value))
+    return None , dtheta_by_d0
 
 #%% 
 if __name__ == '__main__':
@@ -69,7 +84,7 @@ if __name__ == '__main__':
     for kv in [100, 50, 30, 10]:
         paramv = {'k':kv,'R':0.1}
         _, dirnlty = point_source_on_a_sphere_directionality(angles,paramv)    
-        plt.plot(angles, 20*np.log10(dirnlty), label='ka: '+str(kv*0.1))
+        plt.plot(angles, dirnlty, label='ka: '+str(kv*0.1))
         angles *= -1 
         
     plt.legend(loc=(0.1,0.9))
