@@ -1,4 +1,6 @@
 '''
+Flint parallelisation
+=====================
 Holds convenience functions which help in parallelising FLINT
 code. 
 

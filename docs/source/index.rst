@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Beamshapes: directivity patterns for multiple emitter models
-============================================================
+Beamshapes: directivity patterns for multiple sound sources
+===========================================================
 
 Introduction
 ~~~~~~~~~~~~
@@ -76,9 +76,19 @@ Acknowledgements
 Many thanks to Tim Mellow for sharing Mathematica code to help with porting to Python.
 
 
-Indices and tables
-==================
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+   :maxdepth:1
+   :caption: API reference:
+
+   source_models.rst
+   misc.rst
+
+
+    
+    
+    
+    
+
+
+
