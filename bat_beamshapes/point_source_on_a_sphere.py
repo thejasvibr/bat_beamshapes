@@ -20,7 +20,7 @@ Chp 12, secn. 12.5, Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields
 Academic Press.
 
 """
-
+import numpy as np 
 from sympy import symbols, legendre, lambdify, I, Sum, cos
 from bat_beamshapes.special_functions import sph_hankel2
 from bat_beamshapes.utilities import dB

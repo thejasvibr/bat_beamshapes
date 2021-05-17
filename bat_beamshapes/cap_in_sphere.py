@@ -6,7 +6,7 @@ Parameters
 ----------
 k : mpmath.mpf > 0 
     Wavenumber
-alpha : mpmath.mpf > 0
+alpha : mpmath.mpf < pi/2
     Half-angle of cap
 R : mpmath.mpf > 0
     Radius of sphere.
@@ -19,21 +19,29 @@ References
 Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
 Academic Press.
 
+Notes
+-----
+Experience has shown it's best to leave the dps un-specified while using this 
+module. I guess this is because of the summation terms. 
+
 
 TODO
 ----
 * Implement the special case of alpha = pi/2, described by equations 
     12.60
 """
+import copy
+from joblib import Parallel, delayed
 import numpy as np 
 from symengine import * 
 import mpmath
-# mpmath.mp.dps = 50
+#mpmath.mp.dps = 50
 from sympy import symbols,  I, cos, sin, legendre
 from sympy import lambdify
 import tqdm
 import warnings
 from bat_beamshapes.special_functions import sph_hankel2, legendre_mvz
+from bat_beamshapes.utilities import args_to_mpmath, args_to_str, dB
 
 n, z,k,R,alpha,theta = symbols('n z k R alpha theta')
 
@@ -86,18 +94,30 @@ def d_0_t3_func(k_v,R_v,alpha_v,theta_v):
     return mpmath.nsum(lambdify([n],version_with_freen, 'mpmath'), [2,mpmath.inf])
 
 
-def d_theta(kv,Rv,alphav,thetav):
-    brackets_term1 = d_theta_t1_func(kv,Rv,alphav,thetav)
-    brackets_term2 = d_theta_t2_func(kv,Rv,alphav,thetav)
-    brackets_term3 = dtheta_t3_func(kv,Rv,alphav,thetav)
-    final_d_theta= (2/kv**2*Rv**2)*(brackets_term1+brackets_term2+brackets_term3)
+def d_theta(**param):
+    brackets_term1 = d_theta_t1_func(param['k'],param['R'],
+                                     param['alpha'],param['theta'])
+    brackets_term2 = d_theta_t2_func(param['k'],param['R'],
+                                     param['alpha'],param['theta'])
+    brackets_term3 = dtheta_t3_func(param['k'],param['R'],
+                                         param['alpha'],param['theta'])
+    kR_square = (param['k']*param['R'])**2
+    final_d_theta= (2/kR_square)*(brackets_term1+brackets_term2+brackets_term3)
     return final_d_theta
+
+def d_theta_pll(**param):
+    mpmath_args = args_to_mpmath(**param)
+    output = d_theta(**mpmath_args)
+    str_output = str(output)
+    return str_output
+
 
 def d_zero(kv,Rv,alphav,thetav=0):
     brackets_term1 = d_theta_t1_func(kv,Rv,alphav,thetav)
     brackets_term2 = d_0_t2_func(kv,Rv,alphav,thetav)
     brackets_term3 = d_0_t3_func(kv,Rv,alphav,thetav)
-    final_d_0 = (2/kv**2*Rv**2)*(brackets_term1+brackets_term2+brackets_term3)
+    kR_square = (kv*Rv)**2
+    final_d_0 = (2/kR_square)*(brackets_term1+brackets_term2+brackets_term3)
     return final_d_0
 
 
@@ -158,11 +178,39 @@ def cap_in_sphere_directionality(angles, params):
         warnings.warn('The validity of this function for alpha>= pi/2 has not \
                       been checked. Proceed with caution.')
 
-    directionality = []
-    for angle_v in tqdm.tqdm(angles):
-        directionality.append(relative_directionality_db(angle_v,
-                                                         params['k'],
-                                                         params['R'], 
-                                                         params['alpha']))
-    directionality = np.array(directionality, 'float32')
+    params['a'] = params['R']*mpmath.sin(params['alpha']) # effective piston radius
+    ka = params['k']*params['a']
+    if ka>=5:
+        num_cores = -1
+    else:
+        num_cores = 1 
+    
+    dzero_value =  d_zero(params['k'],
+                                    params['R'], 
+                                    params['alpha'])
+    paramset = []
+    for each in angles:
+        one_paramset = copy.deepcopy(params)
+        one_paramset['theta'] = each
+        paramset.append(args_to_str(**one_paramset))
+
+    dtheta_out = Parallel(n_jobs=num_cores, backend='multiprocessing')(delayed(d_theta_pll)(**params_str) for params_str in tqdm.tqdm(paramset))
+    dtheta_values = [mpmath.mpmathify(each) for each in dtheta_out]
+    
+    directionality = np.array([20*mpmath.log10(abs(each/dzero_value)) for each in dtheta_values],
+                            'float32')
+    
+    #directionality = dB(dtheta_by_d0)
     return None , directionality
+
+# if __name__ == '__main__':
+#     kaval = 30
+#     paramv = {}
+#     paramv['R'] = 0.01
+#     paramv['alpha'] = mpmath.pi/3
+#     paramv['a'] = paramv['R']*mpmath.sin(paramv['alpha'])
+#     paramv['k'] = kaval/paramv['a']
+#     angles = mpmath.linspace(0,mpmath.pi,10)
+#     outs = cap_in_sphere_directionality(angles,
+#                                                    paramv)
+#     #print()
