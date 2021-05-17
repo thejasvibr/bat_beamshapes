@@ -1,14 +1,31 @@
 """
-Trying to implement the oscillating cap in a 
-rigid sphere described in Chp. 12 of Beranek and Mello 2012
+Oscillating cap of a sphere
+============================
+
+Parameters
+----------
+k : mpmath.mpf > 0 
+    Wavenumber
+alpha : mpmath.mpf > 0
+    Half-angle of cap
+R : mpmath.mpf > 0
+    Radius of sphere.
 
 
-TODO: 
-    * Implement the special case of alpha = pi/2, described by equations 
+
+
+References
+----------
+Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
+Academic Press.
+
+
+TODO
+----
+* Implement the special case of alpha = pi/2, described by equations 
     12.60
 """
-
-from gmpy2 import *
+import numpy as np 
 from symengine import * 
 import mpmath
 # mpmath.mp.dps = 50
@@ -111,8 +128,9 @@ def cap_in_sphere_directionality(angles, params):
     
     Returns 
     -------
-    directionality : list
-        # List with relative directionalities in (20log10) dB. 
+    _ : None
+    directionality : np.array
+        Array with relative directionalities in (20log10) dB. 
         The number of items is equal to the number of angles.
 
     
@@ -146,5 +164,5 @@ def cap_in_sphere_directionality(angles, params):
                                                          params['k'],
                                                          params['R'], 
                                                          params['alpha']))
-    
-    return directionality
+    directionality = np.array(directionality, 'float32')
+    return None , directionality

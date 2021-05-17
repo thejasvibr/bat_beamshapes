@@ -18,7 +18,8 @@ Chp 13, Beranek, L. L., & Mellow, T. (2019). Acoustics: sound fields and transdu
 Academic Press.
 
 """
-
+import numpy as np 
+from bat_beamshapes.utilities import dB
 from sympy import besselj, sin, symbols, lambdify, limit
 k,a,theta = symbols('k a theta')
 #%%
@@ -44,10 +45,31 @@ def d_theta_func(kv,av,thetav):
 #%%
 def piston_in_infinite_baffle_directionality(angles, param):
     '''
+    Calculates relative directionality dB (D(theta)/D(0))
+    of a piston in an infinite baffle.
+    
+    
+    Parameters
+    ----------
+    angles : array-like
+        Angles at which the directionality is to be calculated in radians. 
+    params : dictionary
+        Dictionary with at least the following keys:
+            k : float>0
+                Wavenumber. 
+            a : float>0
+                Piston radius
+            
+    Returns 
+    -------
+    _ : None 
+    beamshape : np.array
+        Array with dB(D_theta/D_0).
+        The number of items is equal to the number of angles.
+    
     '''
     kv,av = [ param[each] for each in ['k','a']]
-    dtheta_by_dzero = []
-    for angle in angles:
-        
-        dtheta_by_dzero.append(d_theta_func(kv,av,angle)/1.0)
+    dtheta_by_dzero = np.zeros(len(angles))
+    for i,angle in enumerate(angles):        
+        dtheta_by_dzero[i] = dB(d_theta_func(kv,av,angle))
     return None, dtheta_by_dzero

@@ -27,8 +27,9 @@ to use this package in the :doc:`examples <gallery_examples/index>`.
 
 Models implemented
 ~~~~~~~~~~~~~~~~~~
+* Point source on a sphere
 * Piston in an infinite baffle 
-* Piston in a sphere (speed optimisation underway)
+* Piston in a sphere
 * Oscillating cap of a sphere 
 
 Models under implementation 
@@ -38,7 +39,7 @@ Models under implementation
 Models to be implemented
 ~~~~~~~~~~~~~~~~~~~~~~~~
 * Rectangular cap of a sphere 
-* Any others of potential relevance?
+* Any others of potential relevance -- suggest!
 
 
 Package under active development
@@ -47,6 +48,7 @@ This package is relatively young, and changing dynamically. Things may
 break fairly often if you are installing from the GitHub repo directly.
 A stable release will hopefully be out by the end of May 2021 or 
 beginning of June 2021. Stay tuned!!
+
 
 
 .. toctree::

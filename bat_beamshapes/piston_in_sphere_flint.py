@@ -1,24 +1,39 @@
 '''
-Re-working of piston in a sphere using python-Flint
-The model is implemented from Beranek & Mellow 2012 Chp. 12. Equation numer
+Piston in a sphere (FLINT implementation)
+=========================================
+Re-working of piston in a sphere using python-Flint. 
 
-See Fig. 12.22 in Beranek & Mellow 2012 to place the parameters in context.
+Installation/requirements
+-------------------------
+This implementation requires the installation of the 'python-flint' package.
+See `here <https://github.com/fredrik-johansson/python-flint/>`_ or the `docs <https://fredrikj.net/python-flint/>`_ .
+
+While the installation is a bit involved due to the packages dependencies (GMP,MPFR, FLINT etc),
+the speed-up afterwards is worth it. This implementation currently only works on 
+Linux machines (as of python-flint 0.3.0 - but perhaps later releases may be OS-agnostic!).
+
 
 Parameters
 ----------
-    k : wavenumber (2pi/wavelength)
-    a : radius of piston 
-    alpha : half-angle of piston in radians
-    R : radius of sphere 
-
-Attention
----------
-Please check to make sure that a= Rsin(alpha). The code does not verify this 
-at all - and takes in all user input straight as it is. 
+alpha : 0<float<pi
+    The 'gape'/'aperture' of the piston. The half-angle it occupies 
+    in radians. 
+k : float>0
+    Wavenumber, 2*pi/wavelength
+a : float>0 
+    Piston radius
+alpha : float>0
+    Half-angle of piston, radians. 
 
 References
 ----------
-Beranek & Mellow 2012, Acoustics: Sound Fields and Transducers, Academic Press
+Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
+Academic Press.
+
+See Also 
+--------
+bat_beamshapes.piston_in_sphere
+
 
 '''
 #%%
@@ -26,9 +41,10 @@ Beranek & Mellow 2012, Acoustics: Sound Fields and Transducers, Academic Press
 from joblib import Parallel, delayed
 import flint 
 from flint import ctx
+import numpy as np 
 import tqdm
-from flint_parallelisation import conv_acb_to_str, conv_str_acb, interchange_params_and_str
-ctx.dps = 100
+from bat_beamshapes.flint_parallelisation import conv_acb_to_str, conv_str_acb, interchange_params_and_str
+ctx.dps = 50
 cos = flint.acb.cos
 sin = flint.acb.sin
 tan = flint.acb.tan
@@ -265,29 +281,28 @@ def piston_in_sphere_directionality(thetas, param,**kwargs):
 
     Returns
     -------
-    An : acb_mat
+    A_n : acb_mat
         The 'An' term required for calculating directionalities.
     dB_directionality : np.array
         Array with 20log10(on-axis/off-axis) values. 
     '''
-    An = kwargs.get('An', None)
-    if An is None:
+    A_n = kwargs.get('A_n', None)
+    if A_n is None:
         mmn_mat  = make_Mmn_pll(param)
         b_mat = make_bm(param)
-        An = mmn_mat.solve(b_mat)
+        A_n = mmn_mat.solve(b_mat)
     
-    ratios = directionality(thetas, An, param)
+    ratios = directionality(thetas, A_n, param)
     dB_directionality = 20*np.log10(np.float32(ratios))
-    return An, dB_directionality
+    return A_n, dB_directionality
 
 #%%
 if __name__ == '__main__':
-    import numpy as np 
-    ka = acb(1)
+    ka = acb(15)
     kv = 2*pi/(330.0/50000.0)
     av = ka/kv
     alphav = pi/3
-    Rv = av/sin(alphav)
+    Rv = acb(0.002)#av/sin(alphav)
     params = {'k':kv,
               'a':av,
               'alpha': alphav,
@@ -299,4 +314,11 @@ if __name__ == '__main__':
     
     print(dbdirn)
     # %% 
-    _, dbdirn2 = piston_in_sphere_directionality(angles, params, An=an)
+    angles = np.linspace(0,np.pi,200)
+    angles_acb = [acb(each) for each in angles]
+    _, dbdirn2 = piston_in_sphere_directionality(angles_acb, params, A_n=an)
+    import matplotlib.pyplot as plt 
+    plt.figure()
+    a0 = plt.subplot(111, projection='polar')
+    plt.plot(angles, dbdirn2)
+    plt.ylim(-60,0);plt.yticks(np.arange(-60,10,10))

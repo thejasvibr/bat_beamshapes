@@ -6,6 +6,13 @@ Point source on a sphere
 An infinitesimally oscillating on the surface of a sphere. Useful where the 
 source is very small in comparison to the sphere.
    
+Parameters
+----------
+k : float > 0 
+    WAvenumber
+R : float > 0
+    Radius of sphere
+
 
 References 
 ----------
