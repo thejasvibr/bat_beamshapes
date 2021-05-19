@@ -1,3 +1,5 @@
+https://travis-ci.org/thejasvibr/bat_beamshapes.svg?branch=dev
+
 # Beamshapes
 
 Calculate directivity of various sound source models and get the beamshapes!
