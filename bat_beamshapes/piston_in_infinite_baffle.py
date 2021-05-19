@@ -4,14 +4,6 @@
 Piston in an infinite baffle
 ============================
 
-
-Parameters
-----------
-k : float>0
-    Wavenumber, 2*pi/wavelength
-a : float>0
-    Radius of piston. 
-
 References
 ----------
 Chp 13, Beranek, L. L., & Mellow, T. (2019). Acoustics: sound fields and transducers.

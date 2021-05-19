@@ -1,4 +1,4 @@
-https://travis-ci.org/thejasvibr/bat_beamshapes.svg?branch=dev
+[![Build Status](https://travis-ci.org/thejasvibr/bat_beamshapes.svg?branch=dev)](https://travis-ci.org/thejasvibr/bat_beamshapes)
 
 # Beamshapes
 
@@ -10,10 +10,10 @@ This package is released under an MIT license.
 ```
 >>> import matplotlib.pyplot as plt 
 >>> import numpy as np 
->>> import bat_beamshapes as beamshapes
->>> from beamshapes import piston_in_infinite_baffle_directionality as PIB # short alias
+>>> import bat_beamshapes
+>>> from bat_beamshapes import piston_in_infinite_baffle_directionality as PIB # short alias
 >>> input_parameters = {'k':50, 'a':0.1}
->>> angles = np.linspace(0,np.pi/2,20)
+>>> angles = np.linspace(-np.pi/2,np.pi/2,50)
 >>> _, directionality = PIB(angles, input_parameters) # output the dB(D(theta)/D(on-axis))
 >>> plt.figure();a0 = plt.subplot(111, projection='polar')
 >>> plt.plot(angles, directionality) # plot the beamshape !!

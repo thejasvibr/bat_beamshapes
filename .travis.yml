@@ -5,4 +5,4 @@ install: pip install -r bat_beamshapes/tests/requirements_test.txt
 branches:
   only:
     - dev
-script: python -m unittest bat_beamshapes/tests/
+script: python -m unittest discover bat_beamshapes/tests

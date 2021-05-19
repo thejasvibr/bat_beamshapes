@@ -6,6 +6,13 @@ predicted outputs.
 
 """
 
+import os 
+try:
+    os.chdir('bat_beamshapes/tests')
+except:
+    pass
+
+
 import unittest
 import mpmath
 import numpy as np 
