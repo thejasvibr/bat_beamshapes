@@ -79,7 +79,7 @@ master_doc = 'index'
 autodoc_member_order = 'bysource'
 
 # Add a logo
-html_logo = 'logo1.png'#'_static/beamshapes_logo.png'
+html_logo = '_static/logo1.png'#'_static/beamshapes_logo.png'
 
 # sphinx gallery
 from sphinx_gallery.sorting import FileNameSortKey

@@ -1,5 +1,5 @@
 Misc 
-=====
+====
 
 .. automodule:: bat_beamshapes.special_functions
        :members:
