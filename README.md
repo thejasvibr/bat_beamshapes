@@ -1,6 +1,7 @@
 # Beamshapes
 
 Calculate directivity of various sound source models and get the beamshapes!
+This package is released under an MIT license. 
 
 ## Getting started with *beamshapes*
 
