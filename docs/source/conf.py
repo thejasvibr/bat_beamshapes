@@ -40,7 +40,7 @@ templates_path = ['_templates']
 exclude_patterns = []
 
 # MOCK THE INSTALLATION OF THESE PACKAGES  becaue RTD doesn't allow C packages
-autodoc_mock_imports = ["gmpy2"]
+autodoc_mock_imports = ["flint"]
 
 
 # -- Options for HTML output -------------------------------------------------
