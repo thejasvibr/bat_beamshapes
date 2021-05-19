@@ -1,8 +1,6 @@
 numpy
 sympy
 mpmath
-symengine
-gmpy2
 scipy
 matplotlib
 tqdm

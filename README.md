@@ -59,3 +59,4 @@ DONE:
 * ~~Include option to run FLINT version of piston in sphere! This will help at least Linux users a lot.~~
 * ~~Cap of sphere - implement parallelisation when ka>5~~
 * ~~Include module-level docs too.~~
+* ~~Check if you really need symengine and gmpy2 for the code to run -- is sruntime really affected? -- Not needed. Speed not affected much in tests.~~
