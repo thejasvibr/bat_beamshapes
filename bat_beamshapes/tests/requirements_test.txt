@@ -1,6 +1,7 @@
-numpy
-sympy
-mpmath
-scipy
 matplotlib
+mpmath
+numpy
+pandas
+sympy
+scipy
 tqdm
