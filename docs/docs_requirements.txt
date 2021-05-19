@@ -1,11 +1,11 @@
+joblib
+matplotlib
+mpmath
 numpy
 pandas
-scipy 
-matplotlib 
-symengine
 sympy
-mpmath
-tqdm 
+scipy
+tqdm
 recommonmark 
 sphinx==3.5.3
 sphinx_gallery==0.8.2
