@@ -1,9 +1,9 @@
 Misc 
 ====
 
-.. automodule:: bat_beamshapes.utilities 
+.. automodule:: beamshapes.utilities 
        :members:
 
 
-.. automodule:: bat_beamshapes.flint_parallelisation 
+.. automodule:: beamshapes.flint_parallelisation 
        :members:

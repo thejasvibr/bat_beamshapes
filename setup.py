@@ -1,12 +1,12 @@
 
 from setuptools import setup, find_packages
-import bat_beamshapes
+import beamshapes
 
  # link to test upload and fresh install on Test PyPi https://packaging.python.org/guides/using-testpypi/
  
-version_number = bat_beamshapes.__version__
+version_number = beamshapes.__version__
 
-setup(name='bat_beamshapes',
+setup(name='beamshapes',
      version=version_number,
      description='Acoustic beamshape modelling for various sources',
      long_description=open('README.md').read(),

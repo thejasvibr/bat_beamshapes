@@ -2,7 +2,8 @@
 
 # Beamshapes
 
-Calculate directivity of various sound source models and get the beamshapes!
+Calculate directivity of various sound source models and get their beamshapes.
+
 This package is released under an MIT license. 
 
 ## Getting started with *beamshapes*
@@ -11,7 +12,7 @@ This package is released under an MIT license.
 >>> import matplotlib.pyplot as plt 
 >>> import numpy as np 
 >>> import bat_beamshapes
->>> from bat_beamshapes import piston_in_infinite_baffle_directionality as PIB # short alias
+>>> from beamshapes import piston_in_infinite_baffle_directivity as PIB # short alias
 >>> input_parameters = {'k':50, 'a':0.1}
 >>> angles = np.linspace(-np.pi/2,np.pi/2,50)
 >>> _, directionality = PIB(angles, input_parameters) # output the dB(D(theta)/D(on-axis))
@@ -38,12 +39,12 @@ For more details on the concepts and source documentation - please check out the
 ## Citation information 
 If you use this package - please do consider citing it! 
 
-*Beleyur, Thejasvi, , 2021, beamshapes: directivity patterns for multiple sound sources {version number here}, https://github.com/thejasvibr/bat_beamshapes*
+*Beleyur, Thejasvi, , 2021, beamshapes: directivity patterns for sound sources {version number here}, https://github.com/thejasvibr/bat_beamshapes*
 
 You can access the version number of the package being used with 
 ```
->>> import bat_beamshapes
->>> print(bat_beamshapes.__version__)
+>>> import beamshapes
+>>> print(beamshapes.__version__)
 ```
 
 ## Future implementations

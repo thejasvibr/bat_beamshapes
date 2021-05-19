@@ -1,7 +1,7 @@
 '''print('miaaaow') Whaat
 '''
 
-__version__ = '0.0.0'
+__version__ = '0.0.1'
 # from beamshapes.beamshape_predictions import * 
 from beamshapes.sim_reclevels  import * 
 from beamshapes.piston_in_sphere import piston_in_sphere_directivity

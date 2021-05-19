@@ -3,7 +3,7 @@ Piston in a rigid sphere: the bat version
 =========================================
 
 """
-import bat_beamshapes
+import beamshapes
 import matplotlib.pyplot as plt
 import mpmath
 mpmath.mp.dps = 50
@@ -46,7 +46,7 @@ aucalc = paramv['R']*mpmath.sin(paramv['alpha'])
 # the default 50 dps for all models. 
 
 angles = mpmath.linspace(0,mpmath.pi,100)
-beamshape = bat_beamshapes.piston_in_sphere_directionality(angles, paramv)
+beamshape = beamshapes.piston_in_sphere_directivity(angles, paramv)
 plt.figure()
 a0 = plt.subplot(111, projection='polar')
 plt.plot(angles, beamshape)

@@ -40,7 +40,7 @@ The oscillating cap in a sphere does not produce additional output
 
     # .... having chosen certain input parameters and put them into  input_params
     >>> import mpmath
-    >>> import bat_beamshapes as beamshapes
+    >>> import beamshapes as beamshapes
     >>> from beamshapes import cap_in_sphere_directionality
     >>> angles = mpmath.linspace(0,pi,10) 
     >>>  _, spherecap_beam = cap_in_sphere_directionality(angles, input_params)
@@ -52,7 +52,7 @@ to generate estimates, then the calculated outputs are also returned.
     
     # .... having chosen certain input parameters and put them into input_params 
     >>> import mpmath
-    >>> import bat_beamshapes as beamshapes
+    >>> import beamshapes as beamshapes
     >>> from beamshapes import piston_in_sphere_directionality
     >>> angles = mpmath.linspace(0,pi,10) 
     >>> An_out, spherepiston_beam = piston_in_sphere_directionality(angles, input_params)
