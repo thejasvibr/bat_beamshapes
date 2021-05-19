@@ -8,15 +8,17 @@ Beamshapes: directivity patterns for multiple sound sources
 
 Introduction
 ~~~~~~~~~~~~
-The `beamshapes` (currently called `bat_beamshapes`) package implements the 
-directivity functions (:math:`\frac{D_{\theta}}{D_{0}}`) of various sound radiation models (piston in a sphere, cap in a sphere, piston in a closed circular baffle, etc.).
+The `beamshapes` package implements the 
+directivity functions (:math:`\frac{D_{\theta}}{D_{0}}`) of various sound radiation models
+(piston in a sphere, cap in a sphere, piston in a closed circular baffle, etc.).
 
-While there are many sound emission models in the literature, there aren't
-any (AFAIK) openly available computational implementations. `beamshapes` 
-covers this gap.
 
 Check out a general introduction to the concepts of the package :doc:`here <general_intro>`.
 
+What gap does `package` fill?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+While there are many sound radiation models described in the literature, there aren't
+that many (or any?) openly available computational implementations of their beamshapes.
 
 Who is this useful for? 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -45,10 +47,9 @@ Models to be implemented
 Package under active development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This package is relatively young, and changing dynamically. Things may
-break fairly often if you are installing from the GitHub repo directly.
+break fairly often if you are installing from the `GitHub repo <https://github.com/thejasvibr/bat_beamshapes>`_ directly.
 A stable release will hopefully be out by the end of May 2021 or 
-beginning of June 2021. Stay tuned!!
-
+beginning of June 2021. Stay tuned!
 
 
 .. toctree::
@@ -66,7 +67,7 @@ beginning of June 2021. Stay tuned!!
 
 Contributors
 ~~~~~~~~~~~~
-Thejasvi Beleyur (maintainer)
+Thejasvi Beleyur (maintainer, thejasvib@gmail.com)
 
 Gaurav Dhariwal
 

@@ -5,9 +5,9 @@ Holds convenience functions which help in parallelising FLINT
 code. 
 
 The idea is to:
-    > convert acb objects into strings to allow pickling
-    > convert string --> acb to allow computation in function
-    > convert acb back to string and export results
+    * convert acb objects into strings to allow pickling
+    * convert string --> acb to allow computation in function
+    * convert acb back to string and export results
 
 '''
 

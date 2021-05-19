@@ -1,7 +1,7 @@
 '''
 Piston in a sphere (FLINT implementation)
 =========================================
-Re-working of piston in a sphere using python-Flint. 
+Implementation of piston in a sphere directivity using python-Flint. 
 
 Installation/requirements
 -------------------------
@@ -12,19 +12,6 @@ While the installation is a bit involved due to the packages dependencies (GMP,M
 the speed-up afterwards is worth it. This implementation currently only works on 
 Linux machines (as of python-flint 0.3.0 - but perhaps later releases may be OS-agnostic!).
 
-
-Parameters
-----------
-alpha : 0<float<pi
-    The 'gape'/'aperture' of the piston. The half-angle it occupies 
-    in radians. 
-k : float>0
-    Wavenumber, 2*pi/wavelength
-a : float>0 
-    Piston radius
-alpha : float>0
-    Half-angle of piston, radians. 
-
 References
 ----------
 Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
@@ -33,7 +20,6 @@ Academic Press.
 See Also 
 --------
 bat_beamshapes.piston_in_sphere
-
 
 '''
 #%%
@@ -254,7 +240,7 @@ def dzero(An, param):
     
     return pt1*sum_term
 
-def directionality(thetas, An, param):
+def directivity(thetas, An, param):
     d_zero_val = dzero(An, param)
     ratios = []
     for each in thetas:
@@ -263,7 +249,7 @@ def directionality(thetas, An, param):
         ratios.append(ratio)
     return ratios
 
-def piston_in_sphere_directionality(thetas, param,**kwargs):
+def piston_in_sphere_directivity(thetas, param,**kwargs):
     '''
 
     Parameters
@@ -283,7 +269,7 @@ def piston_in_sphere_directionality(thetas, param,**kwargs):
     -------
     A_n : acb_mat
         The 'An' term required for calculating directionalities.
-    dB_directionality : np.array
+    dB_directivity : np.array
         Array with 20log10(on-axis/off-axis) values. 
     '''
     A_n = kwargs.get('A_n', None)
@@ -292,9 +278,9 @@ def piston_in_sphere_directionality(thetas, param,**kwargs):
         b_mat = make_bm(param)
         A_n = mmn_mat.solve(b_mat)
     
-    ratios = directionality(thetas, A_n, param)
-    dB_directionality = 20*np.log10(np.float32(ratios))
-    return A_n, dB_directionality
+    ratios = directivity(thetas, A_n, param)
+    dB_directivity = 20*np.log10(np.float32(ratios))
+    return A_n, dB_directivity
 
 #%%
 if __name__ == '__main__':
@@ -310,13 +296,13 @@ if __name__ == '__main__':
     print(f'The DPS is: {ctx.dps}')
     #mmn_mat = make_Mmn(params)
     angles = [pi*0, pi/6, pi/4, pi/2, pi]
-    an, dbdirn = piston_in_sphere_directionality(angles, params)
+    an, dbdirn = piston_in_sphere_directivity(angles, params)
     
     print(dbdirn)
     # %% 
     angles = np.linspace(0,np.pi,200)
     angles_acb = [acb(each) for each in angles]
-    _, dbdirn2 = piston_in_sphere_directionality(angles_acb, params, A_n=an)
+    _, dbdirn2 = piston_in_sphere_directivity(angles_acb, params, A_n=an)
     import matplotlib.pyplot as plt 
     plt.figure()
     a0 = plt.subplot(111, projection='polar')

@@ -8,7 +8,7 @@ textbook groundtruth by 2-5 dB -- which is not ignorable!!
     effects, which is odd
     * low N (matrix size/number of terms calculcated) -- changing from 
     baseline of 12+f(ka) --> 15+f(ka) had no effect
-    * the directionality calculations were done with numpy pre 5th may, 
+    * the directivity calculations were done with numpy pre 5th may, 
     and then changed to mpmath backend --> no effect. 
 
 > 2021-06-05: I now suspect the problem lies perhaps with the quadrature 
@@ -436,22 +436,22 @@ def d_zero(k_v,R_v,alpha_v,An):
     rel_level = lambdify([], -part1*part2, 'mpmath')
     return abs(rel_level())
 
-def relative_directionality_db(angle,k_v,R_v,alpha_v,An):
+def relative_directivity_db(angle,k_v,R_v,alpha_v,An):
     off_axis = d_theta(angle,k_v,R_v,alpha_v,An)
     on_axis = d_zero(k_v,R_v,alpha_v,An)
     rel_level = 20*mpmath.log10(abs(off_axis/on_axis))
     return rel_level
 
-def piston_in_sphere_directionality(angles, params):
+def piston_in_sphere_directivity(angles, params):
     '''
-    Calculates relative directionality dB (D(theta)/D(0))
+    Calculates relative directivity dB (D(theta)/D(0))
     of a piston in a rigid sphere.
     
     
     Parameters
     ----------
     angles : array-like
-        Angles at which the directionality is to be calculated in radians. 
+        Angles at which the directivity is to be calculated in radians. 
     params : dictionary
         Dictionary with at least the following keys:
             k : mpmath.mpf>0
@@ -468,7 +468,7 @@ def piston_in_sphere_directionality(angles, params):
 
     Returns 
     -------
-    directionality : list
+    directivity : list
         List with relative directionalities in  dB. 
         The number of items is equal to the number of angles.
 
@@ -486,15 +486,15 @@ def piston_in_sphere_directionality(angles, params):
     bmatrix = compute_b(params)
     amatrix = compute_a(Mmatrix, bmatrix)
     
-    # directionality = []
+    # directivity = []
     # for angle_v in angles:
-    #     directionality.append(relative_directionality_db(angle_v,
+    #     directivity.append(relative_directivity_db(angle_v,
     #                                                      params['k'],
     #                                                      params['R'], 
     #                                                      params['alpha'],
     #                                                      amatrix))
     
-    # return directionality
+    # return directivity
     return amatrix, Mmatrix, bmatrix
 
 if __name__ == '__main__':
@@ -532,8 +532,8 @@ if __name__ == '__main__':
     mpmath.mp.dps = 25
 
     angles = mpmath.matrix(np.radians(ka5['angle_deg'])) #mpmath.linspace(0,mpmath.pi,100)
-    An, Mmn, bm = piston_in_sphere_directionality(angles, paramv)
-    directionality = []
+    An, Mmn, bm = piston_in_sphere_directivity(angles, paramv)
+    directivity = []
     dzero_value = d_zero(paramv['k'],paramv['R'],
                               paramv['alpha'], An)
     dtheta_values = []

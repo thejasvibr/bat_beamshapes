@@ -17,7 +17,7 @@ import unittest
 import mpmath
 import numpy as np 
 import pandas as pd
-from bat_beamshapes import cap_in_sphere_directionality
+from bat_beamshapes import cap_in_sphere_directivity
 
 
 class CapOfSphere(unittest.TestCase):
@@ -37,7 +37,7 @@ class CapOfSphere(unittest.TestCase):
         angles = np.radians(self.by_ka.get_group(kaval)['theta'])
         actual_dirnlty = self.by_ka.get_group(kaval)['r'].to_numpy()
         
-        _, output_dirnlty = cap_in_sphere_directionality(angles,
+        _, output_dirnlty = cap_in_sphere_directivity(angles,
                                                                      self.paramv)
         error = np.abs(output_dirnlty-actual_dirnlty)
         return np.max(error)
@@ -65,7 +65,7 @@ if __name__=='__main__':
     # angles = np.radians(by_ka.get_group(kaval)['theta'])
     # actual_dirnlty = by_ka.get_group(kaval)['r'].to_numpy()
     
-    # _, output_dirnlty = cap_in_sphere_directionality(angles,
+    # _, output_dirnlty = cap_in_sphere_directivity(angles,
     #                                                               paramv)
     # error = np.abs(output_dirnlty-actual_dirnlty)
     # error_deg = pd.DataFrame(data={'theta':angles, 

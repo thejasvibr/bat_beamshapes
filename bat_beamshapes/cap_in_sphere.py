@@ -108,22 +108,22 @@ def d_zero(kv, Rv, alphav, thetav=0):
     return final_d_0
 
 
-def relative_directionality_db(angle, k_v, R_v, alpha_v):
+def relative_directivity_db(angle, k_v, R_v, alpha_v):
     off_axis = d_theta(k_v, R_v, alpha_v, angle)
     on_axis = d_zero(k_v, R_v, alpha_v)
     rel_level = 20*mpmath.log10(abs(off_axis/on_axis))
     return rel_level
 
 
-def cap_in_sphere_directionality(angles, params):
+def cap_in_sphere_directivity(angles, params):
     '''
-    Calculates relative directionality dB (D(theta)/D(0))
+    Calculates relative directivity dB (D(theta)/D(0))
     of an oscillating cap in a rigid sphere.
 
     Parameters
     ----------
     angles : array-like
-        Angles at which the directionality is to be calculated in radians.
+        Angles at which the directivity is to be calculated in radians.
     params : dictionary
         Dictionary with at least the following keys:
             k : mpmath.mpf>0
@@ -137,7 +137,7 @@ def cap_in_sphere_directionality(angles, params):
     Returns
     -------
     _ : None
-    directionality : np.array
+    directivity : np.array
         Array with relative directionalities in (20log10) dB.
         The number of items is equal to the number of angles.
 
@@ -185,10 +185,10 @@ def cap_in_sphere_directionality(angles, params):
     dtheta_out = Parallel(n_jobs=num_cores, backend='multiprocessing')(delayed(d_theta_pll)(**params_str) for params_str in tqdm.tqdm(paramset))
     dtheta_values = [mpmath.mpmathify(each) for each in dtheta_out]
 
-    directionality = np.array([20*mpmath.log10(abs(each/dzero_value)) for each in dtheta_values],
+    directivity = np.array([20*mpmath.log10(abs(each/dzero_value)) for each in dtheta_values],
                             'float32')
 
-    return None, directionality
+    return None, directivity
 
 # if __name__ == '__main__':
 #     kaval = 30
@@ -198,6 +198,6 @@ def cap_in_sphere_directionality(angles, params):
 #     paramv['a'] = paramv['R']*mpmath.sin(paramv['alpha'])
 #     paramv['k'] = kaval/paramv['a']
 #     angles = mpmath.linspace(0,mpmath.pi,10)
-#     outs = cap_in_sphere_directionality(angles,
+#     outs = cap_in_sphere_directivity(angles,
 #                                                    paramv)
 #     #print()

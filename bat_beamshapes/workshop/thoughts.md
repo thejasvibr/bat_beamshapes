@@ -39,7 +39,7 @@ textbook groundtruth by 2-5 dB -- which is not ignorable!!
     effects, which is odd
     * low N (matrix size/number of terms calculcated) -- changing from 
     baseline of 12+f(ka) --> 15+f(ka) had no effect
-    * the directionality calculations were done with numpy pre 5th may, 
+    * the directivity calculations were done with numpy pre 5th may, 
     and then changed to mpmath backend --> no effect. 
 
 > 2021-05-65: I now suspect the problem lies perhaps with the quadrature 

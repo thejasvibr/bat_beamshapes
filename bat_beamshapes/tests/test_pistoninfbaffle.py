@@ -15,7 +15,7 @@ except:
 import unittest
 import numpy as np 
 import pandas as pd
-from bat_beamshapes import piston_in_infinite_baffle_directionality
+from bat_beamshapes import piston_in_infinite_baffle_directivity
 
 
 class PistonInInfBaffle(unittest.TestCase):
@@ -31,7 +31,7 @@ class PistonInInfBaffle(unittest.TestCase):
         angles = np.radians(self.by_ka.get_group(kaval)['theta'])
         actual_dirnlty = self.by_ka.get_group(kaval)['r'].to_numpy()
         
-        _, output_dirnlty = piston_in_infinite_baffle_directionality(angles,
+        _, output_dirnlty = piston_in_infinite_baffle_directivity(angles,
                                                                      self.paramv)
         error = np.abs(output_dirnlty-actual_dirnlty)
         return np.max(error)
@@ -56,7 +56,7 @@ if __name__=='__main__':
     # angles = np.radians(by_ka.get_group(kaval)['theta'])
     # actual_dirnlty = by_ka.get_group(kaval)['r'].to_numpy()
     
-    # _, output_dirnlty = piston_in_infinite_baffle_directionality(angles,
+    # _, output_dirnlty = piston_in_infinite_baffle_directivity(angles,
     #                                                               paramv)
     # error = np.abs(output_dirnlty-actual_dirnlty)
     # error_deg = pd.DataFrame(data={'theta':angles, 

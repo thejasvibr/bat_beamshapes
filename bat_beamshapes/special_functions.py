@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Special math functions 
+======================
 Common special functions to be used across models
 
 """

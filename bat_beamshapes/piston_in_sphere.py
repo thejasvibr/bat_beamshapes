@@ -4,18 +4,6 @@
 Piston in a sphere
 ==================
 
-Parameters
-----------
-alpha : 0<float<pi
-    The 'gape'/'aperture' of the piston. The half-angle it occupies 
-    in radians. 
-k : float>0
-    Wavenumber, 2*pi/wavelength
-a : float>0 
-    Piston radius
-alpha : float>0
-    Half-angle of piston, radians. 
-
 References
 ----------
 Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
@@ -331,22 +319,22 @@ def d_zero(k_v,R_v,alpha_v,An):
     rel_level = lambdify([], -part1*part2, 'mpmath')
     return abs(rel_level())
 
-def relative_directionality_db(angle,k_v,R_v,alpha_v,An):
+def relative_directivity_db(angle,k_v,R_v,alpha_v,An):
     off_axis = d_theta(angle,k_v,R_v,alpha_v,An)
     on_axis = d_zero(k_v,R_v,alpha_v,An)
     rel_level = 20*mpmath.log10(np.abs(off_axis/on_axis))
     return rel_level
 
-def piston_in_sphere_directionality(angles, params, **kwargs):
+def piston_in_sphere_directivity(angles, params, **kwargs):
     '''
-    Calculates relative directionality dB (D(theta)/D(0))
+    Calculates relative directivity dB (D(theta)/D(0))
     of a piston in a rigid sphere.
     
     
     Parameters
     ----------
     angles : array-like
-        Angles at which the directionality is to be calculated in radians. 
+        Angles at which the directivity is to be calculated in radians. 
     params : dictionary
         Dictionary with at least the following keys:
             k : mpmath.mpf>0
@@ -390,66 +378,66 @@ def piston_in_sphere_directionality(angles, params, **kwargs):
         bmatrix = compute_b(params)
         A_n = compute_a(Mmatrix, bmatrix)
         
-    directionality = []
+    directivity = []
     for angle_v in angles:
-        rel_dirnlty = relative_directionality_db(angle_v,
+        rel_dirnlty = relative_directivity_db(angle_v,
                                             params['k'],
                                             params['R'], 
                                             params['alpha'],
                                             A_n)
-        directionality.append(rel_dirnlty)
+        directivity.append(rel_dirnlty)
     
-    directionality = np.array(directionality,'float32')
-    return A_n, directionality
+    directivity = np.array(directivity,'float32')
+    return A_n, directivity
 
 
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-    frequency = mpmath.mpf(50*10**3) # kHz
-    vsound = mpmath.mpf(330) # m/s
-    wavelength = vsound/frequency
-    alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
-    k_value = 2*mpmath.pi/(wavelength)
-    ka_val = 1
-    print(f'Starting piston in sphere for ka={ka_val}')
-    ka = mpmath.mpf(ka_val)
-    a_value = ka/k_value 
-    R_value = a_value/mpmath.sin(alpha_value)  # m
-    paramv = {}
-    paramv['R'] = R_value
-    paramv['alpha'] = alpha_value
-    paramv['k'] = k_value
-    paramv['a'] = a_value
+# if __name__ == '__main__':
+#     import matplotlib.pyplot as plt
+#     frequency = mpmath.mpf(50*10**3) # kHz
+#     vsound = mpmath.mpf(330) # m/s
+#     wavelength = vsound/frequency
+#     alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
+#     k_value = 2*mpmath.pi/(wavelength)
+#     ka_val = 1
+#     print(f'Starting piston in sphere for ka={ka_val}')
+#     ka = mpmath.mpf(ka_val)
+#     a_value = ka/k_value 
+#     R_value = a_value/mpmath.sin(alpha_value)  # m
+#     paramv = {}
+#     paramv['R'] = R_value
+#     paramv['alpha'] = alpha_value
+#     paramv['k'] = k_value
+#     paramv['a'] = a_value
     
     
-    import pandas as pd
-    df = pd.read_csv('workshop/ka5_piston_in_sphere.csv')
-    df2 = pd.read_csv('tests/plots_data/piston_in_sphere_fig12-23.csv')
-    ka5 = df2[df2['ka']==ka_val]
+#     import pandas as pd
+#     df = pd.read_csv('workshop/ka5_piston_in_sphere.csv')
+#     df2 = pd.read_csv('tests/plots_data/piston_in_sphere_fig12-23.csv')
+#     ka5 = df2[df2['ka']==ka_val]
     
     
-    angles = mpmath.matrix(np.radians(ka5['angle_deg'])) #mpmath.linspace(0,mpmath.pi,100)
-    Ann, beamshape = piston_in_sphere_directionality(angles, paramv)
+#     angles = mpmath.matrix(np.radians(ka5['angle_deg'])) #mpmath.linspace(0,mpmath.pi,100)
+#     Ann, beamshape = piston_in_sphere_directivity(angles, paramv)
 
-    plt.figure()
-    a0 = plt.subplot(111, projection='polar')
-    plt.plot(angles, beamshape, '-*',label='calculated')
-    #plt.plot(angles, beamshape_nonpll, label='serial')
-    plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
-    plt.xticks(np.arange(0,2*np.pi,np.pi/6))
-    # load digitised textbook data
-    plt.plot(angles, ka5['relonaxis_db'], '*', label='actual')
-    plt.savefig(f'ka{ka_val}_pistoninasphere.png')
-    # Also compare the error between prediction and textbook values
-    plt.figure()
-    plt.plot(angles, ka5['relonaxis_db'],'-',label='ground truth') # textbook
-    plt.plot(angles, beamshape,'-*',label='calculated') # calculated
-    plt.plot(angles, beamshape-ka5['relonaxis_db'],'-*',label='error') # relative error
-    plt.yticks(np.arange(-36,4,2))
-    plt.grid();plt.legend()
-# plt.savefig(f'ka{ka_val}_pistoninasphere_error.png')
-    error = beamshape-ka5['relonaxis_db']
-    median_error = np.median(np.abs(error))
-    avg_error = np.mean(np.abs(error))
-    rms_error = np.sqrt(np.mean(np.square(error)))
-    print(median_error, avg_error, rms_error)
+#     plt.figure()
+#     a0 = plt.subplot(111, projection='polar')
+#     plt.plot(angles, beamshape, '-*',label='calculated')
+#     #plt.plot(angles, beamshape_nonpll, label='serial')
+#     plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
+#     plt.xticks(np.arange(0,2*np.pi,np.pi/6))
+#     # load digitised textbook data
+#     plt.plot(angles, ka5['relonaxis_db'], '*', label='actual')
+#     plt.savefig(f'ka{ka_val}_pistoninasphere.png')
+#     # Also compare the error between prediction and textbook values
+#     plt.figure()
+#     plt.plot(angles, ka5['relonaxis_db'],'-',label='ground truth') # textbook
+#     plt.plot(angles, beamshape,'-*',label='calculated') # calculated
+#     plt.plot(angles, beamshape-ka5['relonaxis_db'],'-*',label='error') # relative error
+#     plt.yticks(np.arange(-36,4,2))
+#     plt.grid();plt.legend()
+# # plt.savefig(f'ka{ka_val}_pistoninasphere_error.png')
+#     error = beamshape-ka5['relonaxis_db']
+#     median_error = np.median(np.abs(error))
+#     avg_error = np.mean(np.abs(error))
+#     rms_error = np.sqrt(np.mean(np.square(error)))
+#     print(median_error, avg_error, rms_error)

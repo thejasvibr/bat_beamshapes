@@ -5,7 +5,6 @@ Utility functions
 =================
 Functions that helps with formatting shape and converting between object types.
 
-
 """
 import mpmath
 import numpy as np 

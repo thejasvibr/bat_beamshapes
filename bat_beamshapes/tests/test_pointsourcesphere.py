@@ -17,7 +17,7 @@ except:
 import unittest
 import numpy as np 
 import pandas as pd
-from bat_beamshapes import point_source_on_a_sphere_directionality
+from bat_beamshapes import point_source_on_a_sphere_directivity
 
 
 class PointSourceSphere(unittest.TestCase):
@@ -33,7 +33,7 @@ class PointSourceSphere(unittest.TestCase):
         angles = np.radians(self.by_ka.get_group(kRval)['theta'])
         actual_dirnlty = self.by_ka.get_group(kRval)['r'].to_numpy()
         
-        _, output_dirnlty = point_source_on_a_sphere_directionality(angles,
+        _, output_dirnlty = point_source_on_a_sphere_directivity(angles,
                                                                      self.paramv)
         error = np.abs(output_dirnlty-actual_dirnlty)
         return np.max(error)
@@ -59,7 +59,7 @@ if __name__=='__main__':
     # angles = np.radians(by_ka.get_group(kRval)['theta'])
     # actual_dirnlty = by_ka.get_group(kRval)['r'].to_numpy()
     
-    # _, output_dirnlty = point_source_on_a_sphere_directionality(angles,
+    # _, output_dirnlty = point_source_on_a_sphere_directivity(angles,
     #                                                               paramv)
     # error = np.abs(output_dirnlty-actual_dirnlty)
     # error_deg = pd.DataFrame(data={'theta':angles, 

@@ -5,13 +5,6 @@ Point source on a sphere
 ========================
 An infinitesimally oscillating on the surface of a sphere. Useful where the 
 source is very small in comparison to the sphere.
-   
-Parameters
-----------
-k : float > 0 
-    WAvenumber
-R : float > 0
-    Radius of sphere
 
 
 References 
@@ -45,13 +38,13 @@ d_zero_func = lambdify([k,R,NN],d_zero)
 
 #%%
 
-def point_source_on_a_sphere_directionality(angles, param, parallel=False):
+def point_source_on_a_sphere_directivity(angles, param, parallel=False):
     '''
         
     Parameters
     ----------
         angles : list/array-like
-            The angles for which the directionality is to be calculated. 
+            The angles for which the directivity is to be calculated. 
             All angles in radians.
 
         param: dictionary 
@@ -90,7 +83,7 @@ if __name__ == '__main__':
     plt.ylim(-40,10);plt.yticks(np.arange(-40,10,10))
     for kv in [100, 50, 30, 10]:
         paramv = {'k':kv,'R':0.1}
-        _, dirnlty = point_source_on_a_sphere_directionality(angles,paramv)    
+        _, dirnlty = point_source_on_a_sphere_directivity(angles,paramv)    
         plt.plot(angles, dirnlty, label='ka: '+str(kv*0.1))
         angles *= -1 
         

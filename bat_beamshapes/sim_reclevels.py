@@ -138,7 +138,7 @@ def sim_miclevel_beamshape(sl, call_direction,
     miclevel_beamshape
 
     '''
-    # first generate the received levels assuming omnidirectionality
+    # first generate the received levels assuming omnidirectivity
     mic_levels_omni = calc_mic_level_nobeamshape(sl, 
                                                  batposition,
                                                  micpositions,refdist)

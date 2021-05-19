@@ -46,6 +46,10 @@ You can access the version number of the package being used with
 >>> print(bat_beamshapes.__version__)
 ```
 
+## Future implementations
+* Piston on a cylinder
+* Rectangular piston on a prolate spheroid ([paper](https://asa.scitation.org/doi/pdf/10.1121/1.1778840?casa_token=wDAHTxJBISUAAAAA:MW-OSeGIkft-mces_mJgFBuyOhzI1qpPbc_7Xuu9EhDDD8CF8vnCIYaGyVivUb2qOpFda4GkPWto))
+
 
 TODO:
 * Verification tests to check output with Beranek & Mellow 2012 graphs:

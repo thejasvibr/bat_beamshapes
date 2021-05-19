@@ -35,16 +35,16 @@ def d_theta_func(kv,av,thetav):
 
 
 #%%
-def piston_in_infinite_baffle_directionality(angles, param):
+def piston_in_infinite_baffle_directivity(angles, param):
     '''
-    Calculates relative directionality dB (D(theta)/D(0))
+    Calculates relative directivity dB (D(theta)/D(0))
     of a piston in an infinite baffle.
     
     
     Parameters
     ----------
     angles : array-like
-        Angles at which the directionality is to be calculated in radians. 
+        Angles at which the directivity is to be calculated in radians. 
     params : dictionary
         Dictionary with at least the following keys:
             k : float>0
