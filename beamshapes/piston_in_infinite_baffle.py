@@ -11,7 +11,7 @@ Academic Press.
 
 """
 import numpy as np 
-from bat_beamshapes.utilities import dB
+from beamshapes.utilities import dB
 from sympy import besselj, sin, symbols, lambdify, limit
 k,a,theta = symbols('k a theta')
 #%%

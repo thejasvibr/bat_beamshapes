@@ -15,8 +15,8 @@ Academic Press.
 """
 import numpy as np 
 from sympy import symbols, legendre, lambdify, I, Sum, cos
-from bat_beamshapes.special_functions import sph_hankel2
-from bat_beamshapes.utilities import dB
+from beamshapes.special_functions import sph_hankel2
+from beamshapes.utilities import dB
 
 k, R, n, theta, NN, kR = symbols('k R n theta NN kR')
 costheta = cos(theta)

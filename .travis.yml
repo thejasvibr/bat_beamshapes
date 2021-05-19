@@ -1,8 +1,8 @@
 language: python 
 python:
   - "3.8"
-install: pip install -r bat_beamshapes/tests/requirements_test.txt
+install: pip install -r beamshapes/tests/requirements_test.txt
 branches:
   only:
     - dev
-script: python -m unittest discover bat_beamshapes/tests
+script: python -m unittest discover beamshapes/tests

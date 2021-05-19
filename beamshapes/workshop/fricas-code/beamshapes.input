@@ -1,5 +1,5 @@
 -- Module which implements the piston in a sphere Chp 12, Mellow & Beranek 2012---
--- )cd ~/Documents/research-repos/bat_beamshapes/bat_beamshapes/workshop/fricas-code/
+-- )cd ~/Documents/research-repos/beamshapes/beamshapes/workshop/fricas-code/
 -- This script was improved greatly by the comments of Ralf Hemmecke and inputs from 
 -- Waldek Hebbisch. 
 

@@ -20,15 +20,15 @@ from sympy import symbols, legendre, sin, cos, tan, Sum, I, diff, pi, sqrt
 from sympy import Matrix, Piecewise, IndexedBase
 from sympy import  lambdify, expand, Integral
 from sympy import HadamardProduct as HP
-from bat_beamshapes.special_functions import h2_nz
+from beamshapes.special_functions import h2_nz
 import tqdm
 x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r1 R theta,y,z')
 jj, nn = symbols('jj nn')
 
 mpmath.mp.dps = dps
 
-from bat_beamshapes.special_functions import sph_hankel2
-from bat_beamshapes.utilities import args_to_mpmath, args_to_str
+from beamshapes.special_functions import sph_hankel2
+from beamshapes.utilities import args_to_mpmath, args_to_str
 
 r1 = (R*cos(alpha))/cos(theta)
 

@@ -8,7 +8,7 @@ predicted outputs.
 
 import os 
 try:
-    os.chdir('bat_beamshapes/tests')
+    os.chdir('beamshapes/tests')
 except:
     pass
 
@@ -17,7 +17,7 @@ import unittest
 import mpmath
 import numpy as np 
 import pandas as pd
-from bat_beamshapes import cap_in_sphere_directivity
+from beamshapes import cap_in_sphere_directivity
 
 
 class CapOfSphere(unittest.TestCase):

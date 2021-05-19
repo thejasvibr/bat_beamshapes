@@ -15,7 +15,7 @@ import numpy as np
 import scipy.spatial as spatial
 from scipy.spatial.transform import Rotation as R
 import matplotlib.pyplot as plt
-from bat_beamshapes.beamshape_predictions import simple_cardiod, omnidirn_model
+from beamshapes.beamshape_predictions import simple_cardiod, omnidirn_model
 
      
 def calc_relangle(a,b,c):

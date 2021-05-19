@@ -1,149 +1,32 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
-Troubleshooting piston in a sphere
-==================================
-> For ka>3 the calculations show values that deviate from the 
-textbook groundtruth by 2-5 dB -- which is not ignorable!!
-> I suspected the problem may come from:
-    * low mpmath.mp.dps (decimal places) -- changing from 50-400 had no
-    effects, which is odd
-    * low N (matrix size/number of terms calculcated) -- changing from 
-    baseline of 12+f(ka) --> 15+f(ka) had no effect
-    * the directivity calculations were done with numpy pre 5th may, 
-    and then changed to mpmath backend --> no effect. 
+My attempt to convert the mpmath backend piston in a sphere to 
+scipy backend. 
 
-> 2021-06-05: I now suspect the problem lies perhaps with the quadrature 
-terms. What if the quadrature is not 'accurate' enough? Here I'll test this idea
-    * Some points to support this idea. The default quadrature method behind
-    mpmath.quad is the 'tanh-sinh' algorithm. Instead of directly lambdifying 
-    the Imn term into a standard mpmath.quad function I 'manually' made a 
-    quadrature function for it to manipulate the options. 
-    * For dps 200. Using the default 'tanh-sinh' leads to an estimated error 
-    of e-203, while using 'gauss-legendre' leads to an estimated error of e-382. 
-    Perhaps this is where the error is arising from. I noticed the integration 
-    error increases with increasing m,n values. Perhaps this is why for bigger ka's, 
-    (ka>3), the predictions get messier than for small ka's? There is at least 
-    a connection here. 
+Issues and troubleshooting
+==========================
 
-Results with Imn - gauss-legendre flavour
------------------------------------------
+AttributeError: 'function' object has no attribute 'reduce'
+-----------------------------------------------------------
+The problem is with the Kmn_func  -> on lambdifying, it's not working 
+as nicely any more.
 
-* The Imn term is not really the issue -- HOWEVER, using gauss-legendre reduces
-run-time by 1/2!!, which is fantastic. 
+Solution : manually define the Kmn_func, instead of using :code:`Piecewise`.
 
+The main problem is I'm not sure if scipy has complex quadrature, and am 
+unwilling to invest the energy to get into that now. 
 
-Quadrture of the Lm term
-========================
-The other point of errors is the Lm term. What about there, does the exact
-quadrature algorithm make a difference here? 
-
-Here too, the choice of quadrature algorithm makes a difference. 'tanh-sinh' gives
-higher estimated error terms for any given dps.
-
-|Algorithm  | Error | dps   |
-|-----------|-------|-------|
-| tanh-sinh | e-74  | 250   |
-| tanh-sinh | e-304 | 300   |
-| gauss-leg.| e-76  | 250   |
-| gauss-leg.| e-316 | 300   |
-
-Broadly-speaking, the level of 'detail' (degree) that is applied during quadrature is proportional 
-to the binary/decimal precision set for the code. For whatever reason, I couldn't
-bring down the error term down by altering the 'maxdegree' argument of the 
-`mpmath.quad` function. Either way, for now the estimated error has been brought
-down. Hopefully this should do?
-
-
-Results with Lm term
---------------------
-Apparently the prediction-calculation mismatch doesn't have to do with the Lm term's
-integration either!! The same errors appear. 
-
-
-Is it a `dps` related issue? (2021-05-07 and 2021-05-10)
-=========================================
-
-
-| dps  | mismatch occurs? |
-|------|------------------|
-| 300  | yes              |
-| 500  | yes              |
-| 1000 | yes              | 
-
-
-The mismatch still occurs no matter the actual `dps` - which is odd. 
-The bottle-neck must thus be somewhere after the M and b matrix -- is it in 
-the `a` term? Perhaps the inverse being calculated is using a fast-but-dirty approach?
-
-Is it the calculation of the `a` matrix? 
-========================================
-Try lu_solve and qr_solve - one of them is more inaccurate than the other. 
-
-Replace 'mpmath.inverse(M)'*b_matrix with mpmath.lu_solve(M,b) and mpmath.qr_solve
-| Function used  | Mismatch occurs? |
-|----------------|------------------|
-| mpmath.inverse |  yes             |
-| mpmath.lu_solve|  yes             |
-| mpmath.qr_solve|  yes             |
-
-??? -- the mpmath.mp.dps seems to get weirdly switched back to 50! during/after
-the matrix solving -- don't know why!
-
-This is becasue the dps set in the initial part of the module  is not consdiered. 
-Setting the dps once more to 100-300 in the '__main__' part of the module
-will switch it the the user's  preference
-
-
-
-Does setting the D(theta) and D(0) to |D(theta)| and |D(0)| help?
-=================================================================
-In Tim Mellow's Mathematica code, the values are 'abs-ed' before 
-division'  --- NO DIFFERENCE!
-
-Try out mpmath.matrices.linalg -- improve_solution?
-===================================================
-importing improve_solution isn't so straightforward, perhaps on purpose. 
-Needed to check the tests to see hwo to import it. 
-
->>> from mpmath import *
->>> new_an = mp.improve_solution(Mmn, An, bm, maxsteps=10)
-
-but, the `new_an` had the same residual as the old An, and the function 
-didn't make any difference.
-
-Does changing the `N` help?
-=============================
-Changing the N equation from 12+2*() --> 12+3*() didn't change the plot much. 
-
-There is some relation, and hopefully this will lead me to the source of the 
-error. 
-
-The details of the errors to the text-book plots are in 'effect_of_N-dps.csv'.
-The patterns were a bit tough to follow through. 
-
-A potential TYPO??
-==================
-Despite having checked my code and equations multiple times I kept wondering what
-was wrong. I now suspect the difference in my results and those in the textbook
-are because of a typo in the textbook. 
-
-In eqn. 12.98, the sin(theta) term, should be replaced by a sin(theta)^2 term. 
-I think there was an error in the substitution -- this also explains the
-deviation with respect to the angle. The on-axis terms are expected to be
-pretty similar as at theta around 0, sin(theta) and sin(theta)^2 may be
-similar, but as theta increases, the difference increases too!
-
+@author: autumn
 """
-
-#%%
-
 
 import copy
-from gmpy2 import *
 from joblib import Parallel, delayed 
 import mpmath
 from mpmath import mpf
 import numpy as np
 from symengine import * 
+import scipy
 import sympy
 from sympy import symbols, legendre, sin, cos, tan, Sum, I, diff, pi, sqrt
 from sympy import Matrix, Piecewise
@@ -154,8 +37,8 @@ x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r
 dps = 300;
 mpmath.mp.dps = dps
 
-from bat_beamshapes.special_functions import sph_hankel2
-from bat_beamshapes.utilities import args_to_mpmath, args_to_str
+from beamshapes.special_functions import sph_hankel2
+from beamshapes.utilities import args_to_mpmath, args_to_str
 
 r1 = (R*cos(alpha))/cos(theta)
 
@@ -174,19 +57,19 @@ whole_postterm = legendre(m,cos(theta))*(r1**2/R**2)*tan(theta)
 
 Imn_term = (Imn_pt1 + Imn_pt2)*whole_postterm 
 Imn = Integral(Imn_term,(theta,0,alpha))
-Imn_term_func = lambdify([m,n,k,R,alpha, theta], Imn_term, 'mpmath')
-# Imn_func = lambdify([m,n,k,R,alpha],Imn,'mpmath') 
+Imn_term_func = lambdify([m,n,k,R,alpha, theta], Imn_term, 'scipy')
+Imn_func = lambdify([m,n,k,R,alpha],Imn,'scipy') 
 
 #%%
-def Imn_func(mv,nv,kv,Rv,alphav):
-    '''
-    eqn. 12.106
-    The 'gauss-legendre' quadrature method is used here as it provides 
-    more accurate output, even with increasing m&n indices. 
-    '''
-    return mpmath.quad(lambda thetav: Imn_term_func(mv,nv,kv,Rv,alphav, thetav),
-                       (0,alphav),
-                       method='gauss-legendre')
+# defImn_func(mv,nv,kv,Rv,alphav):
+#     '''
+#     eqn. 12.106
+#     The 'gauss-legendre' quadrature method is used here as it provides 
+#     more accurate output, even with increasing m&n indices. 
+#     '''
+#     return mpmath.quad(lambda thetav: Imn_term_func(mv,nv,kv,Rv,alphav, thetav),
+#                        (0,alphav),
+#                        method='gauss-legendre')
 
 # mpmath.mp.dps = 300
 # errors = []
@@ -229,27 +112,40 @@ summn_funcn = legendre(index,cos(alpha))*(legendre(index,cos(alpha))*cos(alpha)-
 
 meqn_sumterm = 2*Sum(summn_funcn, (index,1,m-1))
 eqn70_meqn = (1+ cos(alpha)*legendre(m,cos(alpha))**2 + meqn_sumterm)/(2*m+1)
-Kmn = Piecewise((eqn70_mnoteqn,m>n),
-                (eqn70_mnoteqn,m<n),
-                (eqn70_meqn,True), )
-Kmn_func = lambdify([m,n,alpha],Kmn,'mpmath')
+
+
+
+
+eqn70_mnoteqn_func = lambdify([m,n,alpha],eqn70_mnoteqn,'scipy')
+eqn70_meqn_func    = lambdify([m,n,alpha],eqn70_meqn,'scipy')
+# manually recreate the piecewise function
+def Kmn_func(mv,nv,alphav):
+    if mv>nv or nv>mv:
+        return eqn70_mnoteqn_func(mv,nv,alphav)
+    else:
+        return eqn70_meqn_func(mv,nv,alphav)
+
+# Kmn = Piecewise((eqn70_mnoteqn,m>n),
+#                 (eqn70_mnoteqn,m<n),
+#                 (eqn70_meqn,True), )
+# Kmn_func = lambdify([m,n,alpha],Kmn,'scipy')
 
 #%%
 # equation 12.108
 Lm_expr = legendre(m,cos(theta))*(r1**2/R**2)*tan(theta)
 Lm = Integral(Lm_expr, (theta,0,alpha))
-#Lm_func = lambdify([m, R, alpha], Lm, 'mpmath')
-Lm_term = lambdify([m,R,alpha,theta], Lm_expr,'mpmath')
+Lm_func = lambdify([m, R, alpha], Lm, 'scipy')
+Lm_term = lambdify([m,R,alpha,theta], Lm_expr,'scipy')
 
-def Lm_func(mv,Rv,alphav):
-    '''
-    eqn. 12.106
-    The 'gauss-legendre' quadrature method is used here as it provides 
-    more accurate output, even with increasing m&n indices. 
-    '''
-    return mpmath.quad(lambda thetav: Lm_term(mv,Rv,alphav, thetav),
-                       mpmath.linspace(0,alphav,2),
-                       method='gauss-legendre')
+# def Lm_func(mv,Rv,alphav):
+#     '''
+#     eqn. 12.106
+#     The 'gauss-legendre' quadrature method is used here as it provides 
+#     more accurate output, even with increasing m&n indices. 
+#     '''
+#     return mpmath.quad(lambda thetav: Lm_term(mv,Rv,alphav, thetav),
+#                        mpmath.linspace(0,alphav,2),
+#                        method='gauss-legendre')
 
 
 # mpmath.mp.dps = 300
@@ -277,13 +173,13 @@ def b_func(mv, Rv, alphav):
     b = -I*Lm
     '''
     Lm_value = Lm_func(mv,Rv,alphav) # Integral wrt theta
-    return -mpmath.j*Lm_value
+    return -1j*Lm_value
 
 #%% 
 # Setting up the matrices 
 # %% 
 mmn_hankels = n*sph_hankel2.subs({'n':n-1,'z':k*R})-(n+1)*sph_hankel2.subs({'n':n+1,'z':k*R})
-mmn_hankels_func = lambdify([n,k,R], mmn_hankels,'mpmath')
+mmn_hankels_func = lambdify([n,k,R], mmn_hankels,'scipy')
 
 def calc_N(params):
     '''
@@ -386,9 +282,9 @@ def compute_b(params):
     '''
     params['ka'] = mpmath.fmul(params['k'], params['a'])
     Nv = calc_N(params) #12 + int(2*params['ka']/sin(params['alpha']))
-    b_matrix = mpmath.matrix(Nv,1)
+    b_matrix = np.zeros(Nv)
     for each_m in range(Nv):
-        b_matrix[each_m,:] = b_func(each_m, params['R'], params['alpha'])
+        b_matrix[each_m] = b_func(each_m, params['R'], params['alpha'])
     return b_matrix 
 #%%
 def compute_a(M_mat, b_mat):
@@ -501,23 +397,29 @@ if __name__ == '__main__':
     #%% 
     import matplotlib.pyplot as plt
     mpmath.mp.dps = 100
-    frequency = mpmath.mpf(25*10**3) # kHz
-    vsound = mpmath.mpf(330) # m/s
+    frequency = 25*10**3 # kHz
+    vsound = 330.0 # m/s
     wavelength = vsound/frequency
-    alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
-    k_value = 2*mpmath.pi/(wavelength)
+    alpha_value = np.pi/3 # 60 degrees --> pi/3
+    k_value = 2*np.pi/(wavelength)
     ka_val = 10
     print(f'Starting piston in sphere for ka={ka_val}')
-    ka = mpmath.mpf(ka_val)
+    ka = np.float64(ka_val)
     a_value = ka/k_value 
-    R_value = a_value/mpmath.sin(alpha_value)  # m
+    R_value = a_value/np.sin(alpha_value)  # m
     paramv = {}
     paramv['R'] = R_value
     paramv['alpha'] = alpha_value
     paramv['k'] = k_value
     paramv['a'] = a_value
-    paramv['trend'] = int(10+2*paramv['k']*paramv['a']/mpmath.sin(paramv['alpha']))
+    paramv['trend'] = int(10+2*paramv['k']*paramv['a']/np.sin(paramv['alpha']))
     
+    #%%
+    paramv['m'] = 10
+    paramv['n']  = 2
+    calc_one_Mmn_term(**paramv)
+    
+    #%%
 
     
     

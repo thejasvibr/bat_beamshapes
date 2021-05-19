@@ -25,8 +25,8 @@ from sympy import symbols,  I, cos, sin, legendre
 from sympy import lambdify
 import tqdm
 import warnings
-from bat_beamshapes.special_functions import sph_hankel2, legendre_mvz
-from bat_beamshapes.utilities import args_to_mpmath, args_to_str
+from beamshapes.special_functions import sph_hankel2, legendre_mvz
+from beamshapes.utilities import args_to_mpmath, args_to_str
 
 n, z, k, R, alpha, theta = symbols('n z k R alpha theta')
 

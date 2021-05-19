@@ -14,7 +14,7 @@ import mpmath
 #mpmath.mp.dps = 15
 from sympy import expand,symbols, Sum,summation, I, cos, sin, legendre, oo,zoo
 from sympy import lambdify,pi
-from bat_beamshapes.special_functions import sph_hankel2, legendre_mvz
+from beamshapes.special_functions import sph_hankel2, legendre_mvz
 
 n, z,k,R,alpha,theta = symbols('n z k R alpha theta')
 

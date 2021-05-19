@@ -7,8 +7,8 @@ back -- which can then in term be converted to mpmath objects.
 """
 
 #%%
-import bat_beamshapes
-import bat_beamshapes.piston_in_sphere as pins
+import beamshapes
+import beamshapes.piston_in_sphere as pins
 import copy
 from joblib import Parallel, delayed
 import matplotlib.pyplot as plt

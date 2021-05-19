@@ -6,60 +6,57 @@ predicted outputs.
 
 """
 
-
 import os 
 try:
-    os.chdir('bat_beamshapes/tests')
+    os.chdir('beamshapes/tests')
 except:
     pass
-
 
 import unittest
 import numpy as np 
 import pandas as pd
-from bat_beamshapes import point_source_on_a_sphere_directivity
+from beamshapes import piston_in_infinite_baffle_directivity
 
 
-class PointSourceSphere(unittest.TestCase):
+class PistonInInfBaffle(unittest.TestCase):
     
     def setUp(self):
         self.paramv = {}
-        plotdata = pd.read_csv('plots_data/pointonsphere.csv')        
-        self.by_ka = plotdata.groupby('kR')
+        plotdata = pd.read_csv('plots_data/piston_in_infbaffle_fig13-5_2019edn.csv')        
+        self.by_ka = plotdata.groupby('ka')
     
-    def perform_kR_match(self, kRval):
+    def perform_ka_match(self, kaval):
         self.paramv['k'] = 10
-        self.paramv['R'] = kRval/self.paramv['k']
-        angles = np.radians(self.by_ka.get_group(kRval)['theta'])
-        actual_dirnlty = self.by_ka.get_group(kRval)['r'].to_numpy()
+        self.paramv['a'] = kaval/self.paramv['k']
+        angles = np.radians(self.by_ka.get_group(kaval)['theta'])
+        actual_dirnlty = self.by_ka.get_group(kaval)['r'].to_numpy()
         
-        _, output_dirnlty = point_source_on_a_sphere_directivity(angles,
+        _, output_dirnlty = piston_in_infinite_baffle_directivity(angles,
                                                                      self.paramv)
         error = np.abs(output_dirnlty-actual_dirnlty)
         return np.max(error)
     
     def test_kamatches(self):
-        kRvals = [1, 3, 5, 10]
-        max_abs_errors = np.zeros(len(kRvals))
-        for i, each in enumerate(kRvals):
-            max_abs_errors[i] = self.perform_kR_match(each)
+        kavals = [1, 3, 5, 10]
+        max_abs_errors = np.zeros(len(kavals))
+        for i, each in enumerate(kavals):
+            max_abs_errors[i] = self.perform_ka_match(each)
         print(max_abs_errors)
         self.assertTrue(np.all(max_abs_errors<=1))
 
 if __name__=='__main__':
     unittest.main()
     # #%% 
-    # import numpy as np 
     # paramv = {}
-    # plotdata = pd.read_csv('plots_data/pointonsphere.csv')               
-    # by_ka = plotdata.groupby('kR')
-    # kRval = 10
+    # plotdata = pd.read_csv('plots_data/piston_in_infbaffle_fig13-5_2019edn.csv')        
+    # by_ka = plotdata.groupby('ka')
+    # kaval = 5
     # paramv['k'] = 10
-    # paramv['R'] = kRval/paramv['k']
-    # angles = np.radians(by_ka.get_group(kRval)['theta'])
-    # actual_dirnlty = by_ka.get_group(kRval)['r'].to_numpy()
+    # paramv['a'] = kaval/paramv['k']
+    # angles = np.radians(by_ka.get_group(kaval)['theta'])
+    # actual_dirnlty = by_ka.get_group(kaval)['r'].to_numpy()
     
-    # _, output_dirnlty = point_source_on_a_sphere_directivity(angles,
+    # _, output_dirnlty = piston_in_infinite_baffle_directivity(angles,
     #                                                               paramv)
     # error = np.abs(output_dirnlty-actual_dirnlty)
     # error_deg = pd.DataFrame(data={'theta':angles, 
@@ -67,7 +64,7 @@ if __name__=='__main__':
     #                                 'rout':output_dirnlty})
     # error_deg = error_deg.sort_values(by='theta')
     # error_deg['diff'] = np.abs(error_deg['r']-error_deg['rout'])
-    # error_deg['thetadeg'] = by_ka.get_group(kRval)['theta']
+    # error_deg['thetadeg'] = by_ka.get_group(kaval)['theta']
     # print(np.max(error))
     # #%%
     

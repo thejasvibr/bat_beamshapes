@@ -19,7 +19,7 @@ Academic Press.
 
 See Also 
 --------
-bat_beamshapes.piston_in_sphere
+beamshapes.piston_in_sphere
 
 '''
 #%%
@@ -29,7 +29,7 @@ import flint
 from flint import ctx
 import numpy as np 
 import tqdm
-from bat_beamshapes.flint_parallelisation import conv_acb_to_str, conv_str_acb, interchange_params_and_str
+from beamshapes.flint_parallelisation import conv_acb_to_str, conv_str_acb, interchange_params_and_str
 ctx.dps = 50
 cos = flint.acb.cos
 sin = flint.acb.sin
