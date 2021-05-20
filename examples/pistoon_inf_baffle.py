@@ -17,7 +17,7 @@ import numpy as np
 
 # %% 
 # The piston in an infinite baffle has two parameters `k` and `a` 
-# (for more on these)parameters see :doc:`here<../general_intro>`.
+# (for more on these parameters see :doc:`here<../general_intro>`).
 
 dB = lambda X: 20*np.log10(abs(X))
 
@@ -49,8 +49,9 @@ plt.savefig('PIB.png')
 
 
 
-#%% References
-#   ~~~~~~~~~~
+# %% 
+# References
+# ~~~~~~~~~~
 #   
 #  1. Mogensen, F., & Møhl, B. (1979). Sound radiation patterns in the frequency domain of cries from a Vespertilionid bat. Journal of comparative physiology, 134(2), 165-171.
 #  2. Jakobsen, L., Ratcliffe, J. M., & Surlykke, A. (2013). Convergent acoustic field of view in echolocating bats. Nature, 493(7430), 93-96. 

@@ -11,7 +11,7 @@ This package is released under an MIT license.
 ```
 >>> import matplotlib.pyplot as plt 
 >>> import numpy as np 
->>> import bat_beamshapes
+>>> import beamshapes
 >>> from beamshapes import piston_in_infinite_baffle_directivity as PIB # short alias
 >>> input_parameters = {'k':50, 'a':0.1}
 >>> angles = np.linspace(-np.pi/2,np.pi/2,50)
@@ -54,10 +54,8 @@ You can access the version number of the package being used with
 
 TODO:
 * Verification tests to check output with Beranek & Mellow 2012 graphs:
-    * piston in a sphere pending.s
-* change official name from 'bat_beamshapes' to just 'beamshapes'
-* Ideas for package logo:
-    * butterfly - N suggests 
+    * piston in a sphere pending
+
 
 DONE:
 * ~~Uniform output format to a np.array that has 20*log10 D_theta/D_0~~ Done.
@@ -65,3 +63,6 @@ DONE:
 * ~~Cap of sphere - implement parallelisation when ka>5~~
 * ~~Include module-level docs too.~~
 * ~~Check if you really need symengine and gmpy2 for the code to run -- is sruntime really affected? -- Not needed. Speed not affected much in tests.~~
+* ~~change official name from 'bat_beamshapes' to just 'beamshapes'~~
+* ~~Ideas for package logo  butterfly - N suggests ~~
+

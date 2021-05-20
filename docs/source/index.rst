@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Beamshapes: directivity patterns for multiple sound sources
-===========================================================
+Beamshapes: directivity patterns for various sound sources
+==========================================================
 
 Introduction
 ~~~~~~~~~~~~
@@ -27,8 +27,8 @@ parameter estimation on their sound sources. Check out more on the how
 to use this package in the :doc:`examples <gallery_examples/index>`. 
 
 
-Models implemented
-~~~~~~~~~~~~~~~~~~
+Source models implemented
+~~~~~~~~~~~~~~~~~~~~~~~~~
 * Point source on a sphere
 * Piston in an infinite baffle 
 * Piston in a sphere
@@ -38,18 +38,19 @@ Models under implementation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * Piston in a finite closed baffle  
 
-Models to be implemented
-~~~~~~~~~~~~~~~~~~~~~~~~
+Wishlist for future releases 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Piston on a prolate spheroid
 * Rectangular cap of a sphere 
-* Any others of potential relevance -- suggest!
+
+Interested?? Contribute, check out the general :doc:`workflow tips here <general_workflow>`.
 
 
 Package under active development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This package is relatively young, and changing dynamically. Things may
-break fairly often if you are installing from the `GitHub repo <https://github.com/thejasvibr/beamshapes>`_ directly.
-A stable release will hopefully be out by the end of May 2021 or 
-beginning of June 2021. Stay tuned!
+break fairly often if you are installing from the `GitHub repo <https://github.com/thejasvibr/bat_beamshapes>`_ directly.
+A stable release will hopefully be out by the  May-June 2021. Stay tuned!
 
 
 .. toctree::
@@ -75,7 +76,7 @@ Gaurav Dhariwal
 Acknowledgements
 ~~~~~~~~~~~~~~~~
 Many thanks to Tim Mellow for sharing Mathematica code to help with porting to Python.
-
+Also thanks to Neetash MR for inspiring the package logo!
 
 
 .. toctree::
