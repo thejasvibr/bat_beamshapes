@@ -9,9 +9,15 @@ Notes for 'Acoustic directivity of rectangular pistons on prolate spheroids'
 Defined variables of interest
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 * `h`, 'size parameter' :math:`h=kd/2`
-* :math:`R^{(4)}_{ml}(h, \xi)` : prolate spheroidal function of the 4th kind 
-* 
+* :math:`R^{(4)}_{ml}(h, \xi)` : prolate spheroidal radial function of the 4th kind  (eqn.5)
+* :math:`S^{(1)}_{ml}(h, \eta)`: prolate spheroidal angle function of the 1st kind (eqn. 4)
+* :math:`N_{ml}` : prolate spheroidal angle normalization factor (eqn. 11)
 
+
+
+Notes 
+~~~~~
+* There seem to be something relevant `here <https://docs.scipy.org/doc/scipy/reference/special.html>`_ (Scipy implementations).
 
 
 References
