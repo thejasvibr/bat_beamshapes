@@ -86,6 +86,12 @@ Also thanks to Neetash MR for inspiring the package logo!
    source_models.rst
    misc.rst
 
+.. toctree::
+    :maxdepth: 1
+    :caption: dev notes
+
+    developer_notes.rst
+
 
     
     
