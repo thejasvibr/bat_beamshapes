@@ -1,7 +1,8 @@
 joblib
 matplotlib
 mpmath
-numpy>=1.16pandas
+numpy>=1.17
+pandas
 sympy
 scipy
 tqdm
