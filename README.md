@@ -65,5 +65,5 @@ DONE:
 * ~~Include module-level docs too.~~
 * ~~Check if you really need symengine and gmpy2 for the code to run -- is sruntime really affected? -- Not needed. Speed not affected much in tests.~~
 * ~~change official name from 'bat_beamshapes' to just 'beamshapes'~~
-* ~~Ideas for package logo  butterfly - N suggests ~~
+* ~~Ideas for package logo  butterfly - N suggests~~
 
