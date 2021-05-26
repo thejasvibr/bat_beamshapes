@@ -22,4 +22,4 @@ Notes
 
 References
 ~~~~~~~~~~
-Boisvert & Buren 2044, Acoustic directivity of rectangular pistons on prolate spheroids, JASA, 116, 1932 (2004); doi: 10.1121/1.1778840
+Boisvert & Buren 2004, Acoustic directivity of rectangular pistons on prolate spheroids, JASA, 116, 1932 (2004); doi: 10.1121/1.1778840
