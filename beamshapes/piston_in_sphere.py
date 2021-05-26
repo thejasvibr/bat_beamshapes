@@ -34,8 +34,8 @@ from sympy import  lambdify, expand, Integral
 from sympy import HadamardProduct as HP
 import tqdm
 x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r1 R theta,y,z')
-dps = 50;
-mpmath.mp.dps = dps
+#dps = 50;
+#mpmath.mp.dps = dps
 
 from beamshapes.special_functions import sph_hankel2
 from beamshapes.utilities import args_to_mpmath, args_to_str

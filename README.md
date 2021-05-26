@@ -56,7 +56,7 @@ You can access the version number of the package being used with
 TODO:
 * Verification tests to check output with Beranek & Mellow 2012 graphs:
     * piston in a sphere pending
-
+* Make schematics for each source model describing the source and the acoustic conditions under which the model is formulated (eg. 'rigid', 'resilient' etc.)
 
 DONE:
 * ~~Uniform output format to a np.array that has 20*log10 D_theta/D_0~~ Done.
