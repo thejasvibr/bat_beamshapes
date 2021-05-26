@@ -3,6 +3,9 @@
 """
 Piston in a sphere
 ==================
+The output from this implementation `will not exactly` match Fig. 12-23 of Beranek & Mellow.
+Especially for higher `ka` values (:math:`\geq 5`), the overall shape is the same, but 
+values differ. This is expected, and is due to a typo in the book. For more details see :doc:`this detailed explanation <notes_piston_in_sphere>`.
 
 References
 ----------

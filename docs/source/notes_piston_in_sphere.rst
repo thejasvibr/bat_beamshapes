@@ -1,5 +1,5 @@
 Notes for Piston in a Sphere (Beranek & Mellow 2012)
-============================================================================
+====================================================
 
 This page specifically highlights some of the discrepancies in code and equations I've noticed.
 Given my lack of specialised math, I'm assuming they are the result of typo's and proceeding
@@ -15,7 +15,7 @@ Equation 12.98 is
 
 .. math::
 
-    P^{\prime}_{n}(cos \theta = \frac{\partial}{\partial \theta} P_n(cos \theta) = - \frac{n(n+1)}{(2n+1)sin \theta}(P_{n-1}cos \theta-P_{n+1}cos \theta)
+    P^{\prime}_{n}(cos \theta) = \frac{\partial}{\partial \theta} P_n(cos \theta) = - \frac{n(n+1)}{(2n+1)sin \theta}(P_{n-1}cos \theta-P_{n+1}cos \theta)
 
 Eqn. 12.98 refers to Appendix II eqn. 65.
 
@@ -48,7 +48,7 @@ And for better comparability:
 
 .. math::
 
-   \frac{\partial}{\partial \theta} P_n(cos \theta) = - \frac{n(n+1)}{(2n+1)(sin^{2} \theta)}(P_{n-1}(cos \theta)-P_{n+1}(cos \theta))
+   \frac{\partial}{\partial \theta} P_n(cos \theta) =  \frac{n(n+1)}{(2n+1)(sin^{2} \theta)}(P_{n-1}(cos \theta)-P_{n+1}(cos \theta))
 
 
 Here, I therefore think the :math:`sin \theta` in eqn. 12.98 term should be :math:`-sin^2{\theta}`. In the original Mathematica code, 
@@ -69,16 +69,39 @@ When we do the substitutions for :math:`P^{\prime}_{n}(cos \alpha)` and :math:`P
 
 .. math::
 
-    \small
     \frac{sin(\alpha)}{m(m+1) - n(n+1)} \\
-    \left( P_{m}(cos \alpha)\frac{n(n+1)}{(2n+1)(-sin^{2}(\alpha))}(P_{n+1}(cos \alpha)-P_{n-1}(cos \alpha)) \\
-     - P_{n}(cos \alpha)\frac{m(m+1)}{(2m+1)(-sin^{2}(\alpha))}(P_{m+1}(cos \alpha)-P_{m-1}(cos \alpha)) \right)
+    \left( P_{m}(cos \alpha)\frac{n(n+1)}{(2n+1)(-sin^{2} \alpha)}(P_{n+1}(cos \alpha)-P_{n-1}(cos \alpha)) \\
+     - P_{n}(cos \alpha)\frac{m(m+1)}{(2m+1)(-sin^{2} \alpha)}(P_{m+1}(cos \alpha)-P_{m-1}(cos \alpha)) \right)
 
-TODO 
-~~~~
-However, in the code what seems to be implemented is actuall
+and for comparison (after switching order of the :math:`P_{n}` terms)
 
+.. math::
+
+    \frac{sin(\alpha)}{m(m+1) - n(n+1)} \\
+    \left( P_{m}(cos \alpha)\frac{n(n+1)}{(2n+1)(sin^{2} \alpha)}(P_{n-1}(cos \alpha)-P_{n+1}(cos \alpha)) \\
+     - P_{n}(cos \alpha)\frac{m(m+1)}{(2m+1)(sin^{2} \alpha)}(P_{m-1}(cos \alpha)-P_{m+1}(cos \alpha)) \right)
+
+
+    
+What is implemented in the code
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The original implementation though has the equivalent of:
+
+.. math::
+
+    \frac{sin(\alpha)}{m(m+1) - n(n+1)} \\
+    \left( P_{n}(cos \alpha)\frac{m(m+1)}{(2m+1)(sin \alpha)}(P_{m+1}(cos \alpha)-P_{m-1}(cos \alpha)) \\
+     - P_{m}(cos \alpha)\frac{n(n+1)}{(2n+1)(sin \alpha)}(P_{n+1}(cos \alpha)-P_{n-1}(cos \alpha)) \right)
+
+The `m` and `n` indices have been switched, as well as the :math:`sin \theta` is used instead of :math:`sin^{2} \theta`. 
+Both of these explain the difference in the output between the `beamshapes` output and the output in Fig. 12.23 (comparison not shown).
+
+Summary
+~~~~~~~
+As stated before, I suspect a typo, and have thus taken the liberty of deviating from the 
+reference equations. However, given my limited math knowledge - I'd love to hear if this explanation does not make sense!
 
 References
 ~~~~~~~~~~
-Boisvert & Buren 2004, Acoustic directivity of rectangular pistons on prolate spheroids, JASA, 116, 1932 (2004); doi: 10.1121/1.1778840
+* Chp 12, Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers. Academic Press.
+* To see code implementations check out the :code:`piston_in_sphere` documentation

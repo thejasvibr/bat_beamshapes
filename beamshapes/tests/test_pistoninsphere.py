@@ -32,7 +32,7 @@ del Kmn_func, calc_one_Mmn_term
 #%% 
     
 
-#%%
+#%% Region implementing the suspected TYPO version.
 # equation 12.107
 Kmn_expr = legendre(n, cos(theta))*legendre(m, cos(theta))*sin(theta) # the integrl of this expression 
 # has a solution given in Appendix II, eqn 70
