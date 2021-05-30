@@ -31,11 +31,11 @@ Source models implemented
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 * Point source on a sphere
 * Piston in an infinite baffle 
-* Piston in a sphere
 * Oscillating cap of a sphere 
 
 Models under implementation 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+* Piston in a sphere (almost...troubleshooting underway)
 * Piston in a finite closed baffle  
 
 Wishlist for future releases 

@@ -1,105 +1,86 @@
 Notes for Piston in a Sphere (Beranek & Mellow 2012)
 ====================================================
 
-This page specifically highlights some of the discrepancies in code and equations I've noticed.
-Given my lack of specialised math, I'm assuming they are the result of typo's and proceeding
-with what seems to be the correct versions.
+updated 2021-05-30
 
-Since the original figures may be the result of typo's how to test the function outputs?
-I've resorted to altering only the suspect portions of the model and implementing these in the tests.
-This method checks that the rest of the equations/functions are implemented correctly.
+The previous post on this page highlighted what seemed to be two discrepancies (check commit 46c11ec..), the first being a potential typo in equation 12.98, which described
+:math:`\frac{\partial}{\partial \theta} P_n(cos \theta)` . Upon closer inspection I realised there was no typo, and it was an interpretational error on my part. 
 
-Discrepancy 1: eqn. 12.98 (:math:`sin \theta` --> :math:`-sin^{2} \theta`)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Equation 12.98 is 
+However, discrepancy 2) related to a difference in `m` and `n` index order between the equations in the book and the Mathematica code implementation.
+This post dives into more detail. 
 
-.. math::
+The `m` and `n` index order discrepancy
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-    P^{\prime}_{n}(cos \theta) = \frac{\partial}{\partial \theta} P_n(cos \theta) = - \frac{n(n+1)}{(2n+1)sin \theta}(P_{n-1}cos \theta-P_{n+1}cos \theta)
+I. Expectations from substitutions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Eqn. 12.98 refers to Appendix II eqn. 65.
-
-However, App.II, eqn. 65 defines the derivative of the Legendre function as:
-
-.. math::
-    
-    n(n+1)(P_{n+1}(z)-P_{n-1}(z)) = (2n+1)(z^{2}-1)\frac{d}{dz}P_{n}(z)
-
-and moving :math:`\frac{d}{dz}P_{n}(z)` to the LHS gives:
-
-.. math::
-
-    \frac{d}{dz}P_{n}(z) = \frac{n(n+1)(P_{n+1}(z)-P_{n-1}(z))}{(2n+1)(z^{2}-1)}
-
-Now substituting :math:`z = cos \theta`, we get:
-
-.. math::
-    
-    \frac{d}{dz}P_{n}(z) = \frac{n(n+1)}{(2n+1)(cos^{2} \theta-1)}(P_{n+1}(cos \theta)-P_{n-1}(cos \theta))
-
-Applying the identity :math:`1 = sin^{2} \theta + cos^{2} \theta` , and thus substituting :math:`cos^{2} \theta - 1 = - sin^{2} \theta`
-we get:
-
-.. math::
-
-    \frac{\partial}{\partial \theta} P_n(cos \theta) = \frac{n(n+1)}{(2n+1)(-sin^{2} \theta)}(P_{n+1}(cos \theta)-P_{n-1}(cos \theta))
-
-And for better comparability:
-
-.. math::
-
-   \frac{\partial}{\partial \theta} P_n(cos \theta) =  \frac{n(n+1)}{(2n+1)(sin^{2} \theta)}(P_{n-1}(cos \theta)-P_{n+1}(cos \theta))
-
-
-Here, I therefore think the :math:`sin \theta` in eqn. 12.98 term should be :math:`-sin^2{\theta}`. In the original Mathematica code, 
-(which was presumably used to generate Fig. 12.23) - the :math:`sin \theta` term is present.
-
-
-
-Discrepancy 2: coding order of :math:`P^{\prime}_{n}(cos \theta)` in Mathematica code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The solution for :math:`K_{mn}` is given in App.II, eqn. 70. In the case where  :math:`m \neq n`, the solution is:
+The solution for :math:`K_{mn}` (eqn. 12.107) is given in App.II, eqn. 70. In the case where  :math:`m \neq n`, the solution is:
 
 .. math:: 
 
-    \frac{sin(\alpha)( P_{m}(cos \alpha)P^{\prime}_{n}(cos \alpha) - P_{n}(cos \alpha)P^{\prime}_{m}(cos \alpha))}{m(m+1) - n(n+1)}
+    \frac{sin\:\alpha( P_{m}(cos\:\alpha)P^{\prime}_{n}(cos\:\alpha) - P_{n}(cos\:\alpha)P^{\prime}_{m}(cos\:\alpha))}{m(m+1) - n(n+1)}
 
-When we do the substitutions for :math:`P^{\prime}_{n}(cos \alpha)` and :math:`P^{\prime}_{m}(cos \alpha)` the full term will be:
-
-.. math::
-
-    \frac{sin(\alpha)}{m(m+1) - n(n+1)} \\
-    \left( P_{m}(cos \alpha)\frac{n(n+1)}{(2n+1)(-sin^{2} \alpha)}(P_{n+1}(cos \alpha)-P_{n-1}(cos \alpha)) \\
-     - P_{n}(cos \alpha)\frac{m(m+1)}{(2m+1)(-sin^{2} \alpha)}(P_{m+1}(cos \alpha)-P_{m-1}(cos \alpha)) \right)
-
-and for comparison (after switching order of the :math:`P_{n}` terms)
+Which we'll visually re-arrange for better comparison after substitution:
 
 .. math::
 
-    \frac{sin(\alpha)}{m(m+1) - n(n+1)} \\
-    \left( P_{m}(cos \alpha)\frac{n(n+1)}{(2n+1)(sin^{2} \alpha)}(P_{n-1}(cos \alpha)-P_{n+1}(cos \alpha)) \\
-     - P_{n}(cos \alpha)\frac{m(m+1)}{(2m+1)(sin^{2} \alpha)}(P_{m-1}(cos \alpha)-P_{m+1}(cos \alpha)) \right)
+    \frac{sin\:\alpha}{m(m+1) - n(n+1)}\bigg( P_{m}(cos\:\alpha)P^{\prime}_{n}(cos\:\alpha) - P_{n}(cos\:\alpha)P^{\prime}_{m}(cos\:\alpha) \bigg)
 
 
+Where :math:`P^{\prime}_{n}(cos \theta)` (eqn. 12.98) is:
+
+.. math::
+
+    P^{\prime}_{n}(cos \theta) = \frac{\partial}{\partial \theta}P_{n}(cos \theta) = - \frac{n(n+1)}{(2n+1)sin \theta}(P_{n-1}(cos \theta) - P_{n+1}(cos \theta))
     
-What is implemented in the code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The original implementation though has the equivalent of:
+    = \frac{n(n+1)}{(2n+1)sin \theta}(P_{n+1}(cos \theta) - P_{n-1}(cos \theta))
+
+When we do the substitutions for :math:`P^{\prime}_{n}(cos\:\alpha)`, :math:`P^{\prime}_{m}(cos\:\alpha)` in App.II,eqn.70 and :math:`\theta = \alpha`,
+the full term is expected to be:
 
 .. math::
 
-    \frac{sin(\alpha)}{m(m+1) - n(n+1)} \\
-    \left( P_{n}(cos \alpha)\frac{m(m+1)}{(2m+1)(sin \alpha)}(P_{m+1}(cos \alpha)-P_{m-1}(cos \alpha)) \\
-     - P_{m}(cos \alpha)\frac{n(n+1)}{(2n+1)(sin \alpha)}(P_{n+1}(cos \alpha)-P_{n-1}(cos \alpha)) \right)
+    \frac{sin\:\alpha}{m(m+1) - n(n+1)} \\
+    \left( P_{m}(cos\:\alpha)\frac{n(n+1)}{(2n+1)sin\:\alpha}(P_{n+1}(cos\:\alpha) - P_{n-1}(cos\:\alpha)) \\
+     - P_{n}(cos\:\alpha)\frac{m(m+1)}{(2m+1)sin\:\alpha}(P_{m+1}(cos\:\alpha) - P_{m-1}(cos\:\alpha)) \right)
 
-The `m` and `n` indices have been switched, as well as the :math:`sin \theta` is used instead of :math:`sin^{2} \theta`. 
-Both of these explain the difference in the output between the `beamshapes` output and the output in Fig. 12.23 (comparison not shown).
+As of now the :code:`beamshapes`  piston in a sphere implementation follows the above equation. 
+    
+II. The `Mathematica` code implementation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Summary
-~~~~~~~
-As stated before, I suspect a typo, and have thus taken the liberty of deviating from the 
-reference equations. However, given my limited math knowledge - I'd love to hear if this explanation does not make sense!
+The original `Mathematica` implementation used to generate Fig. 12.23 has the equivalent of:
+
+.. math::
+
+    \frac{sin\:\alpha}{m(m+1) - n(n+1)} \\
+    \left( P_{n}(cos\:\alpha)\frac{m(m+1)}{(2m+1)(sin\:\alpha)}(P_{m+1}(cos\:\alpha)-P_{m-1}(cos\:\alpha)) \\
+     - P_{m}(cos\:\alpha)\frac{n(n+1)}{(2n+1)(sin\:\alpha)}(P_{n+1}(cos\:\alpha)-P_{n-1}(cos\:\alpha)) \right)
+
+
+The `m` and `n` indices have been switched in the :math:`P_{m/n}(cos\:\alpha)` and the :math:`P^{\prime}_{m/n}(cos\:\alpha)` terms -- but the 
+:math:`m(m+1) - n(n+1)` denominator term remains the same order as in section `I` .
+
+III. Comparing directivity patterns from sections I and II
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The switch in `m` and `n` indices between II and III for leads to different  directivity patterns - here `ka=1` and `ka=3` is shown. 
+ 
+.. image:: _static/pistoninsphere_deviation_2021-05-30.png
+    :width: 400
+
+.. image:: _static/pistoninsphere_deviation_2021-05-30_ka=3.png
+    :width: 400
+
+The confusion to be cleared up is whether App.II eqn. 70 (section `I`) or the coded implementation (section `II`) is the correct solution for :math:`K_{mn}` when :math:`m \neq n`.
+
+Is the current `beamshapes` implementation the result of a coding error? No, as switching the `m,n` indices for the :math:`P_{m/n}` and :math:`P^{\prime}_{m/n}` terms
+recreates Fig. 12.23 (not shown here). 
+
+Acknowledgements
+~~~~~~~~~~~~~~~~
+Thanks to Gaurav Dhariwal for re-checking the math once more. 
 
 References
 ~~~~~~~~~~

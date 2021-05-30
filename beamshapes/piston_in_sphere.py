@@ -37,6 +37,8 @@ from sympy import  lambdify, expand, Integral
 from sympy import HadamardProduct as HP
 import tqdm
 x, alpha, index, k, m,n,p, r1, R, theta, y, z = symbols('x alpha index k m n p r1 R theta,y,z')
+legendre_ncosalpha, legendre_mcosalpha = symbols('legendre_ncosalpha legendre_mcosalpha ')
+
 dps = 50;
 mpmath.mp.dps = dps
 
@@ -99,14 +101,14 @@ def Imn_func(mv,nv,kv,Rv,alphav):
 # equation 12.107
 Kmn_expr = legendre(n, cos(theta))*legendre(m, cos(theta))*sin(theta) # the integrl of this expression 
 # has a solution given in Appendix II, eqn 70
-legendre_1stderiv = diff(legendre(n,z),z)
+legendre_ncosalpha = legendre(n, cos(alpha))
+legendre_mcosalpha = legendre_ncosalpha.subs({'n':m})
 
-legendre_cosalpha = (n*(n+1)/((-sin(alpha)**2)*(2*n+1)))*(legendre(n+1,cos(alpha))-legendre(n-1, cos(alpha)))
 
 # when m != n
-num_legendre_term1 = legendre(m,cos(alpha))*legendre_cosalpha
-num_legendre_term2 = legendre(n,cos(alpha))*legendre_cosalpha.subs({'n':m})
-eqn70_mnoteqn = sin(alpha)*(num_legendre_term1-num_legendre_term2)/(m*(m+1)-n*(n+1))
+num_legendre_term1 = legendre_mcosalpha*diff(legendre_ncosalpha, alpha)
+num_legendre_term2 = legendre_ncosalpha*diff(legendre_mcosalpha, alpha)
+eqn70_mnoteqn = sin(alpha)*(num_legendre_term1 - num_legendre_term2)/(m*(m+1)-n*(n+1))
 
 # when m==n
 # substituting 'j' for 'index' 
