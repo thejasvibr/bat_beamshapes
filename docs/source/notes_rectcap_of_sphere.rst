@@ -37,7 +37,7 @@ The variables :math:`S, A_{mn}, A_{0n}` are defined below.
     S = 4R^{2}\Bigg(arctan\bigg(\frac{tan\:\alpha\:tan\:\beta}{sec^2\:\alpha + \sqrt{sec^{2}\:\alpha + tan^{2}\:\beta}}\bigg) \\ + arctan\bigg(\frac{tan\:\alpha\:tan\:\beta}{sec^2\:\beta + \sqrt{sec^{2}\:\beta + tan^{2}\:\alpha}}\bigg)\Bigg) \quad (12.69) \\
     \\ 
 
-    A_{mn} = \frac{(2n+1)^2(n-2m)!I_{mn}}{j2\pi(n+2m)!\bigg(nh^{(2)}_{n-1}(kR) - (n+1)h^{(2)}_n+1(kR)\bigg)} \quad (12.75)
+    A_{mn} = \frac{(2n+1)^2(n-2m)!I_{mn}}{j2\pi(n+2m)!\bigg(nh^{(2)}_{n-1}(kR) - (n+1)h^{(2)}_{n+1}(kR)\bigg)} \quad (12.75)
 
 And |A0n| is all |Amn| where :math:`m=0`. 
 
@@ -48,7 +48,7 @@ And |A0n| is all |Amn| where :math:`m=0`.
     I_{mn} = \\
     \int^{arctan\frac{tan\:\beta}{tan\:\alpha}}_{0} cos\:2m\phi\:\int^{arctan\frac{tan\:\alpha}{cos\:\phi}}_{0} P^{2m}_{n}(cos\:\theta)sin\:\theta\:d\theta d\phi \\ 
     + \int^{\frac{\pi}{2}+arctan\frac{tan\:\alpha}{tan\:\beta}}_{\frac{\pi}{2}-arctan\frac{tan\:\alpha}{tan\:\beta}} cos\:2m\phi \:\int^{arctan\frac{tan\:\beta}{sin\:\phi}}_{0} P^{2m}_{n}(cos\:\theta)sin\:\theta\:d\theta d\phi  \\
-    + \int^{\pi}_{\pi-arctan\frac{tan \:\beta}{tan\:\alpha}} cos\:2m\phi\:\int^{arctan\:\frac{tan\:\alpha}{-cos\phi}}_{0} P^{2m}_{n}(cos\:\theta)sin\:\theta\:d\theta d\phi \\
+    + \int^{\pi}_{\pi-arctan \frac{tan\:\beta}{tan\:\alpha}} cos\:2m\phi\:\int^{arctan\:\frac{tan\:\alpha}{-cos\phi}}_{0} P^{2m}_{n}(cos\:\theta)sin\:\theta\:d\theta d\phi \\
     \quad (12.76)
 
 And |I0n| is all |Imn| where :math:`m=0`, given by: 
@@ -58,16 +58,37 @@ And |I0n| is all |Imn| where :math:`m=0`, given by:
     I_{0n} = \\
     \int^{arctan \frac{tan\:\beta}{tan\:\alpha}}_{0} \frac{tan\:\alpha}{\sqrt{cos^{2}\:\phi + tan^{2}\:\alpha}}
     P^{-1}_{n}\bigg(\frac{\cos\:\phi}{\sqrt{cos^{2}\:\phi + tan^{2}\:\alpha}}\bigg)d\phi \\
-    + \int^{\pi/2+arctan\frac{tan\:\alpha}{tan\:\beta}}_{\pi/2-arctan\frac{tan\alpha}{tan\beta}} \frac{tan\:\beta}{\sqrt{sin^{2}\:\phi + tan^{2}\:\beta}}
+    + \int^{\pi/2+arctan\frac{tan\:\alpha}{tan\:\beta}}_{\pi/2-arctan\frac{tan\\:alpha}{tan\:\beta}} \frac{tan\:\beta}{\sqrt{sin^{2}\:\phi + tan^{2}\:\beta}}
     P^{-1}_{n}\bigg(\frac{sin\:\phi}{\sqrt{sin^{2}\:\phi + tan^{2}\:\beta}}\bigg)d\phi \\
     + \int^{\pi}_{\pi-arctan\frac{tan\:\beta}{tan\:\alpha}} \frac{tan\:\alpha}{\sqrt{cos^{2}\:\phi + tan^{2}\:\alpha}}
     P^{-1}_{n}\bigg(\frac{-cos\:\phi}{\sqrt{cos^{2}\:\phi + tan^{2}\:\alpha}}\bigg)d\phi \\
     \quad (12.77)
 
-TODO
-~~~~
-Compare the equations and the computational implementation. 
 
+Comparing equations and computational implementation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The code implementation looks different from these equations, and that is because the solutions to some of the integrals seem to 
+have been included already. 
+
+Let's examine them one-by-one. 
+
+
+|Imn| is coded with the equivalent of :code:`Int[m_,n_,beta_]`:
+
+.. math::
+
+    I_{mn} = \\
+    \frac{1}{PQ}arctan\frac{sin\:\beta}{sin\:\alpha}\sum^{P}_{p=1}\sum^{Q}_{q=1}arctan\:\frac{tan\:\alpha}{cos\:\phi_{1}}cos\:2m\phi_{1}\:P^{2m}_{n}(cos\theta_{1}\:sin\:\theta_{1}) \\
+    + \frac{2}{PQ}arctan\frac{sin\:\alpha}{sin\:\beta}\sum^{P}_{p=1}\sum^{Q}_{q=1}arctan\:\frac{tan\:\beta}{sin\:\phi_{2}}cos\:2m\phi_{2}\:P^{2m}_{n}(cos\theta_{2}\:sin\:\theta_{2}) \\
+    + \frac{1}{PQ}arctan\frac{sin\:\beta}{sin\:\alpha}\sum^{P}_{p=1}\sum^{Q}_{q=1}arctan\:\frac{tan\:\alpha}{-cos\:\phi_{3}}cos\:2m\phi_{3}\:P^{2m}_{n}(cos\theta_{3}\:sin\:\theta_{3}) \\
+
+where,
+
+.. math::
+    P=100, Q=100 \\
+    \phi_{1}(p,\beta) = \frac{p-1/2}{P}arctan\:\frac{sin\:\beta}{sin\:\alpha} \\
+    \phi_{2}(p,\beta) = \frac{\pi}{2} - arctan\:\frac{sin\:\alpha}{sin\:\beta} + 2\frac{p-1/2}{P}arctan\:\frac{sin\:\alpha}{sin\:\beta} \\
+    \phi_{3}(p.\beta) = \frac{\pi}{2} - arctan\:\frac{sin\:\beta}{sin\:\alpha} + \frac{p-1/2}{P}arctan\:\frac{sin\:\beta}{sin\:\alpha} \\
 
 
 
