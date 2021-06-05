@@ -41,6 +41,8 @@ The variables :math:`S, A_{mn}, A_{0n}` are defined below.
 
 And |A0n| is all |Amn| where :math:`m=0`. 
 
+Definition of |Imn|:
+~~~~~~~~~~~~~~~~~~~~
 |Amn| has the variable |Imn|, defined as: 
 
 .. math::
@@ -129,6 +131,36 @@ Math |Imn| term1:
      \frac{1}{PQ}arctan\frac{sin\:\beta}{sin\:\alpha}\sum^{P}_{p=1}\sum^{Q}_{q=1}arctan\:\frac{tan\:\alpha}{-cos\:\phi_{3}}cos\:2m\phi_{3}\:P^{2m}_{n}(cos\theta_{3})\:sin\:\theta_{3} \\
 
 
+Definition of |I0n|:
+~~~~~~~~~~~~~~~~~~~~
+
+|I0n| (all `m=0`) terms:
+
+.. math:: 
+
+    \int^{arctan\:\frac{tan\:\beta}{tan\:\alpha}}_{0}\:\frac{tan\:\alpha}{\sqrt{cos^{2}\:\phi+tan^{2}\:\alpha}}
+    P^{-1}_{n}\bigg( \frac{cos\:\phi}{\sqrt{cos^{2}\:\phi+tan^{2}\:\alpha}}\bigg)d\phi \\
+    + \int^{\pi/2 + arctan\:\frac{tan\:\alpha}{tan\:\beta}}_{\pi/2-arctan\:\frac{tan\:\alpha}{tan\:\beta}}\:\frac{tan\:\beta}{\sqrt{sin^{2}\:\phi+tan^{2}\:\beta}}
+    P^{-1}_{n}\bigg( \frac{sin\:\phi}{\sqrt{sin^{2}\:\phi+tan^{2}\:\beta}}\bigg)d\phi \\
+    + \int^{\pi}_{\pi-arctan\:\frac{tan\:\beta}{tan\:\alpha}}\:\frac{tan\:\alpha}{\sqrt{cos^{2}\:\phi+tan^{2}\:\alpha}}
+    P^{-1}_{n}\bigg( \frac{-cos\:\phi}{\sqrt{cos^{2}\:\phi+tan^{2}\:\alpha}}\bigg)d\phi \\
+
+Computational implementation of |I0n|:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. math::
+
+    \frac{1}{P} arctan\:\frac{sin\:\beta}{sin\:\alpha} \sum^{P}_{p=1} \frac{tan\:\alpha}{\sqrt{cos^{2}\:\phi_{1}+tan^{2}\alpha}}
+    P^{-1}_{n}\bigg(\frac{cos\:\phi_{1}}{\sqrt{cos^{2}\:\phi_{1}+tan^{2}\:\alpha}}\bigg) \\
+    + \frac{2}{P} arctan\:\frac{sin\:\alpha}{sin\:\beta}\sum^{P}_{p=1}\frac{tan\:\beta}{\sqrt{sin^{2}\:\phi_{2}+tan^{2}\beta}}
+    P^{-1}_{n}\bigg(\frac{sin\:\phi_{2}}{\sqrt{sin^{2}\:\phi_{2}+tan^{2}\:\beta}}\bigg) \\
+    \frac{1}{P} arctan\:\frac{sin\:\beta}{sin\:\alpha} \sum^{P}_{p=1} \frac{tan\:\alpha}{\sqrt{cos^{2}\:\phi_{3}+tan^{2}\alpha}}
+    P^{-1}_{n}\bigg(\frac{-cos\:\phi_{3}}{\sqrt{cos^{2}\:\phi_{3}+tan^{2}\:\alpha}}\bigg) \\
+
+Comparing |I0n| in code and definitions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The |I0n| term doesn't have any substitutions/solutions in the code implementation it. The main difference is that the numerical integration is built into the 
+implementation (an alternative approach to use a inbuilt numerical integration routine). 
 
 
 Acknowledgements
