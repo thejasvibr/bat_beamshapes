@@ -28,7 +28,8 @@ Which we'll visually re-arrange for better comparison after substitution:
     \frac{sin\:\alpha}{m(m+1) - n(n+1)}\bigg( P_{m}(cos\:\alpha)P^{\prime}_{n}(cos\:\alpha) - P_{n}(cos\:\alpha)P^{\prime}_{m}(cos\:\alpha) \bigg)
 
 
-Where :math:`P_{n}(cos \:\theta)` is the Legendre polynomial of the `n`th order, and :math:`P^{\prime}_{n}(cos \theta)` (eqn. 12.98) is:
+
+Where :math:`P_{n}(cos \:\theta)` is the Legendre polynomial of order `n` , and :math:`P^{\prime}_{n}(cos\:\theta)` (eqn. 12.98) is:
 
 .. math::
 
@@ -36,7 +37,7 @@ Where :math:`P_{n}(cos \:\theta)` is the Legendre polynomial of the `n`th order,
     
     = \frac{n(n+1)}{(2n+1)sin \theta}(P_{n+1}(cos \theta) - P_{n-1}(cos \theta))
 
-When we do the substitutions for :math:`P^{\prime}_{n}(cos\:\alpha)`, :math:`P^{\prime}_{m}(cos\:\alpha)` in App.II,eqn.70 and :math:`\theta = \alpha`,
+When we do the substitutions for :math:`P^{\prime}_{n}(cos\:\alpha)`, :math:`P^{\prime}_{m}(cos\:\alpha)` (Appendix II, eqn.70) and :math:`\theta = \alpha`,
 the full term is expected to be:
 
 .. math::
@@ -47,8 +48,8 @@ the full term is expected to be:
 
 As of now the :code:`beamshapes`  piston in a sphere implementation follows the above equation. 
     
-II. The code implementation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+II. The textbook code implementation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The code implementation used to generate Fig. 12.23 has the equivalent of:
 
@@ -74,7 +75,7 @@ The switch in `m` and `n` indices between II and III for leads to different  dir
     :width: 400
 
 
-Is the current `beamshapes` implementation the result of a coding error? No, as switching the order of the :math:`P_{m/n}` and :math:`P^{\prime}_{m/n}` terms in the :code:`beamshapes` implementations recreates Fig. 12.23 (not shown here). 
+Perhaps the current :code:`beamshapes` implementation is the result of a coding error? Unlikely, as switching the order of the :math:`P_{m/n}` and :math:`P^{\prime}_{m/n}` terms in the :code:`beamshapes` implementations recreates Fig. 12.23 (not shown here). 
 
 IV. Which is the correct solution?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

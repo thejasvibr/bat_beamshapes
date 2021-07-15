@@ -1,0 +1,14 @@
+
+---
+Email from Tim Mellow stating that the error is in the Appendix II, Eqn. 70 (1st edition)
+Received 2021-07-14, 18:07 CEST
+
+---
+
+Hello Thejasvi,
+This is correct and I have checked it against numerical calculation of the integral. It is Eq. (A2.70) on p. 843 that has the error. I have updated the errata to indicate a sign change which is achieved by replacing “m(m + 1) - n(n + 1)” with “n(n + 1) - m(m + 1)”.
+All the best,
+Tim
+
+
+

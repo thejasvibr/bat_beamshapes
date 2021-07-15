@@ -1,5 +1,7 @@
 General Intro to `beamshapes`
 =============================
+Sound sources don't radiate sound uniformly most of the time. Even us humans for instance, we emit more energy while talking to the front than to the back. The exact (non-uniform) pattern in which sound is radiated defines the 'beamshape' of a source. The beamshape is typically a combination of the frequency of emitted sound and the geometry of the vibrating surface and its associated (non-vibrating) surfaces. 
+
 Let's go through the main concepts required to use the `beamshapes` package.
 
 

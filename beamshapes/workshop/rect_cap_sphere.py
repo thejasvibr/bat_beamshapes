@@ -9,6 +9,11 @@ rectangular cap.
 
 :math:`R` is the radius of the sphere. 
 
+Notes
+~~~~~
+This implementation uses inbuilt integration functions to calculate :math:`I_{0n}`
+, in contrast to the original implementation which uses a custom numerical 
+integration implementation. 
 """
 
 import copy
@@ -16,15 +21,35 @@ from joblib import Parallel, delayed
 import numpy as np
 import mpmath
 from sympy import symbols,  I, cos, sin, legendre
-from sympy import lambdify, atan, tan, sec, sqrt, pi
+from sympy import lambdify, atan, tan, sec, sqrt, pi, factorial
 from sympy import IndexedBase, Sum, Integral, assoc_legendre
 import tqdm
 import warnings
 from beamshapes.special_functions import sph_hankel2, legendre_mvz
 from beamshapes.utilities import args_to_mpmath, args_to_str
 
-n, N, z, k, R, alpha, beta, theta = symbols('n N z k R alpha beta theta')
+m, n, NN, z, k, R, alpha, beta, theta = symbols('m n NN z k R alpha beta theta')
 phi = symbols('phi')
+
+
+
+kR = k*R
+
+def calc_N(params):
+    '''
+    Decides the number of terms to run calculations for. 
+    
+    Keyword Arguments
+    -----------------
+    trend : 
+    
+    Returns 
+    -------
+    num_N : int
+    
+    '''
+    num_N = params.get('trend', int(12+2*params['k']*params['R']))
+    return num_N
 #%%
 secsq_alpha = sec(alpha)**2
 secsq_beta = secsq_alpha.subs(alpha, beta) 
@@ -38,7 +63,7 @@ sval = lambdify([alpha, beta, R], S,'mpmath')
 #%%
 # First implement the on-axis response. 
 
-subsdict = {'n':1,'alpha':pi/2.5,'beta':pi/2.5}
+subsdict = {'n':1,'alpha':pi/2.5,'beta':pi/2.5, 'k':10, 'R':0.1}
 
 
 ion_pt1_1 = (tan(alpha)/(sqrt(cos(phi)**2+tan(alpha)**2)))
@@ -78,4 +103,47 @@ print(Ion_func(subsdict['n'],subsdict['alpha'],subsdict['beta']).evalf())
 
 
 #%%
+# The on-axis coefficients
+mval = 0
+Aon_num = ((2*n+1)**2)*factorial(n-2*mval)*Ion
+Aon_denom_hankels = n*sph_hankel2.subs({'n':n-1,'z':kR}) - (n+1)*sph_hankel2.subs({'n':n+1,'z':kR})
+Aon_denom = I*2*pi*factorial(n+2*mval)*(Aon_denom_hankels)
+Aon = Aon_num/Aon_denom
+
+Aon_func = lambdify([n,alpha, beta, k,R], Aon, 'sympy')
+
+#%% 
+D_factor = lambdify([alpha, beta, k, R], 4*pi/(S*k**2),'sympy')
+
+def d_zero(A0n, alphav, betav, kv, Rv, Nterms):
+    '''
+    Parameters
+    ----------
+    A0n : array-like
+        On-axis coefficients
+    alphav, betav : float-like < 2*pi
+        Cap width and height
+    kv : float-like
+        Wavenumber
+    Rv : float-like
+        Radius of sphere
+    Nterms : int
+    
+    Returns
+    -------
+    final_d_0 : complex number
+
+    '''
+    front_term = -D_factor(alphav, betav, kv, Rv)
+    summation_term = sum([A0n[n_ind]*I**n_ind for n_ind in range(Nterms)])
+    return front_term*summation_term
+
+#%%
+if __name__ == '__main__':
+    kr_value = 0.1
+    kv = 10
+    Rv = kr_value/kv
+    inputs = {'n':1,'alpha':pi/12,'beta':pi/12, 'k':kv, 'R':Rv}
+    Nt = calc_N(inputs)
+    Aon_values = [ Aon_func(nn, inputs['alpha'], inputs['beta'], inputs['k'], inputs['R']) for nn in range(Nt)]
 

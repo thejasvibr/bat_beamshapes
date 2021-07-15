@@ -15,7 +15,7 @@ directivity functions (:math:`\frac{D_{\theta}}{D_{0}}`) of various sound radiat
 
 Check out a general introduction to the concepts of the package :doc:`here <general_intro>`.
 
-What gap does this package fill?
+Why `beamshapes`?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 While there are many sound radiation models described in the literature, there aren't
 that many (or any?) openly available computational implementations of their beamshapes.
@@ -50,7 +50,7 @@ Package under active development
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 This package is relatively young, and changing dynamically. Things may
 break fairly often if you are installing from the `GitHub repo <https://github.com/thejasvibr/bat_beamshapes>`_ directly.
-A stable release will hopefully be out by the  May-June 2021. Stay tuned!
+A stable release will hopefully be out by the  July-August 2021. Stay tuned!
 
 
 .. toctree::
