@@ -3,10 +3,6 @@ Piston in a sphere (FLINT implementation)
 =========================================
 Very fast implementation of piston in a sphere directivity using python-Flint. 
 
-The output from this implementation `will not exactly` match Fig. 12-23 of Beranek & Mellow.
-Especially for higher `ka` values (:math:`\geq 5`), the overall shape is the same, but 
-values differ. This is expected, and is due to a typo in the book. For more details see :doc:`this detailed explanation <notes_piston_in_sphere>`.
-
 Installation/requirements
 -------------------------
 This implementation requires the installation of the 'python-flint' package.
@@ -94,10 +90,12 @@ def Lm_func(mv, alphav):
     return integral(only_theta_lm, acb(0.0), alphav)
 
 # %% eqn 12.107 solution for the Kmn integral - See eqn. 70 in Appendix II
+# the 2012 edition has a typo for eqn.70 App II, and so be sure to check
+# the Errata. The order of denominator term's 'n' and 'm' are different.
 def m_noteq_n(alpha,m,n):
     term1 = legendre_p(m,cos(alpha))*pprime_cosalpha(n, alpha)
     term2 = legendre_p(n, cos(alpha))*pprime_cosalpha(m, alpha)
-    value = sin(alpha)*(term1-term2)/(m*(m+1)-n*(n+1))
+    value = sin(alpha)*(term1-term2)/(n*(n+1)-m*(m+1))
     return value
 
 def meqn_legendre_summn_term(jj,alpha):
@@ -192,11 +190,11 @@ def make_Mmn_pll(param):
             param['n'] = acb(nn)
             params_as_str[(mm,nn)] = interchange_params_and_str(param,
                                                                 to_str=True)
-   
+  
     # run parallel calc
     Mmn_as_str = Parallel(n_jobs=n_cores, backend='multiprocessing')(delayed(calc_one_Mmn_term_pll)(paramset)   for position, paramset in tqdm.tqdm(params_as_str.items()))
     Mmn_acb = [conv_str_acb(each) for each in Mmn_as_str]
-    
+
     entry_num = 0
     for rowpos in range(NN):
         for colpos in range(NN):
@@ -260,8 +258,18 @@ def piston_in_sphere_directivity(thetas, param,**kwargs):
     ----------
     thetas : list with acb entries
         List with angles in radians.
-    param : dictionary
-        See 'parameters' in module description above.
+    param: dictionary
+    Dictionary with at least the following keys:
+            k : mpmath.mpf>0
+                Wavenumber. 
+            R : mpmath.mpf>0
+                Radius of sphere
+            alpha: 0<mpmath.mpf<pi
+                Half-angular aperture of piston. 
+            num_cores : int, optional
+                The number of cores to be used for the Mmn matrix computation. 
+                Defaults to using all cores.
+        
     
     Keyword Arguments
     -----------------

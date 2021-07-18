@@ -8,24 +8,22 @@
 # """
 
 
-# import os 
-# try:
-#     os.chdir('beamshapes/tests')
-# except:
-#     pass
+import os 
+try:
+    os.chdir('beamshapes/tests')
+except:
+    pass
 
-# import copy
-# import unittest
-# from joblib import Parallel, delayed
-# import tqdm
-# import mpmath
-# import numpy as np 
-# import pandas as pd
-# from beamshapes.piston_in_sphere import piston_in_sphere_directivity, index
-# from beamshapes.piston_in_sphere import Imn_func, mmn_hankels_func, compute_a, compute_b
-# from beamshapes.piston_in_sphere import format_Mmn_to_matrix, calc_N, args_to_str, args_to_mpmath
-# from beamshapes.piston_in_sphere import relative_directivity_db
-# from sympy import symbols, lambdify, legendre, sin, cos, diff, Sum, Piecewise
+import copy
+import unittest
+from joblib import Parallel, delayed
+import tqdm
+import mpmath
+import numpy as np 
+import pandas as pd
+from beamshapes.piston_in_sphere import piston_in_sphere_directivity, index
+from beamshapes.piston_in_sphere import relative_directivity_db
+from sympy import symbols, lambdify, legendre, sin, cos, diff, Sum, Piecewise
 # #%% 
 # alpha, m, n, theta, z = symbols('alpha m n theta z')
 
@@ -121,43 +119,40 @@
 
 
 
-# #%%
-# class PistonInSphereT2(unittest.TestCase):
-#     '''
-#     The test data assumes that alpha = pi/3
-#     '''
+#%%
+class PistonInSphereT2(unittest.TestCase):
+    '''
+    The test data assumes that alpha = pi/3
+    '''
     
-#     def test_substitution_and_automatedversion(self):
-#         kavals = [1,3]
+    def test_substitution_and_automatedversion(self):
+        kavals = [1,3]
         
-#         frequency = mpmath.mpf(50*10**3) # kHz
-#         vsound = mpmath.mpf(330) # m/s
-#         wavelength = vsound/frequency
-#         alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
-#         k_value = 2*mpmath.pi/(wavelength)
-        
-        
-#         paramv = {}
-#         paramv['alpha'] = alpha_value
-#         paramv['k'] = k_value
-        
-#         angles = mpmath.linspace(0, mpmath.pi, 20)
+        frequency = mpmath.mpf(50*10**3) # kHz
+        vsound = mpmath.mpf(330) # m/s
+        wavelength = vsound/frequency
+        alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
+        k_value = 2*mpmath.pi/(wavelength)
         
         
-#         for kaval in kavals:
-#             ka = mpmath.mpf(kaval)
-#             a_value = ka/paramv['k']
-#             R_value = a_value/mpmath.sin(paramv['alpha'])  # m
-#             paramv['R'] = R_value        
-#             paramv['a'] = a_value
-#             paramv['a'] = kaval/paramv['k']
+        paramv = {}
+        paramv['alpha'] = alpha_value
+        paramv['k'] = k_value
         
-#             _, output_dirnlty = piston_in_sphere_directivity3(angles,
-#                                                                       paramv)
-#             _, output_dirnlty_actual = piston_in_sphere_directivity(angles,
-#                                                                       paramv)
+        angles = mpmath.linspace(0, mpmath.pi, 20)
+        
+        
+        for kaval in kavals:
+            ka = mpmath.mpf(kaval)
+            a_value = ka/paramv['k']
+            R_value = a_value/mpmath.sin(paramv['alpha'])  # m
+            paramv['R'] = R_value        
+            paramv['a'] = a_value
+            paramv['a'] = kaval/paramv['k']        
+            _, output_dirnlty_actual = piston_in_sphere_directivity(angles,
+                                                                      paramv)
             
-#             self.assertTrue(np.unique(output_dirnlty - output_dirnlty_actual)==0)
+            self.assertTrue(np.unique(output_dirnlty - output_dirnlty_actual)==0)
 
-# if __name__=='__main__':
-#     unittest.main()
+if __name__=='__main__':
+    unittest.main()

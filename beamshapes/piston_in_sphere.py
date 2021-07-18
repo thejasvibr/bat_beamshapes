@@ -3,14 +3,8 @@
 """
 Piston in a sphere
 ==================
-The output from this implementation `will not exactly` match Fig. 12-23 of Beranek & Mellow.
-Especially for higher `ka` values (:math:`\geq 5`), the overall shape is the same, but 
-values differ. This is expected, and is due to a typo in the book. For more details see :doc:`this detailed explanation <notes_piston_in_sphere>`.
 
-References
-----------
-Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
-Academic Press.
+
 
 See Also 
 --------
@@ -20,9 +14,20 @@ Notes
 -----
 This module is an mpmath implementation compatible with multiple operating systems.
 
+The solution for eqn.12.107 (Kmn term) is shown in Appendix II. However, this solution 
+has a typo in the 2012 edition. The 'correct' version is used here, which also happens
+to match the version used to make the graphs.
+
 For high `ka` values (>3) it can take a few minutes to run. A faster implementation
 (but only Linux compatible) is the beamshapes.piston_in_sphere_flint. `piston_in_sphere_flint` 
 is better suited for those that need to calculate 100-1000's of beamshapes.
+
+
+References
+----------
+Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
+Academic Press.
+
 
 """
 import copy
@@ -74,28 +79,7 @@ def Imn_func(mv,nv,kv,Rv,alphav):
     '''
     return mpmath.quad(lambda thetav: Imn_term_func(mv,nv,kv,Rv,alphav, thetav),
                        (0,alphav),
-                       method='gauss-legendre')
-
-# mpmath.mp.dps = 300
-# errors = []
-# nns =  [1,5,50]
-# for eachm in tqdm.tqdm(nns):
-#     for eachn in nns:
-#         out, err= Imn_func(eachm,eachn, paramv['k'],paramv['R'],paramv['alpha'])
-#         errors.append(err)
-# print(errors)
-
-# angles = mpmath.linspace(0, paramv['alpha'],100)
-# imn_vals = [ (Imn_term_func(20,5,paramv['k'],paramv['R'],paramv['alpha'],ang)) for ang in angles]
-
-# plt.figure()
-# plt.plot(np.degrees(np.float32(angles)), [each.real for each in imn_vals], label='real')
-# plt.plot(np.degrees(np.float32(angles)), [each.imag for each in imn_vals], label='imag')
-# plt.legend()
-
-
-#%% 
-    
+                       method='gauss-legendre')   
 
 #%%
 # equation 12.107
@@ -108,7 +92,8 @@ legendre_mcosalpha = legendre_ncosalpha.subs({'n':m})
 # when m != n
 num_legendre_term1 = legendre_mcosalpha*diff(legendre_ncosalpha, alpha)
 num_legendre_term2 = legendre_ncosalpha*diff(legendre_mcosalpha, alpha)
-eqn70_mnoteqn = sin(alpha)*(num_legendre_term1 - num_legendre_term2)/(m*(m+1)-n*(n+1))
+# Appendix II,70 has a typo in the 2012 edition. This is the correct version here.
+eqn70_mnoteqn = sin(alpha)*(num_legendre_term1 - num_legendre_term2)/(n*(n+1)-m*(m+1))
 
 # when m==n
 # substituting 'j' for 'index' 
