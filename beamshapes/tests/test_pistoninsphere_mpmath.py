@@ -12,22 +12,18 @@ try:
 except:
     pass
 
-
 import unittest
 import mpmath
 import numpy as np 
 import pandas as pd
 from beamshapes.piston_in_sphere import piston_in_sphere_directivity
 
-#%% 
-    
-
-
 #%%
-class PistonInSphere(unittest.TestCase):
+class PistonInSphereMpmath(unittest.TestCase):
     '''
     The test data assumes that alpha = pi/3
     '''
+
     
     def setUp(self):
         self.paramv = {}
@@ -44,13 +40,13 @@ class PistonInSphere(unittest.TestCase):
     
         
     def perform_ka_match(self, kaval):
-        #print(f'Starting piston in sphere for ka={ka_val}')
-        ka = mpmath.mpf(kaval)
+
+        ka = kaval
         a_value = ka/self.paramv['k']
         R_value = a_value/mpmath.sin(self.paramv['alpha'])  # m
         self.paramv['R'] = R_value        
         self.paramv['a'] = a_value
-        self.paramv['a'] = kaval/self.paramv['k']
+        self.paramv['a'] = ka/self.paramv['k']
         angles = np.radians(self.by_ka.get_group(kaval)['theta_deg'])
         actual_dirnlty = self.by_ka.get_group(kaval)['relonaxis_db'].to_numpy()
         
@@ -58,17 +54,16 @@ class PistonInSphere(unittest.TestCase):
                                                          self.paramv)
         error = np.abs(output_dirnlty-actual_dirnlty)
         return np.max(error)
-
+    
     def test_kamatches(self):
         #kavals = [1,3,5,10]
-        # max_error_allowed = [1,1,1,3.5]
-        kavals = [1,3]
-        max_error_allowed = [1,1]
+        kavals = [1,3,5]
+        max_error_allowed = [1,1,1]
         max_abs_errors = np.zeros(len(kavals)) # incorporates digitisation error
         for i, (each, allowed_error)  in enumerate(zip(kavals,max_error_allowed)):
             max_abs_errors[i] = self.perform_ka_match(each)
             print(max_abs_errors[i])
-            self.assertTrue(max_abs_errors[i]<=allowed_error)
+            self.assertTrue(max_abs_errors[i]<=allowed_error) 
 
 if __name__=='__main__':
     unittest.main()

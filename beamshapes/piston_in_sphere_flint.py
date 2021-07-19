@@ -65,10 +65,11 @@ sph_hankel2 = lambda n,z : sph_besselj(n, z) - 1j*sph_bessely(n,z)
 #%%
 # P-prime-cos(alpha) in Appendix II eqn.70 and NOT in eqn. 12.98 in 2012edn.
 def pprime_cosalpha(n, alpha):
-    legendre_term = legendre_p(n-1,cos(alpha))-legendre_p(n+1,cos(alpha))
-    numerator = n*(n+1)*legendre_term
-    denominator = (1+2*n)*(-sin(alpha)**2)
-    return -numerator/denominator
+    legendre_term = legendre_p(n+1,cos(alpha))-legendre_p(n-1,cos(alpha))
+    numerator = (n*(n+1))*legendre_term
+    denominator = (1+2*n)*(-1+cos(alpha)**2)
+    final_term = -sin(alpha)*(numerator/denominator)
+    return final_term
 
 #%% Calculating N -  using the formula from T. Mellow's code.
 def calc_defaultNN(param):
@@ -79,7 +80,7 @@ def calc_defaultNN(param):
 #%%
 r1 = lambda theta,alpha,R : R*cos(alpha)/cos(theta) 
 
-# eqn. 12.018 Lm 
+# eqn. 12.108 Lm 
 # r1/R --> cos(alpha)/cos(theta)
 Lm_term = lambda theta,m,alpha : legendre_p(m, cos(theta))*((cos(alpha)/cos(theta))**2)*tan(theta)
 
@@ -95,11 +96,13 @@ def Lm_func(mv, alphav):
 def m_noteq_n(alpha,m,n):
     term1 = legendre_p(m,cos(alpha))*pprime_cosalpha(n, alpha)
     term2 = legendre_p(n, cos(alpha))*pprime_cosalpha(m, alpha)
-    value = sin(alpha)*(term1-term2)/(n*(n+1)-m*(m+1))
+    value = (sin(alpha)*(term1-term2))/(n*(n+1)-m*(m+1))
     return value
 
 def meqn_legendre_summn_term(jj,alpha):
-    return legendre_p(jj,cos(alpha))*(legendre_p(jj,cos(alpha))*cos(alpha)-legendre_p(jj+1,cos(alpha)))
+    first_term = legendre_p(jj,cos(alpha))
+    second_term = (legendre_p(jj,cos(alpha))*cos(alpha)-legendre_p(jj+1,cos(alpha)))
+    return first_term*second_term
 
 def meqn_summterm(m,alpha):
     m = int(float(str(m)))
@@ -190,7 +193,7 @@ def make_Mmn_pll(param):
             param['n'] = acb(nn)
             params_as_str[(mm,nn)] = interchange_params_and_str(param,
                                                                 to_str=True)
-  
+
     # run parallel calc
     Mmn_as_str = Parallel(n_jobs=n_cores, backend='multiprocessing')(delayed(calc_one_Mmn_term_pll)(paramset)   for position, paramset in tqdm.tqdm(params_as_str.items()))
     Mmn_acb = [conv_str_acb(each) for each in Mmn_as_str]
@@ -294,29 +297,36 @@ def piston_in_sphere_directivity(thetas, param,**kwargs):
     dB_directivity = 20*np.log10(np.float32(ratios))
     return A_n, dB_directivity
 
-#%%
-if __name__ == '__main__':
-    ka = acb(15)
-    kv = 2*pi/(330.0/50000.0)
-    av = ka/kv
-    alphav = pi/3
-    Rv = acb(0.002)#av/sin(alphav)
-    params = {'k':kv,
-              'a':av,
-              'alpha': alphav,
-              'R': Rv}
-    print(f'The DPS is: {ctx.dps}')
-    #mmn_mat = make_Mmn(params)
-    angles = [pi*0, pi/6, pi/4, pi/2, pi]
-    an, dbdirn = piston_in_sphere_directivity(angles, params)
+# #%%
+# if __name__ == '__main__':
+#     kaval = 10
+#     ka = acb(kaval)
+#     kv = 2*pi/(330.0/50000.0)
+#     av = ka/kv
+#     alphav = pi/3
+#     Rv = av/sin(alphav)
+#     params = {'k':kv,
+#               'a':av,
+#               'alpha': alphav,
+#               'R': Rv}
+#     print(f'The DPS is: {ctx.dps}')
+#     #mmn_mat = make_Mmn(params)
+#     import pandas as pd
+#     plotdata = pd.read_csv('tests/plots_data/pistoninsphere.csv')        
+#     by_ka = plotdata.groupby('ka')
+#     angles = np.radians(by_ka.get_group(kaval)['theta_deg']).tolist()
+#     angles_acb = [acb(each) for each in angles]
     
-    print(dbdirn)
-    # %% 
-    angles = np.linspace(0,np.pi,200)
-    angles_acb = [acb(each) for each in angles]
-    _, dbdirn2 = piston_in_sphere_directivity(angles_acb, params, A_n=an)
-    import matplotlib.pyplot as plt 
-    plt.figure()
-    a0 = plt.subplot(111, projection='polar')
-    plt.plot(angles, dbdirn2)
-    plt.ylim(-60,0);plt.yticks(np.arange(-60,10,10))
+#     #%%
+#     an, dbdirn = piston_in_sphere_directivity(angles_acb, params)
+#     #%%
+#     #an, dbdirn = piston_in_sphere_directivity(angles_acb, params, A_n=an)
+#     # %% 
+#     dirnlty_ground = by_ka.get_group(kaval)['relonaxis_db']
+#     import matplotlib.pyplot as plt 
+#     plt.figure()
+#     a0 = plt.subplot(111, projection='polar')
+#     plt.plot(angles, dirnlty_ground,'-*',label='ground')
+#     plt.plot(angles, dbdirn, '-*',label='output')
+#     plt.legend()
+#     #plt.ylim(-60,0);plt.yticks(np.arange(-60,10,10))

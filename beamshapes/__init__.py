@@ -1,7 +1,8 @@
-'''print('miaaaow') Whaat
+'''Loads a bunch of directivities into the packages main namespace.
+All others will need to be deliberately loaded. 
 '''
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 # from beamshapes.beamshape_predictions import * 
 from beamshapes.sim_reclevels  import * 
 from beamshapes.piston_in_sphere import piston_in_sphere_directivity

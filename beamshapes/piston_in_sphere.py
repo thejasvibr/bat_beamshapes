@@ -361,6 +361,12 @@ def piston_in_sphere_directivity(angles, params, **kwargs):
     aperture alpha, use ```mpmath.pi/3``` rather than ```np.pi/3```
     for instance.
     
+    Warning
+    -------
+    The radius of the piston is automatically assumed to follow the 
+    relation: a = R*sin(alpha) - please make sure this relationship 
+    holds to have believable results.
+    
     '''
     A_n = kwargs.get('A_n', None)
     if A_n is None:
@@ -431,3 +437,4 @@ def piston_in_sphere_directivity(angles, params, **kwargs):
 #     avg_error = np.mean(np.abs(error))
 #     rms_error = np.sqrt(np.mean(np.square(error)))
 #     print(median_error, avg_error, rms_error)
+    

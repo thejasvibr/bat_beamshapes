@@ -1,7 +1,7 @@
 Notes for Piston in a Sphere
 ============================
 
-updated 2021-06-01
+updated 2021-07-18
 
 The previous post on this page highlighted what seemed to be two discrepancies (check commit 46c11ec..), the first being a potential typo in equation 12.98, which described
 :math:`\frac{\partial}{\partial \theta} P_n(cos \theta)` . Upon closer inspection I realised there was no typo, and it was an interpretational error on my part. 
@@ -77,15 +77,16 @@ The switch in `m` and `n` indices between II and III for leads to different  dir
 
 Perhaps the current :code:`beamshapes` implementation is the result of a coding error? Unlikely, as switching the order of the :math:`P_{m/n}` and :math:`P^{\prime}_{m/n}` terms in the :code:`beamshapes` implementations recreates Fig. 12.23 (not shown here). 
 
-IV. Which is the correct solution?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Which form of the :math:`K_{mn}` solution is the correct one - the one in the textbook or the one in the code?
+IV. The correct solution is the Mathematica code implementation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The code implementation is the correct solution - Tim Mellow has checked its correctness also through numerical integration.
+The current implementations of the piston in a sphere are based on the Mathematica code implementation.
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~
-Thanks to Gaurav Dhariwal for re-checking the math once more. 
+Thanks to Tim Mellow for clarifying the discrepancy between published and implemented models, and Gaurav Dhariwal for re-checking the math once more. 
 
 References
 ~~~~~~~~~~
-* Chp 12, Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers. Academic Press.
+* Chp 12, Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers. Academic Press. (also see the online Errata)
 * To see code implementations check out the :code:`piston_in_sphere` documentation

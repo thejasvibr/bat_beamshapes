@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/thejasvibr/bat_beamshapes.svg?branch=dev)](https://travis-ci.org/thejasvibr/bat_beamshapes)
+[![Build Status](https://travis-ci.com/thejasvibr/bat_beamshapes.svg?branch=dev)](https://travis-ci.com/thejasvibr/bat_beamshapes)
 
 # Beamshapes
 
