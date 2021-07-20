@@ -50,6 +50,31 @@ class CapOfSphere(unittest.TestCase):
         print(max_abs_errors)
         self.assertTrue(np.all(max_abs_errors<=1.05))
 
+
+class OnAxisCapOfSphere(unittest.TestCase):
+    '''
+    Check the on-axis levels over different cap apertures and ka values
+    '''
+    
+    def setUp(self):
+        self.paramv = {}
+        plotdata = pd.read_csv('plots_data/onaxis_response_capofsphere.csv')        
+        self.alpha_values = plotdata['alpha_deg'].unique()
+        self.by_alpha = plotdata.groupby('alpha_deg')
+        
+    # def test_onaxis_match(self):
+    #     self.paramv['k'] = 10
+    #     self.paramv['R'] = 0.1
+    #     for alpha in self.alpha_values:
+    #         for kaval in 
+    #         self.paramv['alpha'] = np.radians(alpha)
+    #         self.paramv['a'] = self.paramv['R']*mpmath.sin(self.paramv['alpha'])
+    #         self.paramv['k'] = kaval/self.paramv['a']
+                
+        
+        
+
+
 if __name__=='__main__':
     unittest.main()
     #%% 
