@@ -79,7 +79,6 @@ def d_0_t3_func(k_v, R_v, alpha_v, theta_v):
                                               'theta': theta_v})
     return mpmath.nsum(lambdify([n],version_with_freen, 'mpmath'), [2,mpmath.inf])
 
-
 def d_theta(**param):
     brackets_term1 = d_theta_t1_func(param['k'], param['R'],
                                      param['alpha'], param['theta'])
@@ -88,7 +87,7 @@ def d_theta(**param):
     brackets_term3 = dtheta_t3_func(param['k'], param['R'],
                                          param['alpha'], param['theta'])
     kR_square = (param['k']*param['R'])**2
-    final_d_theta = (2/kR_square)*(brackets_term1+brackets_term2+brackets_term3)
+    final_d_theta = -(2/kR_square)*(brackets_term1+brackets_term2+brackets_term3)
     return final_d_theta
 
 
@@ -104,7 +103,7 @@ def d_zero(kv, Rv, alphav, thetav=0):
     brackets_term2 = d_0_t2_func(kv, Rv, alphav, thetav)
     brackets_term3 = d_0_t3_func(kv, Rv, alphav, thetav)
     kR_square = (kv*Rv)**2
-    final_d_0 = (2/kR_square)*(brackets_term1+brackets_term2+brackets_term3)
+    final_d_0 = -(2/kR_square)*(brackets_term1+brackets_term2+brackets_term3)
     return final_d_0
 
 
