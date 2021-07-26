@@ -17,6 +17,7 @@ import unittest
 import mpmath
 import numpy as np 
 import pandas as pd
+import tqdm
 from beamshapes import cap_in_sphere_directivity
 from beamshapes.cap_in_sphere import d_zero
 
@@ -58,29 +59,28 @@ class OnAxisCapOfSphere(unittest.TestCase):
     
     def setUp(self):
         self.paramv = {}
-        self.plotdata = pd.read_csv('plots_data/onaxis_response_capofsphere.csv')        
+        self.plotdata = pd.read_csv('plots_data/onaxis_capofsphere_v2.csv')        
         self.alpha_values = self.plotdata['alpha_deg'].unique()
         self.by_alpha = self.plotdata.groupby('alpha_deg')
         
     def test_onaxis_match(self):
         self.paramv['R'] = 0.1
-        groundtruth_levels = self.plotdata['normalised_onaxis_db']
-        all_obtained = []
+        groundtruth_levels = self.plotdata['onaxis_db'].tolist()
         all_obtained_raw = []
         
         for alpha in self.alpha_values:
             subdf = self.by_alpha.get_group(alpha)
             this_alpha_set = []
-            for kaval in subdf['ka']:
+            for kaval in tqdm.tqdm(subdf['kR']):
                 self.paramv['alpha'] = np.radians(alpha)
-                self.paramv['a'] = self.paramv['R']*mpmath.sin(alpha)
-                self.paramv['k'] = kaval/self.paramv['a']
+                #self.paramv['a'] = self.paramv['R']*mpmath.sin(alpha)
+                self.paramv['k'] = kaval/self.paramv['R']
                 onaxis_value = d_zero(self.paramv['k'], self.paramv['R'], 
                                       self.paramv['alpha'])
                 this_alpha_set.append(float(np.abs(onaxis_value)))
 
             this_alpha_normalised = np.array(this_alpha_set)
-            this_alpha_normalised *= 1/np.min(this_alpha_normalised)
+            #this_alpha_normalised *= 1/np.min(this_alpha_normalised)
             all_obtained_raw.append(this_alpha_normalised)
         
         all_obtained_raw =  np.concatenate(all_obtained_raw)
@@ -88,39 +88,40 @@ class OnAxisCapOfSphere(unittest.TestCase):
         difference = all_obtained_db - groundtruth_levels
 
         print(difference.tolist())
-        print('\n', all_obtained_db)
-        print('\n', groundtruth_levels)
+        print('\n', len(all_obtained_db))
+        print('\n', len(groundtruth_levels))
         
         df = pd.DataFrame(data={'groundtruth_db':groundtruth_levels,
-                                'obtained_db': all_obtained,
-                                'alpha': self.plotdata['alpha_deg'],
-                                'ka': self.plotdata['ka']})
-        df.to_csv('miaow_cap.csv')        
+                                'obtained_db': all_obtained_db,
+                                'alpha': self.plotdata['alpha_deg'].tolist(),
+                                'kR': self.plotdata['kR'].tolist()
+                                })
+        df.to_csv('miaow_cap.csv')
         self.assertTrue(np.max(np.abs(difference))<1)
 
 if __name__=='__main__':
     unittest.main()
-    # #%% 
-    # import matplotlib.pyplot as plt
+    
+    #%% 
+    import matplotlib.pyplot as plt
     
     # paramv = {}
     # paramv['R'] = 0.1
-    # plotdata = pd.read_csv('plots_data/onaxis_response_capofsphere.csv')
-    # groundtruth_levels = plotdata['normalised_onaxis_db']
+    # plotdata = pd.read_csv('plots_data/onaxis_capofsphere_v2.csv')
+    # groundtruth_levels = plotdata['onaxis_db']
     # all_obtained = []
-    # all_obtained_raw = []    
+    # all_obtained_raw = []
     # alpha_values = plotdata['alpha_deg'].unique()
     # by_alpha = plotdata.groupby('alpha_deg')
-    # #%%
-    # ka_values = np.concatenate((np.linspace(0.1,0.9,9), 
-    #                             np.linspace(1,5,5)))
-    # alpha_values =  [15,30, 60,90]
+    # all_kas = []
     # for alpha in alpha_values:
     #     this_alpha_set = []
-    #     for kaval in ka_values:
+    #     ka_values = by_alpha.get_group(alpha)['kR']
+    #     all_kas.append(ka_values)
+    #     for kaval in tqdm.tqdm(ka_values):
     #         paramv['alpha'] = np.radians(alpha)
-    #         paramv['a'] = paramv['R']*mpmath.sin(alpha)
-    #         paramv['k'] = kaval/paramv['a']
+    #         #paramv['a'] = paramv['R']*mpmath.sin(alpha)
+    #         paramv['k'] = kaval/paramv['R']
     #         onaxis_value = d_zero(paramv['k'], paramv['R'], 
     #                               paramv['alpha'])
     #         this_alpha_set.append(float(np.abs(onaxis_value)))
@@ -131,20 +132,18 @@ if __name__=='__main__':
     
     # plt.figure()
     # for i, each in enumerate(alpha_values):
-    #     try:
-    #         subdf = by_alpha.get_group(each)
-    #         plt.plot(subdf['ka'], subdf['normalised_onaxis_db'],'-*', label=f'{each}')
-    #     except: 
-    #         pass
-    #     this_alphaset = np.array(all_obtained_raw[i])
-    #     this_alphaset *= 1/this_alphaset[0]
 
-    #     plt.plot(ka_values, db(this_alphaset), 
-    #               label=f'alpha={each}')
+    #     subdf = by_alpha.get_group(each)
+    #     plt.plot(subdf['kR'], subdf['onaxis_db'],'-*', label=f'{each}')
     #     plt.xscale('log')
-    # plt.legend()
-    # plt.grid()
+    #     plt.grid();plt.title('ground truth')
+    #     plt.xlim(0.1,100);plt.ylim(-30,6)
+    #     plt.legend()
+        
+    # db_obtained =  [db(each) for each in all_obtained_raw]
     
+    # for kas, db_vals in zip(all_kas, db_obtained):
+    #     plt.plot(kas, db_vals, '*')
     
     
     

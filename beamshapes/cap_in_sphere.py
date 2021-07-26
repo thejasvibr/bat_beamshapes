@@ -30,16 +30,21 @@ from beamshapes.utilities import args_to_mpmath, args_to_str
 
 n, z, k, R, alpha, theta = symbols('n z k R alpha theta')
 
+def sphhankel2(nv,zv):
+    return sph_hankel2.subs({'n': nv, 'z': zv})
+
 # equation 12.59
 # split the big parenthesis into 3 parts (j/sph_hankel, cos(theta) term and the summation)
-d_theta_term1 = I/(2*sph_hankel2.subs({'n': 1, 'z': k*R}))
+d_theta_term1 = I/(2*sphhankel2(1,k*R))
 
 d_theta_term2_num = 3*(1-cos(alpha)**3)*cos(theta)
-d_theta_term2_denom = (sin(alpha)**2)*(sph_hankel2.subs({'n': 0, 'z': k*R})-2*sph_hankel2.subs({'n': 2, 'z': k*R}))
+d_theta_term2_denom = (sin(alpha)**2)*(sphhankel2(0,k*R)-2*sphhankel2(2,k*R))
 d_theta_term2 = d_theta_term2_num/d_theta_term2_denom
 P_1ncosalpha = legendre_mvz.subs({'m': 1, 'v': n, 'z': cos(alpha)}).doit()
+
+
 dtheta_t3_num = (I**(n+1))*((2*n+1)**2)*(sin(alpha)*legendre(n, cos(alpha)) + cos(alpha)*P_1ncosalpha)
-dtheta_t3_denom = (n-1)*(n+2)*sin(alpha)*(n*sph_hankel2.subs({'n': n-1, 'z': k*R})-(n+1)*sph_hankel2.subs({'n': n+1, 'z': k*R}))
+dtheta_t3_denom = (n-1)*(n+2)*sin(alpha)*(n*sphhankel2( n-1,k*R)-(n+1)*sphhankel2(n+1,k*R))
 dtheta_t3_oneterm = (dtheta_t3_num/dtheta_t3_denom)*legendre(n, cos(theta))
 
 d_theta_t1_func = lambdify([k, R, alpha, theta], d_theta_term1, 'mpmath')
@@ -60,6 +65,7 @@ def dtheta_t3_func(k_v, R_v, alpha_v, theta_v):
                                                  'theta': theta_v})
     freen_func = lambdify([n], version_with_freen, 'mpmath')
     return mpmath.nsum(freen_func, [2, mpmath.inf])
+    #return mpmath.nsum(freen_func, [2, int(5+2*k_v*R_v)])
 
 
 # %% In eqn. 12.61, term 2 differs by the absence of a cos(theta)
@@ -78,6 +84,7 @@ def d_0_t3_func(k_v, R_v, alpha_v, theta_v):
                                               'alpha': alpha_v,
                                               'theta': theta_v})
     return mpmath.nsum(lambdify([n],version_with_freen, 'mpmath'), [2,mpmath.inf])
+    #return mpmath.nsum(lambdify([n],version_with_freen, 'mpmath'), [2, int(5+2*k_v*R_v)])
 
 def d_theta(**param):
     brackets_term1 = d_theta_t1_func(param['k'], param['R'],
