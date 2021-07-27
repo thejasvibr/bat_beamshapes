@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-End-to-end tests to check if various beamshape models are generating the
-predicted outputs. 
+Tests to check point-source on a sphere
 
 """
 
@@ -18,6 +17,7 @@ import unittest
 import numpy as np 
 import pandas as pd
 from beamshapes import point_source_on_a_sphere_directivity
+from beamshapes.point_source_on_a_sphere import d_zero_func 
 
 
 class PointSourceSphere(unittest.TestCase):
@@ -46,36 +46,30 @@ class PointSourceSphere(unittest.TestCase):
         print(max_abs_errors)
         self.assertTrue(np.all(max_abs_errors<=1))
 
+class OnAxisPointSourceOnSphere(unittest.TestCase):
+    
+    def setUp(self):
+        self.R = 0.1
+        self.plotdata = pd.read_csv('plots_data/onaxis_response_pointsourceonsphere.csv')
+        self.kr_values = self.plotdata['kR'].tolist()
+        self.tolerance = 0.1
+    
+    def test_onaxis(self):
+        dzero_outputs = []
+        for each_kr in self.kr_values:
+            k_val = each_kr/self.R
+            NN = int(10 + 2*each_kr)
+            dzero_outputs.append(np.abs(d_zero_func(k_val, self.R, NN)))
+        db_dzero = 20*np.log10(dzero_outputs)
+        # check all values are < deviation
+        deviation = db_dzero-self.plotdata['onaxis_db']
+        less_than_threshold = np.all(np.abs(deviation)<self.tolerance)
+        self.assertTrue(less_than_threshold)
+
+
 if __name__=='__main__':
-    unittest.main()
-    # #%% 
-    # import numpy as np 
-    # paramv = {}
-    # plotdata = pd.read_csv('plots_data/pointonsphere.csv')               
-    # by_ka = plotdata.groupby('kR')
-    # kRval = 10
-    # paramv['k'] = 10
-    # paramv['R'] = kRval/paramv['k']
-    # angles = np.radians(by_ka.get_group(kRval)['theta'])
-    # actual_dirnlty = by_ka.get_group(kRval)['r'].to_numpy()
+    unittest.main()        
     
-    # _, output_dirnlty = point_source_on_a_sphere_directivity(angles,
-    #                                                               paramv)
-    # error = np.abs(output_dirnlty-actual_dirnlty)
-    # error_deg = pd.DataFrame(data={'theta':angles, 
-    #                                 'r':actual_dirnlty,
-    #                                 'rout':output_dirnlty})
-    # error_deg = error_deg.sort_values(by='theta')
-    # error_deg['diff'] = np.abs(error_deg['r']-error_deg['rout'])
-    # error_deg['thetadeg'] = by_ka.get_group(kRval)['theta']
-    # print(np.max(error))
-    # #%%
     
-    # import matplotlib.pyplot as plt 
-    # plt.figure()
-    # a0 = plt.subplot(111, projection='polar')
-    # plt.plot(angles, output_dirnlty, '*')
-    # plt.plot(angles, actual_dirnlty, '*')
-    # plt.ylim(-50,10)
     
         
