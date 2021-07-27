@@ -33,7 +33,7 @@ n, z, k, R, alpha, theta = symbols('n z k R alpha theta')
 def sphhankel2(nv,zv):
     return sph_hankel2.subs({'n': nv, 'z': zv})
 
-# equation 12.59
+#%% equation 12.59
 # split the big parenthesis into 3 parts (j/sph_hankel, cos(theta) term and the summation)
 d_theta_term1 = I/(2*sphhankel2(1,k*R))
 
@@ -42,7 +42,7 @@ d_theta_term2_denom = (sin(alpha)**2)*(sphhankel2(0,k*R)-2*sphhankel2(2,k*R))
 d_theta_term2 = d_theta_term2_num/d_theta_term2_denom
 P_1ncosalpha = legendre_mvz.subs({'m': 1, 'v': n, 'z': cos(alpha)}).doit()
 
-
+# the summation term 
 dtheta_t3_num = (I**(n+1))*((2*n+1)**2)*(sin(alpha)*legendre(n, cos(alpha)) + cos(alpha)*P_1ncosalpha)
 dtheta_t3_denom = (n-1)*(n+2)*sin(alpha)*(n*sphhankel2( n-1,k*R)-(n+1)*sphhankel2(n+1,k*R))
 dtheta_t3_oneterm = (dtheta_t3_num/dtheta_t3_denom)*legendre(n, cos(theta))
@@ -68,7 +68,7 @@ def dtheta_t3_func(k_v, R_v, alpha_v, theta_v):
     #return mpmath.nsum(freen_func, [2, int(5+2*k_v*R_v)])
 
 
-# %% In eqn. 12.61, term 2 differs by the absence of a cos(theta)
+# %% In eqn. 12.61, only term 2 differs by the absence of a cos(theta)
 d_0_term2_num = 3*(1-cos(alpha)**3)
 d_0_term2 = d_0_term2_num/d_theta_term2_denom
 d_0_t2_func = lambdify([k, R, alpha, theta], d_0_term2, 'mpmath')
@@ -113,7 +113,7 @@ def d_zero(kv, Rv, alphav, thetav=0):
     final_d_0 = -(2/kR_square)*(brackets_term1+brackets_term2+brackets_term3)
     return final_d_0
 
-
+#%%
 def relative_directivity_db(angle, k_v, R_v, alpha_v):
     off_axis = d_theta(k_v, R_v, alpha_v, angle)
     on_axis = d_zero(k_v, R_v, alpha_v)
