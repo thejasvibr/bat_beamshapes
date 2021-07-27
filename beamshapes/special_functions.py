@@ -24,5 +24,6 @@ h2_nz = sph_bessel1 - I*sph_bessel2 # more compact notation.
 # This function can actuall be replaced by the inbuilt 'assoc_legendre' with varying mileage
 # upon lambdification
 # pmvz version of legendre function (Appendix II of Beranek & Mello 2012, eqn. 63)
+# this is the equivalent of Latex: P^{m}_{v}(z)
 legendre_mvz = ((-1)**m)*((1-z**2)**(m/2))*legendre(v,z).diff((z,m))
 

@@ -100,50 +100,51 @@ class OnAxisCapOfSphere(unittest.TestCase):
         self.assertTrue(np.max(np.abs(difference))<1)
 
 if __name__=='__main__':
-    unittest.main()
+    #unittest.main()
     
     #%% 
     import matplotlib.pyplot as plt
     
-    # paramv = {}
-    # paramv['R'] = 0.1
-    # plotdata = pd.read_csv('plots_data/onaxis_capofsphere_v2.csv')
-    # groundtruth_levels = plotdata['onaxis_db']
-    # all_obtained = []
-    # all_obtained_raw = []
-    # alpha_values = plotdata['alpha_deg'].unique()
-    # by_alpha = plotdata.groupby('alpha_deg')
-    # all_kas = []
-    # for alpha in alpha_values:
-    #     this_alpha_set = []
-    #     ka_values = by_alpha.get_group(alpha)['kR']
-    #     all_kas.append(ka_values)
-    #     for kaval in tqdm.tqdm(ka_values):
-    #         paramv['alpha'] = np.radians(alpha)
-    #         #paramv['a'] = paramv['R']*mpmath.sin(alpha)
-    #         paramv['k'] = kaval/paramv['R']
-    #         onaxis_value = d_zero(paramv['k'], paramv['R'], 
-    #                               paramv['alpha'])
-    #         this_alpha_set.append(float(np.abs(onaxis_value)))
-    #     all_obtained_raw.append(this_alpha_set)
+    paramv = {}
+    paramv['R'] = 0.1
+    plotdata = pd.read_csv('plots_data/onaxis_capofsphere_v2.csv')
+    groundtruth_levels = plotdata['onaxis_db']
+    all_obtained = []
+    all_obtained_raw = {}
+    alpha_values = plotdata['alpha_deg'].unique()
+    by_alpha = plotdata.groupby('alpha_deg')
+    all_kas = {}
+    for alpha in alpha_values:
+        this_alpha_set = []
+        ka_values = by_alpha.get_group(alpha)['kR']
+        all_kas[alpha] = ka_values
+        for kaval in tqdm.tqdm(ka_values):
+            paramv['alpha'] = np.radians(alpha)
+            #paramv['a'] = paramv['R']*mpmath.sin(alpha)
+            paramv['k'] = kaval/paramv['R']
+            onaxis_value = d_zero(paramv['k'], paramv['R'], 
+                                  paramv['alpha'])
+            this_alpha_set.append(float(np.abs(onaxis_value)))
+        all_obtained_raw[alpha] = this_alpha_set
 
-    # #%%
-    # db = lambda X: 20*np.log10(X)
+    #%%
+    db = lambda X: 20*np.log10(X)
     
-    # plt.figure()
-    # for i, each in enumerate(alpha_values):
+    plt.figure()
+    for i, each in enumerate(alpha_values):
 
-    #     subdf = by_alpha.get_group(each)
-    #     plt.plot(subdf['kR'], subdf['onaxis_db'],'-*', label=f'{each}')
-    #     plt.xscale('log')
-    #     plt.grid();plt.title('ground truth')
-    #     plt.xlim(0.1,100);plt.ylim(-30,6)
-    #     plt.legend()
+        subdf = by_alpha.get_group(each)
+        plt.plot(subdf['kR'], subdf['onaxis_db'],'-*', label=f'{each}')
+        plt.plot(all_kas[each], db(all_obtained_raw[each]), label=f'{each} -calculated')
+        plt.xscale('log');
+        plt.grid(which='both',axis='both');plt.title('ground truth')
+        plt.xlim(0.1,100);plt.ylim(-30,7)
+        plt.legend()
         
-    # db_obtained =  [db(each) for each in all_obtained_raw]
+    #db_obtained =  [db(each) for each in all_obtained_raw]
     
-    # for kas, db_vals in zip(all_kas, db_obtained):
-    #     plt.plot(kas, db_vals, '*')
+    #for kas, db_vals in zip(all_kas, db_obtained):
+    #    plt.plot(kas, db_vals, '*')
     
     
     
