@@ -8,15 +8,16 @@ Beamshapes: directivity patterns for various sound sources
 
 Introduction
 ~~~~~~~~~~~~
-The `beamshapes` package implements the 
-directivity functions (:math:`\frac{D_{\theta}}{D_{0}}`) of various sound radiation models
-(piston in a sphere, cap in a sphere, piston in a closed circular baffle, etc.).
+The `beamshapes` package implements directivity functions (:math:`\frac{D_{\theta}}{D_{0}}`) of various published 
+sound radiation models.
 
+What is a directivity function? It's a function that quantifies how sound level changes as you change
+the frequency of the emitted sound, and location of the receiver. 
 
 Check out a general introduction to the concepts of the package :doc:`here <general_intro>`.
 
 Why `beamshapes`?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
 While there are many sound radiation models described in the literature, there aren't
 that many (or any?) openly available computational implementations of their beamshapes.
 
@@ -26,7 +27,6 @@ Acousticians and bio-acousticians looking to assess model-fits or perform
 parameter estimation on their sound sources. Check out more on the how
 to use this package in the :doc:`examples <gallery_examples/index>`. 
 
-
 Source models implemented
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 * Point source on a sphere
@@ -34,23 +34,25 @@ Source models implemented
 * Oscillating cap of a sphere 
 * Piston in a sphere
 
-Models under implementation 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Piston in a finite closed baffle  
-
 Wishlist for future releases 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-* Piston on a prolate spheroid
+* Piston in a finite closed baffle
+* One-sided piston radiator (baffle=cylinder width)
 * Rectangular cap of a sphere 
+* Piston on a prolate spheroid
 
 Interested?? Contribute, check out the general :doc:`workflow tips here <general_workflow>`.
+All of the sound-source models and directivity calculations are from Leo Beranek & Tim Mellow's 
+`Acoustics: sound fields and transducers. (Academic Press)` -  check it out for models
+that may be of interest or to get an idea of how the wishlist models look like!
 
 
-Package under active development
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-This package is relatively young, and changing dynamically. Things may
-break fairly often if you are installing from the `GitHub repo <https://github.com/thejasvibr/bat_beamshapes>`_ directly.
-A stable release will hopefully be out by the  July-August 2021. Stay tuned!
+Package installation
+~~~~~~~~~~~~~~~~~~~~
+Install from the `GitHub repo <https://github.com/thejasvibr/bat_beamshapes>`_ directly by cloning and 
+following the instructions in the README.
+
+An alpha release will hopefully be out by the  July-August 2021. Stay tuned!
 
 
 .. toctree::
@@ -75,8 +77,10 @@ Gaurav Dhariwal
 
 Acknowledgements
 ~~~~~~~~~~~~~~~~
+
 Many thanks to Tim Mellow for sharing Mathematica code to help with porting to Python.
-Also thanks to Neetash MR for inspiring the package logo!
+Also thanks to Holger R. Goerlitz for layout feedback (still in progress!) and
+ Neetash MR for inspiring the package logo!
 
 
 .. toctree::

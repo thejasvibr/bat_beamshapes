@@ -2,9 +2,9 @@
 All others will need to be deliberately loaded. 
 '''
 
-__version__ = '0.0.2'
+__version__ = '0.2.0'
 # from beamshapes.beamshape_predictions import * 
-from beamshapes.sim_reclevels  import * 
+# from beamshapes.sim_reclevels  import * 
 from beamshapes.piston_in_sphere import piston_in_sphere_directivity
 from beamshapes.cap_in_sphere import cap_in_sphere_directivity
 from beamshapes.piston_in_infinite_baffle import piston_in_infinite_baffle_directivity
