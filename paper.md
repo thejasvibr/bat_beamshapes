@@ -41,12 +41,11 @@ A host of published directivity functions exist in the literature, but it is my 
 
 Computational implementations of directivity functions often require long run-times due to the intensive numerical routines and arbitrary precision math required to generate results. Long run-times hinder scientific projects in reducing the number of models and parameter space that can be explored. ```beamshapes``` boasts parallelised code to generate significant speed-ups in run-times. 
 
-The availability of openly-available directivity implementations will hopefully stir the acoustics, and specifically the bio-acoustics community to test and compare sound radiation using alternate models that may present a better description of the data. Until recently, computational power has perhaps been a limiting factor to calculating directivity functions for various models. Models with easily calculable outputs have thus been favoured (eg. piston in an infinite baffle), especially in the field of bioacoustics [@strother1970acoustical;mogensen1979sound]. However, despite the recent availability of computational power, older, simpler models with limited biological relevance continue to dominate the field of bio-acoustics. For instance, the piston in an infinite baffle only predicts the beam-shape for a $\pm90^{\circ}$ range off-axis, and assumes front-back symmetry. This is unrealistic for most vocalising animals, especially echolocating bats and odontocetes. However, the model continues to be a standard reference point for multiple studies ranging over the past decade [@jakobsen2013convergent;kounitsky2015bats;@macaulay2020high]. The piston in a sphere (implemented in ```beamshapes```), for instance recreates many of the highly directional central and side lobes and that are seen in bats, while also predicting sound radiation behind the bat Figure \autoref{fig:pistoninsphere}. 
+The availability of openly-available directivity implementations will hopefully stir the acoustics, and specifically the bio-acoustics community to test and compare sound radiation using alternate models that may present a better description of the data. Until recently, computational power has perhaps been a limiting factor to calculating directivity functions for various models. Models with easily calculable outputs have thus been favoured (eg. piston in an infinite baffle), especially in the field of bioacoustics [@strother1970acoustical;@mogensen1979sound]. However, despite the recent availability of computational power, older, simpler models with limited biological relevance continue to dominate the field of bio-acoustics. For instance, the piston in an infinite baffle only predicts the beam-shape for a $\pm90^{\circ}$ range off-axis, and assumes front-back symmetry. This is unrealistic for most vocalising animals, especially echolocating bats and odontocetes. However, the model continues to be a standard reference point for multiple studies ranging over the past decade [@jakobsen2013convergent;@kounitsky2015bats;@macaulay2020high]. The piston in a sphere, implemented in ```beamshapes```, for instance recreates many of the highly directional central and side lobes and that are seen in bats, while also predicting sound radiation behind the bat (Figure \autoref{fig:pistonsphereinf}). 
 
 
+![Comparison on directivity patterns for piston in a sphere (left) and piston in an infinite baffle (right) for various ka values. The half-angle aperture of the piston ($\alpha$) of the sphere was set to 30 degrees. There is a broad similarity in the primary lobe, though the differences become clear with increasing off-axis angles. The lack of front-back symmetry may be very informative for parameter estimation of real bats in the field for instance. \label{fig:pistonsphereinf}](paper_related/piston_sphere_baffle.png)
 
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
 
 Future releases of ```beamshapes``` are scheduled to include directivity patterns for additional models of interest such as rectangular cap of a sphere or piston in a closed finite baffle.
 
@@ -58,8 +57,6 @@ Future releases of ```beamshapes``` are scheduled to include directivity pattern
 # Figures
 
 Figures can be included like this:
-![Caption for example figure.\label{fig:example}](figure.png)
-and referenced from text using \autoref{fig:example}.
 
 Figure sizes can be customized by adding an optional second parameter:
 ![Caption for example figure.](figure.png){ width=20% }
