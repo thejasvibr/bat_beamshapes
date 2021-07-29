@@ -79,8 +79,8 @@ Acknowledgements
 ~~~~~~~~~~~~~~~~
 
 Many thanks to Tim Mellow for sharing Mathematica code to help with porting to Python.
-Also thanks to Holger R. Goerlitz for layout feedback (still in progress!) and
- Neetash MR for inspiring the package logo!
+Also thanks to Holger R. Goerlitz for layout feedback (still in progress!) and 
+Neetash MR for inspiring the package logo!
 
 
 .. toctree::

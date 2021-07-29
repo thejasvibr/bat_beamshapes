@@ -22,40 +22,37 @@ bibliography: paper.bib
 
 # Summary
 
-Sound sources such as human beings or loudspeaker exhibit a 'directionality'. A
-listener or microphone placed at different angles at a fixed radius will often 
-pick up sometimes drastically different sound levels. The directionality of 
-a sound source is often modelled as a combination of the frequency of the emitted
-sound, the geometry of the sound source itself, and the combination of the physics
-of sound propagation over space. The resulting pattern of sound levels with angular location
- is called the *directivity* function [@beranek2012acoustics]. 
+Sound sources such as human beings or loudspeaker often exhibit a 'directionality' in how loud they sound at different angles.
+A listener or microphone placed at various angles at a fixed radius will often pick up sometimes drastically different sound levels. Oftentimes the same sound source may actually produce omnidirectional sound fields, with rather uniform levels at various angles. The directionality of a sound source can be modelled as a combination of the frequency of the emitted
+sound, the geometry of the vibrating and non-vibrating parts of the sound source itself. The resulting pattern of sound radiation with angular location is called the *directivity* of the source [@beranek2012acoustics]. 
 
-Directivity functions describe the relative sound levels at a given angle off-axis (at angle $\theta$)
-with relation to the level on-axis (at $\theta = 0$), $directivity = \frac{D_{\theta}}{D_{0}}$. Directivity
+Directivity ($D$) describes the relative sound levels at a given angle $D(\theta)$
+with relation to the level on-axis ($D(0)$, and thus $directivity = \frac{D_{\theta}}{D_{0}}$). Directivity
 functions exist for a wide variety of sound sources that can be modelled analytically. A well known example 
 of a directivity function is that of the piston in an infinite baffle. The piston is a circular surface of radius
-$a$, vibrating back and forth about a hole in an infinite wall or baffle. The directivity is described by $\frac{2J_{1}(ka \times sin \theta)}{ka \times sin \theta}$, 
-where $J_{1}$ is the Bessel's function of the first kind, $k$ is the wavenumber, where $k = \frac{2\pi f}{c}$, where $f$ is the frequency 
-of the sound, and $c$ is the speed of sound. The angle of the receiver is $\theta$, which varies from from 0-2$\pi$ radians in the azimuth. 
+$a$, vibrating back and forth about a hole in an infinite wall or baffle. The directivity is described by $\frac{2J_{1}(ka \times sin \theta)}{ka \times sin \theta}$, where $J_{1}$ is the Bessel's function of the first kind, $k$ is the wavenumber, where $k = \frac{2\pi f}{c}$, where $f$ is the frequency of the sound, and $c$ is the speed of sound. The angle of the receiver is $\theta$, which varies from from 0-2$\pi$ radians in the azimuth. 
 
-Directivity functions can be used  experimentally for both prediction (to estimate the expected directionality of
-a given sound source), and inference (to estimate the parameters which match an observed set of sound level measurements).
-
-
-
-
-
-* Directivity functions ($D_{\theta}/D_{0}$) describe the relative sound energy levels at different angular positions, relative to the on-axis level ($0^{\circ}$). 
-* The directivity functions of various sound sources are described in literature [@beranek2012acoustics;beranek2019acoustics] but there aren't any openly available computational implementations 
-* ```beamshapes``` implements directivity functions of multiple sound source models in one place.
-* Implementing multiple models together allows an easy comparison of model and measurements, or parameter estimation [guarato2011method].
+Directivity functions can be used in a two-fold manner 1) to engineer deliberately engineer devices to suit particular specifications, eg. loudspeaker sound fields [@beranek2012acoustics] and 2) to infer parameters of a sound source itself having assumed a relevant model, eg. estimating direction of call emission [@guarato2011method] and mouth aperture of bat echolocation calls [@jakobsen2013convergent].
 
 
 # Statement of need
 
-* Until recently, computational power has been a limiting factor to calculating directivity functions for various models. Models with easily calculable outputs have thus been favoured (eg. piston in an infinite baffle), especially in the field of bioacoustics [mogensen1979sound;@surlykke2009echolocating]. 
-* Now, with increasing computational power in hand, calculating and implementing directivity functions is much easier. However, despite the increase in computational power, older, simpler models with limited biological relevance continue to dominate the field of bio-acoustics. For instance, the piston in an infinite baffle only predicts the beam-shape for a $\pm90^{\circ}$ range off-axis, and assumes front-back symmetry. This is unrealistic for most vocalising animals, especially echolocating bats and odontocetes. However, the model continues to be a standard reference point [@jakobsen2013convergent;@macaulay2020high]. 
-* `beamshapes` allows for the 
+A host of published directivity functions exist in the literature, but it is my experience that their computational implementations remain as inhouse scripts that are often in proprietary language platforms. To my knowledge there are no computational implementations of sound source directivities that are open-source and developed using modern software practices such as version-control and unit-testing. In this paper I present ```beamshapes```, a Python package that implements directivity patterns for sound source models. As of this publication, ```beamshapes``` version 0.2.0 implements four sound sources 1) piston in an infinite baffle, 2) point source of a sphere 3) oscillating cap of a sphere 4) piston in a sphere. 
+
+Computational implementations of directivity functions often require long run-times due to the intensive numerical routines and arbitrary precision math required to generate results. Long run-times hinder scientific projects in reducing the number of models and parameter space that can be explored. ```beamshapes``` boasts parallelised code to generate significant speed-ups in run-times. 
+
+The availability of openly-available directivity implementations will hopefully stir the acoustics, and specifically the bio-acoustics community to test and compare sound radiation using alternate models that may present a better description of the data. Until recently, computational power has perhaps been a limiting factor to calculating directivity functions for various models. Models with easily calculable outputs have thus been favoured (eg. piston in an infinite baffle), especially in the field of bioacoustics [@strother1970acoustical;mogensen1979sound]. However, despite the recent availability of computational power, older, simpler models with limited biological relevance continue to dominate the field of bio-acoustics. For instance, the piston in an infinite baffle only predicts the beam-shape for a $\pm90^{\circ}$ range off-axis, and assumes front-back symmetry. This is unrealistic for most vocalising animals, especially echolocating bats and odontocetes. However, the model continues to be a standard reference point for multiple studies ranging over the past decade [@jakobsen2013convergent;kounitsky2015bats;@macaulay2020high]. The piston in a sphere (implemented in ```beamshapes```), for instance recreates many of the highly directional central and side lobes and that are seen in bats, while also predicting sound radiation behind the bat Figure \autoref{fig:pistoninsphere}. 
+
+
+
+![Caption for example figure.\label{fig:example}](figure.png)
+and referenced from text using \autoref{fig:example}.
+
+Future releases of ```beamshapes``` are scheduled to include directivity patterns for additional models of interest such as rectangular cap of a sphere or piston in a closed finite baffle.
+
+
+# Software packages used in this work
+```beamshapes``` relies on the Python open-source ecosystem and is built on the numpy, scipy, sympy, mpmath and flint libraries. 
 
 
 # Figures
