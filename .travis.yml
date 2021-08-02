@@ -1,10 +1,15 @@
 language: python 
+os: linux
+arch:
+  - arm64
+  - ppc64le
+  - s390x
 python:
   - "3.7"
   - "3.8"
-  - "3.9"
 install: pip install -r beamshapes/tests/requirements_test.txt
 branches:
   only:
     - dev
 script: python -m unittest discover beamshapes/tests
+
