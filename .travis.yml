@@ -3,11 +3,8 @@ os: linux
 python:
   - "3.7"
   - "3.8"
- 
-before_install:
-    - travis_wait mvn 30 install
+
 install: pip install -r beamshapes/tests/requirements_test.txt
-    
 
 branches:
   only:
