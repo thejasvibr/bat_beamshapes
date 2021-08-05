@@ -1,24 +1,27 @@
 ---
-title: '```beamshapes```: a Python package to generate directivity patterns for various sound source models'
+title: "```beamshapes```: a Python package to generate directivity patterns for various sound source models"
 authors:
-- affiliation: 1, 2, 3
-  name: Thejasvi Beleyur
-  orcid: 0000-0001-5360-4383
-date: "May 2021"
-output: pdf_document
-bibliography: paper.bib
-tags:
-- Python
-- acoustics
-- bioacoustics
-affiliations:
-- index: 1
-  name: Centre for the Advanced Study of Collective Behaviour, University of Konstanz,
-    Konstanz
-- index: 2
-  name: Acoustic and Functional Ecology, Max Planck Institute for Ornithology, Seewiesen
-- index: 3
-  name: Max Planck Institute for Animal Behavior, Radolfzell
+  - name: Thejasvi Beleyur
+    thanks:  1) Centre for the Advanced Study of Collective Behaviour, Konstanz 2) Acoustic and Functional Ecology, Max Planck Institute for Ornithology, Seewiesen 3) Max Planck Institute for Animal Behavior, Radolfzell
+    email: thejasvib@gmail.com
+
+abstract: |
+  ```beamshapes``` is an open-source Python package that implements various directivity patterns for sound sources. While there is an abundance of published directivity patterns in the literature - their computational implementations often remain as in-house scripts in proprietary languages. ```beamshapes``` overcomes this gap, and provides acousticians and bioacousticians easily accessible implementations of sound source directivities.
+
+keywords:
+  - acoustics
+  - bioacoustics
+  - directivity 
+  - sound radiation
+  - Python 
+  - echolocation
+
+bibliography: ../../paper.bib
+biblio-style: unsrt
+output: 
+  rticles::arxiv_article:
+    keep_tex: true
+    latex_engine: xelatex
 ---
 
 # Summary
@@ -36,7 +39,7 @@ $a$, vibrating back and forth about a hole in an infinite wall or baffle. The di
 Directivity functions can be used in a two-fold manner 1) to deliberately engineer devices to suit particular specifications, eg. loudspeaker sound fields [@beranek2012acoustics] and 2) to infer parameters of a sound source itself having assumed a relevant model, eg. estimating direction of call emission [@guarato2011method] and mouth aperture of bat echolocation calls [@jakobsen2013convergent;@kounitsky2015bats].
 
 
-![Directivity patterns ($\frac{D_{\theta}}{D_{0}}$) of the currently implemented sound sources for a common set of $ka$ values for comparison, where $k$ is the wavenumber ($\frac{2\pi\:f}{c}$) and $a$ is the piston radius - or its equivalent. The directivity pattern shows the ratio between the off-axis sound level at ($\theta^{\circ}$) to the on-axis level at ($0^{\circ}$) in decibels. A) piston in an infinite baffle B) piston in a sphere with the half-angle aperture $\alpha = 30^{\circ}$, and where the piston radius $a=R\:sin \:\alpha$ C) oscillating cap of a sphere with  $\alpha=30^{\circ}$, and the equivalent piston radius is $a=R\:sin \:\alpha$ D) vibrating point on a sphere, here the $kR=ka$ for comparison with the other models. \label{fig:pistonsphereinf}](paper_related/piston_sphere_baffle.png)
+![Directivity patterns ($\frac{D_{\theta}}{D_{0}}$) of the currently implemented sound sources for a common set of $ka$ values for comparison, where $k$ is the wavenumber ($\frac{2\pi\:f}{c}$) and $a$ is the piston radius - or its equivalent. The directivity pattern shows the ratio between the off-axis sound level at ($\theta^{\circ}$) to the on-axis level at ($0^{\circ}$) in decibels. A) piston in an infinite baffle B) piston in a sphere with the half-angle aperture $\alpha = 30^{\circ}$, and where the piston radius $a=R\:sin \:\alpha$ C) oscillating cap of a sphere with  $\alpha=30^{\circ}$, and the equivalent piston radius is $a=R\:sin \:\alpha$ D) vibrating point on a sphere, here the $kR=ka$ for comparison with the other models. \label{fig:pistonsphereinf}](../piston_sphere_baffle.png)
 
 
 # Statement of need
@@ -55,6 +58,9 @@ Future releases of ```beamshapes``` are scheduled to include directivity pattern
 
 # Software packages used in this work
 ```beamshapes``` relies on the Python open-source ecosystem and is built on the numpy, scipy, sympy, mpmath and flint libraries [@2020NumPy;@2020SciPy;@meurer2017sympy;@mpmath;@hart2011flint]. 
+
+# Package repository
+```beamshapes``` can be currently accessed at https://github.com/thejasvibr/bat_beamshapes.git and the documentation with examples are hosted at https://beamshapes.readthedocs.io/en/latest/ .
 
 # Acknowledgements
 TB thanks Gaurav Dhariwal for his continual math advice and inputs, and Tim Mellow for 
