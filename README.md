@@ -38,15 +38,31 @@ For more details on the concepts and source documentation - please check out the
 
 
 ## Citation information 
-If you use this package - please do consider citing it! 
+If you use this package - please do consider citing the preprint: 
 
-*Beleyur, Thejasvi, , 2021, beamshapes: directivity patterns for sound sources {version number here}, https://github.com/thejasvibr/bat_beamshapes*
+*Beleyur, T. (2021, August 5). beamshapes : a Python package to generate directivity patterns for various sound sources. https://doi.org/10.31219/osf.io/zc52t, version {VERSIONNUMBER-HERE} *
 
 You can access the version number of the package being used with 
 ```
 >>> import beamshapes
 >>> print(beamshapes.__version__)
 ```
+
+Bibtext format: 
+
+```
+@misc{beleyur_2021,
+ title={beamshapes : a Python package to generate directivity patterns for various sound sources},
+ url={osf.io/zc52t},
+ DOI={10.31219/osf.io/zc52t},
+ publisher={OSF Preprints},
+ author={Beleyur, Thejasvi},
+ year={2021},
+ month={Aug}
+}
+```
+
+
 
 ## Future implementations
 * Piston on a cylinder
