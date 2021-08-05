@@ -1,13 +1,13 @@
 language: python 
 os: linux
-arch:
-  - arm64
-  - ppc64le
-  - s390x
 python:
   - "3.7"
   - "3.8"
-install: pip install -r beamshapes/tests/requirements_test.txt
+ 
+install:
+    - pip install -r beamshapes/tests/requirements_test.txt
+    - travis_wait mvn install
+
 branches:
   only:
     - dev
