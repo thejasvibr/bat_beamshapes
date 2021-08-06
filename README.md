@@ -70,16 +70,6 @@ Bibtext format:
 
 
 TODO:
-* Verification tests to check output with Beranek & Mellow 2012 graphs:
-    * piston in a sphere pending
-* Make schematics for each source model describing the source and the acoustic conditions under which the model is formulated (eg. 'rigid', 'resilient' etc.)
-
-DONE:
-* ~~Uniform output format to a np.array that has 20*log10 D_theta/D_0~~ Done.
-* ~~Include option to run FLINT version of piston in sphere! This will help at least Linux users a lot.~~
-* ~~Cap of sphere - implement parallelisation when ka>5~~
-* ~~Include module-level docs too.~~
-* ~~Check if you really need symengine and gmpy2 for the code to run -- is sruntime really affected? -- Not needed. Speed not affected much in tests.~~
-* ~~change official name from 'bat_beamshapes' to just 'beamshapes'~~
-* ~~Ideas for package logo  butterfly - N suggests~~
+* Add more examples 
+* Remove 'a' parameter from piston in sphere directivity?  (next releases, this is backwards incompatible!)
 

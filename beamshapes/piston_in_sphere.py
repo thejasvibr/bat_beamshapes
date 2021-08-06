@@ -329,6 +329,8 @@ def piston_in_sphere_directivity(angles, params, **kwargs):
         Dictionary with at least the following keys:
             k : mpmath.mpf>0
                 Wavenumber. 
+            a : mpmath.mpf>0
+                Radius of piston. See `Warning` below.
             R : mpmath.mpf>0
                 Radius of sphere
             alpha: 0<mpmath.mpf<pi
@@ -363,9 +365,9 @@ def piston_in_sphere_directivity(angles, params, **kwargs):
     
     Warning
     -------
-    The radius of the piston is automatically assumed to follow the 
+    The radius of the piston 'a' needs to follow the 
     relation: a = R*sin(alpha) - please make sure this relationship 
-    holds to have believable results.
+    can hold to have believable results!
     
     '''
     A_n = kwargs.get('A_n', None)
