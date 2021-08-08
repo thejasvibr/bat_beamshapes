@@ -29,6 +29,36 @@ of sound and its geometric properties, and assumptions of the vibrations etc. Ac
 to the situation in hand, different source models may be physically/biologically relevant! 
 
 
+.. image:: ./_static/point_on_sphere.png.png
+	:width: 200
+
+`Point on a sphere schematic`
+
+
+.. image:: ./_static/oscillating_cap_sphere.png.png
+	:width: 200
+	
+`Oscillating cap of a sphere schematic`
+
+	
+.. image:: ./_static/piston_in_inf_baffle.png.png
+	:width: 200
+
+`Piston in an infinite baffle schematic`
+
+
+.. image:: ./_static/piston_in_a_sphere.png.png
+	:width: 200
+
+`Piston in a sphere schematic`
+
+
+
+
+
+
+
+
 Directionality functions
 ------------------------
 Each source model has an associated `directionality` function with it. 
