@@ -56,6 +56,11 @@ Future releases of ```beamshapes``` are scheduled to include directivity pattern
 # Software packages used in this work
 ```beamshapes``` relies on the Python open-source ecosystem and is built on the numpy, scipy, sympy, mpmath and flint libraries [@2020NumPy;@2020SciPy;@meurer2017sympy;@mpmath;@hart2011flint]. 
 
+
+# Package repository
+```beamshapes``` can be currently accessed at https://github.com/thejasvibr/bat_beamshapes.git and the documentation with examples are hosted at https://beamshapes.readthedocs.io/en/latest/ .
+
+
 # Acknowledgements
 TB thanks Gaurav Dhariwal for his continual math advice and inputs, and Tim Mellow for 
 strong support through sharing his Mathematica code and timely clarifications. TB thanks Lasse Jakobsen and Holger Goerlitz for productive discussions leading to this project. This work was executed through a combination of TB's private time, a DAAD stipend, the IMPRS for Organismal Biology,  and then finally by a CASCB Medium grant.
