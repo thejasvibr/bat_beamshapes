@@ -1,7 +1,0 @@
---trial code--
-
--- based on example in Chp. 1.8 writing your own functions --
-
-Lm_expr(alpha,m,r1,R):
-    integ_Lm := integrate(legendreP(m,cos(theta))*r1^2/R^2,theta=0..alpha)
-    integ_Lm
