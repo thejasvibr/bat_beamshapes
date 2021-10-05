@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.com/thejasvibr/bat_beamshapes.svg?branch=dev)](https://travis-ci.com/thejasvibr/bat_beamshapes)
 [![status](https://joss.theoj.org/papers/820fd37f8255a8c533d6cc4c9475ecb5/status.svg)](https://joss.theoj.org/papers/820fd37f8255a8c533d6cc4c9475ecb5)
+[![Documentation Status](https://readthedocs.org/projects/batracker/badge/?version=latest)](https://batracker.readthedocs.io/en/latest/?badge=latest)
+
 
 # Beamshapes
 
@@ -39,7 +41,7 @@ For the steps below to work you need to have a working Python installation that 
 
 
 ## Detailed documentation 
-For more details on the concepts and source documentation - please check out the [online docs](beamshapes.rtfd.io).
+For more details on the concepts and source documentation - please check out the [online docs](https://beamshapes.rtfd.io).
 
 
 ## Citation information 
