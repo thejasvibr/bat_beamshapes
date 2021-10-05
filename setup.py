@@ -1,10 +1,11 @@
 
 from setuptools import setup, find_packages
-import beamshapes
 
- # link to test upload and fresh install on Test PyPi https://packaging.python.org/guides/using-testpypi/
+from beamshapes.version import __version__
+
+# link to test upload and fresh install on Test PyPi https://packaging.python.org/guides/using-testpypi/
  
-version_number = beamshapes.__version__
+version_number = '0.2.0'
 
 setup(name='beamshapes',
      version=version_number,
