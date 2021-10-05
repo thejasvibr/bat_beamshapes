@@ -3,7 +3,6 @@ All others will need to be deliberately loaded.
 '''
 
 from beamshapes.version import __version__
-
 # from beamshapes.beamshape_predictions import * 
 # from beamshapes.sim_reclevels  import * 
 from beamshapes.piston_in_sphere import piston_in_sphere_directivity

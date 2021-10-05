@@ -1,14 +1,18 @@
 
 from setuptools import setup, find_packages
 
-from beamshapes.version import __version__
+#from beamshapes.version import __version__
+
+version_number = {}
+with open("beamshapes/version.py") as fp:
+    exec(fp.read(), version_number)
 
 # link to test upload and fresh install on Test PyPi https://packaging.python.org/guides/using-testpypi/
  
-version_number = '0.2.0'
+
 
 setup(name='beamshapes',
-     version=version_number,
+     version=version_number['__version__'],
      description='Acoustic beamshape modelling for various sources',
      long_description=open('README.md').read(),
      long_description_content_type="text/markdown",
