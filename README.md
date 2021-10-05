@@ -25,7 +25,11 @@ For more detailed use-cases, check out the [example gallery online](https://beam
 
 ## Installation 
 
-*Pre-PyPi installation instructions*
+*PyPi installation (>=version 0.2.1)*
+
+```pip install beamshapes```
+
+*Local installation instructions*
 For the steps below to work you need to have a working Python installation that you can access from the command line. It is recommended to do the installation in a  [virtual environment](https://realpython.com/effective-python-environment/#virtual-environments). 
 
 1. Clone the Github repository ```git clone https://github.com/thejasvibr/bat_beamshapes.git```
