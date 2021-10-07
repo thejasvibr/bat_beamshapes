@@ -28,6 +28,7 @@ class PistonInSphereMpmath(unittest.TestCase):
 
     
     def setUp(self):
+        # load the ground-truth data and parameters used to generate them
         plotdata = pd.read_csv('plots_data/pistoninsphere.csv')        
         self.by_ka = plotdata.groupby('ka')
         frequency = mpmath.mpf(50*10**3) # kHz
@@ -41,7 +42,7 @@ class PistonInSphereMpmath(unittest.TestCase):
     
         
     def perform_ka_match(self, kaval):
-
+        # runs and outputs results for a parameter set across the azimuth
         ka = kaval
         a_value = ka/self.paramv['k']
         R_value = a_value/mpmath.sin(self.paramv['alpha'])  # m
@@ -57,7 +58,7 @@ class PistonInSphereMpmath(unittest.TestCase):
         return np.max(error)
     
     def test_kamatches(self):
-        #kavals = [1,3,5,10]
+        
         kavals = [1,3,5]
         max_error_allowed = [1,1,1]
         max_abs_errors = np.zeros(len(kavals)) # incorporates digitisation error
