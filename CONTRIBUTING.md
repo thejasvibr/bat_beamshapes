@@ -18,3 +18,10 @@ If you're in doubt about whether an implementation is of relevance to the ```bea
 If you wish to contribute a directivity implementation for a source-model see the generalised workflow page [here](https://beamshapes.readthedocs.io/en/latest/general_workflow.html). 
 For reasons of code homogeneity, I request that you keep the template structure suggested in the [how-to](https://beamshapes.readthedocs.io/en/latest/general_workflow.html) page. All implementations must have tests that at least check the coded implementation matches the published results of the original paper/book that described the model. (If you are planning to implement a directivity that isn't published or have calculated yourself - we still need tests, but I'd be curious to hear how to check the validity of the implementation's results!)
 
+##  Unit-tests
+### Running unit-tests
+To run the unittests, first clone an install the ````beamshapes``` package (see the [README](README.md)). From the root of the directory, open your Python command line tool of 
+choice and run ```python -m unittest``` to run unit tests. 
+
+### Writing unit-tests
+The unit-tests in ```beamshapes``` should test the computational implementation for correctness based on previously published results. See [here](beamshapes/tests/testing.md) for more on the testing approach. 
