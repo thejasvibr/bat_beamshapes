@@ -20,8 +20,9 @@ For reasons of code homogeneity, I request that you keep the template structure 
 
 ##  Unit-tests
 ### Running unit-tests
-To run the unittests, first clone an install the ````beamshapes``` package (see the [README](README.md)). From the root of the directory, open your Python command line tool of 
-choice and run ```python -m unittest``` to run unit tests. 
+To run the unittests, first clone an install the ````beamshapes``` package (see the [README](README.md)). From the root of the directory, open your Python command line tool of choice and run:
+
+```python -m unittest``` to run unit tests. 
 
 ### Writing unit-tests
 The unit-tests in ```beamshapes``` should test the computational implementation for correctness based on previously published results. See [here](beamshapes/tests/testing.md) for more on the testing approach. 
