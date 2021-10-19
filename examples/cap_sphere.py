@@ -29,20 +29,20 @@ R_v = a_v/sin(alpha_v) #mpmath.mpf(0.01)
 
 angles = mpmath.linspace(0,mpmath.pi,50)
 input_params = {'k':k_v, 'R':R_v, 'alpha':alpha_v}
-_, rato = cap_in_sphere_directivity(angles, input_params)
+_, db_ratio = cap_in_sphere_directivity(angles, input_params)
+
+# save time by concatenating the same values for +ve and -ve angles
 
 plt.figure()
 a0 = plt.subplot(111, projection='polar')
-plt.plot(np.array(angles), rato, label='calculated')
+plt.plot(np.array(angles), db_ratio, 'k' ,label='ka=10')
+plt.plot(-np.array(angles), db_ratio, 'k' )
 plt.ylim(-40,10);plt.yticks(np.arange(-40,20,10))
-
+plt.ylim(-40,10);plt.yticks(np.arange(-40,20,10))
+a0.set_theta_zero_location('N')
 a0.set_xticks(np.arange(0,2*np.pi,np.pi/6))
-df = pd.read_csv('fig12-17.csv')
-plt.plot(np.radians(df['deg']), df['rel_db_0deg'],'*',
-         label='Beranek & Mellow 2012') 
-# Data digitised from figure 12.17 using WebPlotDigitizer (Ankit Rohatgi)
 plt.legend()
-
+plt.savefig('capsphere_ka-10.0_dps=50.png')
 #%%
 #.. image:: ../_static/capsphere_ka-10.0_dps=50.png
 #  :width: 400
