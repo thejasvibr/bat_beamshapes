@@ -34,7 +34,7 @@ a0 = plt.subplot(111, projection='polar')
 for ka_v, a_v in zip(ka_values, a_values):
     parameters['a'] = a_v
     _, dirn = piston_in_infinite_baffle_directivity(angles, parameters)
-    plt.plot(angles, dB(np.array(dirn)), label=str(ka_v))
+    plt.plot(angles, np.array(dirn), label=str(ka_v))
     angles *= -1 # switch between L & R of 
 plt.legend(title='ka')
 plt.savefig('PIB.png')
