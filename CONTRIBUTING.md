@@ -19,6 +19,8 @@ If you wish to contribute a directivity implementation for a source-model see th
 For reasons of code homogeneity, I request that you keep the template structure suggested in the [how-to](https://beamshapes.readthedocs.io/en/latest/general_workflow.html) page. All implementations must have tests that at least check the coded implementation matches the published results of the original paper/book that described the model. (If you are planning to implement a directivity that isn't published or have calculated yourself - we still need tests, but I'd be curious to hear how to check the validity of the implementation's results!)
 
 ##  Unit-tests
+All unit-tests in the ```beamshapes``` package are written using the ```unittest``` package.
+
 ### Running unit-tests
 To run the unittests, first clone and install the ````beamshapes``` package (see the [README](README.md)).To run the tests you will need to install all the packages in the ```tests/requirements_test.txt``` file. From the root of the directory, open your Python command line tool of choice and run:
 
@@ -27,9 +29,16 @@ To run the unittests, first clone and install the ````beamshapes``` package (see
 ### Writing unit-tests
 The unit-tests in ```beamshapes``` should test the computational implementation for correctness based on previously published results. See [here](beamshapes/tests/testing.md) for more on the testing approach. 
 
+### Test coverage
+If you'd like to estimate test coverage:
+
+* Install the [```coverage```](https://coverage.readthedocs.io/en/6.0.2/) package: ```pip install coverage``` 
+* Change directories and enter the repo ```cd bat_beamshapes```
+* To generate an overall report on coverage: ```coverage report```
+
 ## Documentation
 
-## Building docs locally
+### Building docs locally
 To build the documentation locally, you must first install all the required packages:
 
 ```pip install -r docs/docs_requirements.txt``` 
@@ -41,3 +50,6 @@ And then:
 * Generate the docs with ```sphinx-build source build```
 
 All the formatted web-pages are in the ```build/``` directory. Start with the ```index.html``` to begin browsing from the landing page. 
+
+
+

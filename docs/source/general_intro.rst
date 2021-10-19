@@ -11,7 +11,7 @@ The inputs will tend to be model-specific, but the common input parameters
 to keep in mind are:
 
     #. `k`, wavenumber. This is :math:`\frac{2\pi}{\lambda}`
-    #. :math:`\lambda`, wavelength or :math:`\frac{v_{sound}}{frequency}`
+    #. :math:`\lambda`, wavelength or :math:`\frac{v_\text{sound}}{\text{frequency}}`
     #. `a` : piston radius, wherever applicable
     #. `R` : sphere radius, wherever applicable. 
     #. :math:`\alpha, \theta, \phi`: various angles describing the size of the oscillating portion. These angles are in radians - not degrees!

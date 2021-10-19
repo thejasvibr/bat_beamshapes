@@ -52,13 +52,11 @@ Package installation
 Install from the `GitHub repo <https://github.com/thejasvibr/bat_beamshapes>`_ directly by cloning and 
 following the instructions in the README.
 
-An alpha release will hopefully be out by the  July-August 2021. Stay tuned!
-
 
 .. toctree::
-      :maxdepth: 3
+      :maxdepth: 4
       :caption: Concepts
-    
+
       ./general_intro.rst
 
 .. toctree::
