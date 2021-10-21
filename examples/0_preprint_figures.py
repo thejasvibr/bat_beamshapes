@@ -18,10 +18,9 @@ import mpmath
 import numpy as np 
 import matplotlib.pyplot as plt
 from beamshapes import piston_in_infinite_baffle as piston_infbaf
-from beamshapes import piston_in_sphere_flint as piston_sphere # to speed things up!!
+from beamshapes import piston_in_sphere_directivity 
 from beamshapes import cap_in_sphere_directivity
 from beamshapes import point_source_on_a_sphere_directivity
-from flint import acb
 
 #%% set up the infinite baffle directivity on the left and in sphere on the right
 ka_values  = [1, 5, 10]
@@ -38,21 +37,20 @@ for j,each_ka in enumerate(ka_values):
     parameters = {'k':k_value, 'a':a}
     _, piston_infbaf_D[:,j] = piston_infbaf.piston_in_infinite_baffle_directivity(angles,
                                                                                parameters)
-    
+
 #%% 
 # Now calculate the piston in sphere 
-pistonsphere_directivity = piston_sphere.piston_in_sphere_directivity
-angles_as_acb = [acb(each) for each in angles]
 
-R = acb(0.1) # radius of a sphere
-alpha = acb.pi()/acb(6)
-a_value = R*acb.sin(alpha)
-piston_in_sphere_D = np.zeros(piston_infbaf_D.shape)
+
+R = 0.1 # radius of a sphere
+alpha = mpmath.pi/6
+a_value = R*mpmath.sin(alpha)
+piston_in_sphere_D = np.zeros(angles.size)
 
 for j,each_ka in enumerate(ka_values):
-    k_value = acb(each_ka)/a_value
+    k_value = each_ka/a_value
     parameters = {'k':k_value, 'a':a_value, 'R': R, 'alpha':alpha}
-    A_n, piston_in_sphere_D[:,j] = pistonsphere_directivity(angles_as_acb,
+    A_n, piston_in_sphere_D[:,j] = piston_in_sphere_directivity(angles,
                                                                     parameters)
 
 
@@ -61,8 +59,6 @@ for j,each_ka in enumerate(ka_values):
 # Now calculate oscillating cap of a sphere
 
 R = mpmath.mpf(0.1) # radius of a sphere
-alpha = mpmath.pi/6
-a_value = R*mpmath.sin(alpha)
 cap_of_sphere = np.zeros(piston_infbaf_D.shape)
 
 for j,each_ka in enumerate(ka_values):
