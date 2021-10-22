@@ -3,7 +3,8 @@
 """
 Piston in a sphere
 ==================
-
+This source model assumes a piston whose outline matches a cut-out portion of a sphere
+exactly. 
 
 
 See Also 
@@ -233,10 +234,9 @@ def compute_Mmn_parallel(params):
             
     multi_paramset_str = [args_to_str(**each) for each in multi_paramsets]
     num_cores = int(params.get('num_cores',-1))
-    if platform.system()=='Linux':
-        M_mn_out = Parallel(n_jobs=num_cores, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
-    elif platform.system()=='Windows':
-        M_mn_out = Parallel(n_jobs=num_cores)(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
+    print('miaow miaow')
+    if platform.system()=='Windows':
+        M_mn_out = Parallel(n_jobs=num_cores)(delayed(parallel_calc_one_Mmn_term, backend='loky')(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
     else:
         M_mn_out = Parallel(n_jobs=num_cores, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
     M_matrix = format_Mmn_to_matrix(M_mn_out)
@@ -393,56 +393,3 @@ def piston_in_sphere_directivity(angles, params, **kwargs):
     
     directivity = np.array(directivity,'float32')
     return A_n, directivity
-
-
-if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-    frequency = mpmath.mpf(50*10**3) # kHz
-    vsound = mpmath.mpf(330) # m/s
-    wavelength = vsound/frequency
-    alpha_value = mpmath.pi/3 # 60 degrees --> pi/3
-    k_value = 2*mpmath.pi/(wavelength)
-    ka_val = 5
-    print(f'Starting piston in sphere for ka={ka_val}')
-    ka = mpmath.mpf(ka_val)
-    a_value = ka/k_value 
-    R_value = a_value/mpmath.sin(alpha_value)  # m
-    paramv = {}
-    paramv['R'] = R_value
-    paramv['alpha'] = alpha_value
-    paramv['k'] = k_value
-    paramv['a'] = a_value
-    
-    
-    import pandas as pd
-    df = pd.read_csv('workshop/ka5_piston_in_sphere.csv')
-    df2 = pd.read_csv('tests/plots_data/pistoninsphere.csv')
-    ka5 = df2[df2['ka']==ka_val]
-    
-    
-    angles = mpmath.matrix(np.radians(ka5['theta_deg'])) #mpmath.linspace(0,mpmath.pi,100)
-    Ann, beamshape = piston_in_sphere_directivity(angles, paramv)
-
-    plt.figure()
-    a0 = plt.subplot(111, projection='polar')
-    plt.plot(angles, beamshape, '-*',label='calculated')
-    #plt.plot(angles, beamshape_nonpll, label='serial')
-    plt.ylim(-40,0);plt.yticks(np.arange(-40,10,10))
-    plt.xticks(np.arange(0,2*np.pi,np.pi/6))
-    # load digitised textbook data
-    plt.plot(angles, ka5['relonaxis_db'], '*', label='actual')
-    plt.savefig(f'ka{ka_val}_pistoninasphere.png')
-    # Also compare the error between prediction and textbook values
-    plt.figure()
-    plt.plot(angles, ka5['relonaxis_db'],'-',label='ground truth') # textbook
-    plt.plot(angles, beamshape,'-*',label='calculated') # calculated
-    plt.plot(angles, beamshape-ka5['relonaxis_db'],'-*',label='error') # relative error
-    plt.yticks(np.arange(-36,4,2))
-    plt.grid();plt.legend()
-# plt.savefig(f'ka{ka_val}_pistoninasphere_error.png')
-    error = beamshape-ka5['relonaxis_db']
-    median_error = np.median(np.abs(error))
-    avg_error = np.mean(np.abs(error))
-    rms_error = np.sqrt(np.mean(np.square(error)))
-    print(median_error, avg_error, rms_error)
-    
