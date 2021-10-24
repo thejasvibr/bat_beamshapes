@@ -12,10 +12,9 @@ Notes
 Experience has shown it's best to leave the dps un-specified while using this
 module. I guess this is because of the summation terms.
 
-To Do
------
-* Implement the special case of alpha = pi/2, described by equations
-    12.60
+ToDo
+----
+* Implement the special case of alpha = pi/2, described by equations 12.60
 """
 import copy
 from joblib import Parallel, delayed
@@ -33,7 +32,7 @@ n, z, k, R, alpha, theta = symbols('n z k R alpha theta')
 def sphhankel2(nv,zv):
     return sph_hankel2.subs({'n': nv, 'z': zv})
 
-#%% equation 12.59
+# equation 12.59
 # split the big parenthesis into 3 parts (j/sph_hankel, cos(theta) term and the summation)
 d_theta_term1 = I/(2*sphhankel2(1,k*R))
 
@@ -50,7 +49,7 @@ dtheta_t3_oneterm = (dtheta_t3_num/dtheta_t3_denom)*legendre(n, cos(theta))
 d_theta_t1_func = lambdify([k, R, alpha, theta], d_theta_term1, 'mpmath')
 d_theta_t2_func = lambdify([k, R, alpha, theta], d_theta_term2, 'mpmath')
 
-# %% the problem is here that the summation doesn't happen as
+#  the problem is here that the summation doesn't happen as
 # 'n' is somehow not treated as an internal integer variable by mpmath
 # the alternative is to then to create a function out of it and then
 # perform summation through mpmath.
@@ -68,13 +67,13 @@ def dtheta_t3_func(k_v, R_v, alpha_v, theta_v):
     #return mpmath.nsum(freen_func, [2, int(5+2*k_v*R_v)])
 
 
-# %% In eqn. 12.61, only term 2 differs by the absence of a cos(theta)
+#  In eqn. 12.61, only term 2 differs by the absence of a cos(theta)
 d_0_term2_num = 3*(1-cos(alpha)**3)
 d_0_term2 = d_0_term2_num/d_theta_term2_denom
 d_0_t2_func = lambdify([k, R, alpha, theta], d_0_term2, 'mpmath')
 
 
-# %% term 3 of eqn. 12.61 doesn't have a Pn(cos(theta)) at the end.
+#  term 3 of eqn. 12.61 doesn't have a Pn(cos(theta)) at the end.
 d_0_t3_oneterm = dtheta_t3_num/dtheta_t3_denom
 
 
@@ -106,6 +105,22 @@ def d_theta_pll(**param):
 
 
 def d_zero(kv, Rv, alphav, thetav=0):
+    '''Calculates the on-axis level :math:`D_{0}` for cap in sphere.
+    
+    Parameters
+    ----------
+    kv : mpmath.mpf 
+        Wavenumber
+    Rv : mpmath.mpf
+        Sphere radius
+    alphav : mpmath.mpf
+        Cap aperture.
+
+    Returns
+    -------
+    final_d_0 : mpmath.mpf  
+        On-axis level :math:`D_{0}`
+    '''
     brackets_term1 = d_theta_t1_func(kv, Rv, alphav, thetav)
     brackets_term2 = d_0_t2_func(kv, Rv, alphav, thetav)
     brackets_term3 = d_0_t3_func(kv, Rv, alphav, thetav)
@@ -113,8 +128,12 @@ def d_zero(kv, Rv, alphav, thetav=0):
     final_d_0 = -(2/kR_square)*(brackets_term1+brackets_term2+brackets_term3)
     return final_d_0
 
-#%%
+#
 def relative_directivity_db(angle, k_v, R_v, alpha_v):
+    '''
+    Calculates the :math:`D_{\\theta}/D_{0}` in dB for all angles
+    in the cap in a sphere model.
+    '''
     off_axis = d_theta(k_v, R_v, alpha_v, angle)
     on_axis = d_zero(k_v, R_v, alpha_v)
     rel_level = 20*mpmath.log10(abs(off_axis/on_axis))

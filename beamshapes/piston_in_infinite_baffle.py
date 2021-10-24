@@ -14,7 +14,7 @@ import numpy as np
 from beamshapes.utilities import dB
 from sympy import besselj, sin, symbols, lambdify, limit
 k,a,theta = symbols('k a theta')
-#%%
+
 # eqn. 13.102
 kasintheta = k*a*sin(theta)
 d_theta_num = 2*besselj(1,kasintheta)
@@ -22,19 +22,22 @@ d_theta_denom = kasintheta
 d_theta = d_theta_num/d_theta_denom
 
 def d_theta_func(kv,av,thetav):
+    '''Calculates directivity of piston in an infinite baffle. 
+    
+    Parameters
+    ----------
+    kv : float >0
+        Wavenumber
+    av : float >0
+        Piston radius
+    thetav : float  
+        Azimuth/elevation angle in radians
     '''
-    The function must be used in the limit version to get valid outputs. 
-    '''
-    # the limit version 
+    # The function must be used in the limit version to get valid outputs. 
     subs_dtheta = d_theta.subs({'k':kv,'a':av})
     return lambdify([], limit(subs_dtheta, theta, thetav))()
 
-#d_theta_func = lambdify([k,a,theta],d_theta_num)
 
-
-
-
-#%%
 def piston_in_infinite_baffle_directivity(angles, param):
     '''
     Calculates relative directivity dB (D(theta)/D(0))

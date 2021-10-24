@@ -29,28 +29,52 @@ of sound and its geometric properties, and assumptions of the vibrations etc. Ac
 to the situation in hand, different source models may be physically/biologically relevant! 
 
 
+Piston in an infinite baffle
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~	
+.. image:: ./_static/piston_in_inf_baffle.png.png
+	:width: 200
+
+`Piston in an infinite baffle schematic`
+
+Here a rigid circular disk (the 'piston') vibrates back and forth between a hole in a huge baffle that matches the disk's size.
+The parameters needed to define this model are the wavenumber and piston radius. 
+
+Point on a sphere
+~~~~~~~~~~~~~~~~~
 .. image:: ./_static/point_on_sphere.png.png
 	:width: 200
 
 `Point on a sphere schematic`
 
+An infinitesimally small portion of a sphere's surface (the 'point') is considered to vibrate. The rest of the sphere does not vibrate.
+The parameters needed to define this model are the wavenumber and sphere radius. 
+
+
+Oscillating cap of a sphere
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. image:: ./_static/oscillating_cap_sphere.png.png
 	:width: 200
 	
 `Oscillating cap of a sphere schematic`
 
-	
-.. image:: ./_static/piston_in_inf_baffle.png.png
-	:width: 200
+The 'sliced' part of a sphere is the 'cap' in this case. The cap moves with an axial velocity :math:`u_{0}`.
+Portions of the cap closer to the periphery vibrate less than portions close to the center, this is summarised by the 
+relation :math:`u(R,\theta) = u_{0}cos \theta`, where :math:`\theta` is the distended angle from the cap's centre. 
 
-`Piston in an infinite baffle schematic`
+The parameters needed to define this model are wavenumber, sphere radius, and the aperture angle of the cap. 
 
+Piston in a sphere
+~~~~~~~~~~~~~~~~~~
 
 .. image:: ./_static/piston_in_a_sphere.png.png
 	:width: 200
 
 `Piston in a sphere schematic`
+
+A sphere is sliced, and the 'cap' is discarded. The 'open' portion of the sliced sphere is now replaced with a piston. 
+This piston in the sphere vibrates to produce sound. The parameters needed to define this model are wavenumber, sphere radius, 
+aperture angle of the piston, and piston radius. 
 
 
 

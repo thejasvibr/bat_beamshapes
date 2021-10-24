@@ -3,7 +3,7 @@
 """
 Special math functions 
 ======================
-Common special functions to be used across models
+Common special functions to be used across Sympy implemented models
 
 """
 

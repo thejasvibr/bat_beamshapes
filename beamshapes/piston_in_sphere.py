@@ -55,7 +55,7 @@ from beamshapes.utilities import args_to_mpmath, args_to_str
 r1 = (R*cos(alpha))/cos(theta)
 
 
-#%%
+
 # equation 12.106
 alternate_hankels = n*sph_hankel2.subs({'n':n-1, 'z':k*r1})-(n+1)*sph_hankel2.subs({'n':n+1, 'z':k*r1})
 pt1_postterm = legendre(n,cos(theta))*cos(theta)
@@ -72,7 +72,7 @@ Imn = Integral(Imn_term,(theta,0,alpha))
 Imn_term_func = lambdify([m,n,k,R,alpha, theta], Imn_term, 'mpmath')
 # Imn_func = lambdify([m,n,k,R,alpha],Imn,'mpmath') 
 
-#%%
+
 def Imn_func(mv,nv,kv,Rv,alphav):
     '''
     eqn. 12.106
@@ -83,7 +83,7 @@ def Imn_func(mv,nv,kv,Rv,alphav):
                        (0,alphav),
                        method='gauss-legendre')   
 
-#%%
+
 # equation 12.107
 Kmn_expr = legendre(n, cos(theta))*legendre(m, cos(theta))*sin(theta) # the integrl of this expression 
 # has a solution given in Appendix II, eqn 70
@@ -109,7 +109,7 @@ Kmn = Piecewise((eqn70_mnoteqn,m>n),
                 (eqn70_meqn,True), )
 Kmn_func = lambdify([m,n,alpha],Kmn,'mpmath')
 
-#%%
+
 # equation 12.108
 Lm_expr = legendre(m,cos(theta))*(r1**2/R**2)*tan(theta)
 Lm = Integral(Lm_expr, (theta,0,alpha))
@@ -135,13 +135,13 @@ def Lm_func(mv,Rv,alphav):
 #     errors.append(err)
 # print(errors)
 # # what does the Lm term plot like? 
-# #%% 
+#  
 # lm_theta = lambda mv, thetav: Lm_term(mv, paramv['R'],paramv['alpha'], thetav)
 # thet = mpmath.linspace(0, mpmath.pi/3,50)
 # plt.figure()
 # plt.plot(np.degrees(np.float32(thet)), [lm_theta(25, each) for each in thet])
 
-#%%
+
 # b matrix
 b = -I*Lm
 # b_func = lambdify([m,alpha], b,'mpmath') # eqn. 12.104
@@ -154,7 +154,7 @@ def b_func(mv, Rv, alphav):
     Lm_value = Lm_func(mv,Rv,alphav) # Integral wrt theta
     return -mpmath.j*Lm_value
 
-#%% 
+ 
 # Setting up the matrices 
 # %% 
 mmn_hankels = n*sph_hankel2.subs({'n':n-1,'z':k*R})-(n+1)*sph_hankel2.subs({'n':n+1,'z':k*R})
@@ -178,7 +178,7 @@ def calc_N(params):
 
 ### parallel zone 
 def calc_one_Mmn_term(**params):
-    '''
+    '''Calculates on Mmn term given the input m,n,k,R and alpha terms.
     '''
     Imn_value = Imn_func(params['m'], params['n'],params['k'],
                          params['R'],params['alpha'])
@@ -189,6 +189,8 @@ def calc_one_Mmn_term(**params):
     return numerator/denom
 
 def parallel_calc_one_Mmn_term(**args):
+    '''Parallelised version of `calc_one_Mmn_term`
+    '''
     mpmath_args = args_to_mpmath(**args)
     output = calc_one_Mmn_term(**mpmath_args)
     backto_str = str(output)
@@ -236,16 +238,17 @@ def compute_Mmn_parallel(params):
     num_cores = int(params.get('num_cores',-1))
     print('miaow miaow')
     if platform.system()=='Windows':
-        M_mn_out = Parallel(n_jobs=num_cores)(delayed(parallel_calc_one_Mmn_term, backend='loky')(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
+        M_mn_out = Parallel(n_jobs=num_cores, backend='loky')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
     else:
         M_mn_out = Parallel(n_jobs=num_cores, backend='multiprocessing')(delayed(parallel_calc_one_Mmn_term)(**inputs) for inputs in tqdm.tqdm(multi_paramset_str))
     M_matrix = format_Mmn_to_matrix(M_mn_out)
     return M_matrix
-#%%
+
 #####
 
 def compute_b(params):
     '''
+    
     Keyword Arguments
     -----------------
     m
@@ -269,7 +272,7 @@ def compute_b(params):
     for each_m in range(Nv):
         b_matrix[each_m,:] = b_func(each_m, params['R'], params['alpha'])
     return b_matrix 
-#%%
+
 def compute_a(M_mat, b_mat):
     '''
     Keyword Arguments
@@ -291,8 +294,28 @@ def compute_a(M_mat, b_mat):
     '''
     a_matrix = mpmath.lu_solve(M_mat, b_mat)
     return a_matrix
-#%%
+
 def d_theta(angle,k_v,R_v,alpha_v,An):
+    '''Off-axis level, :math:`D_{\\theta}`, for piston in a sphere
+    
+    Parameters
+    ----------
+    angle : mpmath.mpf
+        Azimuth/elevation angle in radians
+    k_v : mpmath.mpf
+        Wavenumber
+    alpha: mpmath.mpf   
+        Piston equivalent aperture in radians. 
+    An : mpmath.matrix
+        An is a required pre-calculated matrix which results from the 
+        satisfying the conditions of the model - specific to each parameter
+        set.
+    
+    Returns
+    -------
+    abs(rel_level()) : mpmath.mpf   
+        The off-axis value at angle :math:`\theta`
+    '''
     num = 4 
     N_v = An.rows
     denom  = (k_v**2)*(R_v**2)*mpmath.sin(alpha_v)**2
@@ -306,6 +329,25 @@ def d_theta(angle,k_v,R_v,alpha_v,An):
     return abs(rel_level())
 
 def d_zero(k_v,R_v,alpha_v,An):
+    '''
+    Parameters
+    ----------
+    k_v : mpmath.mpf
+        Wavenumber
+    R_v: mpmath.mpf
+        Sphere radius
+    alpha_v: mpmath.mpf   
+        Piston equivalent aperture in radians. 
+    An : mpmath.matrix
+        An is a required pre-calculated matrix which results from the 
+        satisfying the conditions of the model - specific to each parameter
+        set.
+    
+    Returns
+    -------
+    abs(rel_level()) : mpmath.mpf   
+        The off-axis value at angle :math:`\theta`
+    '''
     num = 4
     N_v = An.rows
     denom  = (k_v**2)*(R_v**2)*mpmath.sin(alpha_v)**2
@@ -316,6 +358,9 @@ def d_zero(k_v,R_v,alpha_v,An):
     return abs(rel_level())
 
 def relative_directivity_db(angle,k_v,R_v,alpha_v,An):
+    '''Calculates on-axis and off-axis angles to get the directivity
+    for piston in a sphere.
+    '''
     off_axis = d_theta(angle,k_v,R_v,alpha_v,An)
     on_axis = d_zero(k_v,R_v,alpha_v,An)
     rel_level = 20*mpmath.log10(np.abs(off_axis/on_axis))
@@ -348,6 +393,7 @@ def piston_in_sphere_directivity(angles, params, **kwargs):
     Keyword Arguments
     -----------------
     A_n : optional, mpmath.matrix
+        A_n is a matrix which results from satisfying the conditions of the model.
         If not provided, then the A_n is calculated from scratch, 
         which can take time for certain `ka` values. 
 
@@ -374,7 +420,6 @@ def piston_in_sphere_directivity(angles, params, **kwargs):
     The radius of the piston 'a' needs to follow the 
     relation: a = R*sin(alpha) - please make sure this relationship 
     can hold to have believable results!
-    
     '''
     A_n = kwargs.get('A_n', None)
     if A_n is None:

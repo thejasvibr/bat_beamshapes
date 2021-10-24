@@ -22,7 +22,7 @@ See Also
 beamshapes.piston_in_sphere
 
 '''
-#%%
+
 
 from joblib import Parallel, delayed
 import flint 
@@ -41,7 +41,7 @@ acb_mat = flint.acb_mat
 good = flint.good
 integral = flint.acb.integral
 
-#%% 
+ 
 
 def conv_acb_to_int(X):
     try:
@@ -50,7 +50,7 @@ def conv_acb_to_int(X):
         int_out = int(float(str(X.abs_upper())))
     return int_out
 
-#%%
+
 ## !! ATTENTION -- the FLINT legendre has diff conventions than the 
 # mpmath one !! 
 legendre_p = lambda n,z : flint.acb.legendre_p(z,n) 
@@ -62,7 +62,7 @@ sph_besselj = lambda n,z : acb.sqrt(pi/(2*z))*besselj(n+acb(0.5),z)
 sph_bessely = lambda n,z : acb.sqrt(pi/(2*z))*bessely(n+acb(0.5),z)
 sph_hankel2 = lambda n,z : sph_besselj(n, z) - 1j*sph_bessely(n,z)
 
-#%%
+
 # P-prime-cos(alpha) in Appendix II eqn.70 and NOT in eqn. 12.98 in 2012edn.
 def pprime_cosalpha(n, alpha):
     legendre_term = legendre_p(n+1,cos(alpha))-legendre_p(n-1,cos(alpha))
@@ -71,13 +71,13 @@ def pprime_cosalpha(n, alpha):
     final_term = -sin(alpha)*(numerator/denominator)
     return final_term
 
-#%% Calculating N -  using the formula from T. Mellow's code.
+ Calculating N -  using the formula from T. Mellow's code.
 def calc_defaultNN(param):
     ka = param['k']*param['a']
     return conv_acb_to_int(12+2*ka/sin(param['alpha']))
 
 
-#%%
+
 r1 = lambda theta,alpha,R : R*cos(alpha)/cos(theta) 
 
 # eqn. 12.108 Lm 
@@ -90,7 +90,7 @@ def Lm_func(mv, alphav):
     only_theta_lm = lambda theta, a : legendre_p(mv, cos(theta))*((cos(alphav)/cos(theta))**2)*tan(theta)
     return integral(only_theta_lm, acb(0.0), alphav)
 
-# %% eqn 12.107 solution for the Kmn integral - See eqn. 70 in Appendix II
+# eqn 12.107 solution for the Kmn integral - See eqn. 70 in Appendix II
 # the 2012 edition has a typo for eqn.70 App II, and so be sure to check
 # the Errata. The order of denominator term's 'n' and 'm' are different.
 def m_noteq_n(alpha,m,n):
@@ -123,7 +123,7 @@ def kmn_func(alpha,m,n):
         output = m_eq_n(alpha, m, n)
     return output
 
-#%% eqn. 12.106
+ eqn. 12.106
 alternate_hankels = lambda n,kr1 : n*sph_hankel2(n-1, kr1) - (n+1)*sph_hankel2(n+1, kr1)
 
 
@@ -139,7 +139,7 @@ def Imn_func(mv,nv,kv,Rv,alphav):
     imn_wrapper = lambda theta,_: imn_term(theta, mv,nv,kv,Rv,alphav)
     return integral(imn_wrapper, acb(0.0), alphav)
 
-#%% 
+ 
 def calc_one_Mmn_term(param):
     m,n = param['m'], param['n']
     k,R,alpha = [param[each] for each in ['k','R','alpha']]
@@ -154,7 +154,6 @@ def calc_one_Mmn_term(param):
 
 def calc_one_Mmn_term_pll(param):
     '''
-    Wrapper to calculate one Mmn term in a parallel loop
     '''
     # convert from string to acb
     param_acb = interchange_params_and_str(param, to_str=False)
@@ -165,7 +164,7 @@ def calc_one_Mmn_term_pll(param):
     return one_Mmn_term_str
 
 
-#%%
+
 def make_Mmn(param):
     NN = param.get('NN', calc_defaultNN(param))
     Mmn_matrix = acb_mat(NN,NN)
@@ -178,7 +177,27 @@ def make_Mmn(param):
 
 def make_Mmn_pll(param):
     '''
-    Parallel version of make_Mmn
+    Wrapper to calculate one Mmn term in a parallel loop. 
+    This function interchanges `acb` and `str` objects 
+    in both directions. For proper parallelisation, only
+    string-converted acb objects are used, converted back to
+    acb objects for calculations, and then sent back as
+    string again. 
+    
+    Parameters
+    ----------
+    param : dictionary
+        Dictionary with the following entries
+        
+    Returns 
+    -------
+    Mmn_matrix : flint.acb_mat
+        A matrix with all coefficients that satisfy model 
+        conditions. 
+    
+    See Also
+    --------
+    calc_one_Mmn_term_pll, calc_one_Mmn_term
     '''
     NN = param.get('NN', calc_defaultNN(param))
     Mmn_matrix = acb_mat(NN,NN)
@@ -204,7 +223,7 @@ def make_Mmn_pll(param):
             Mmn_matrix[rowpos,colpos] = Mmn_acb[entry_num]
             entry_num += 1 
     return Mmn_matrix
-#%%
+
 
 def make_bm(param):
     NN = param.get('NN', calc_defaultNN(param))
@@ -255,7 +274,8 @@ def directivity(thetas, An, param):
     return ratios
 
 def piston_in_sphere_directivity(thetas, param,**kwargs):
-    '''
+    '''Calculates directivity for piston in a sphere using the
+    fast python-flint package. 
 
     Parameters
     ----------
@@ -273,17 +293,17 @@ def piston_in_sphere_directivity(thetas, param,**kwargs):
                 The number of cores to be used for the Mmn matrix computation. 
                 Defaults to using all cores.
         
-    
+
     Keyword Arguments
     -----------------
     An : optional, acb_mat
         A complex matrix from a previous calculation. 
-        Using this saves time for repeated use. 
 
     Returns
     -------
     A_n : acb_mat
-        The 'An' term required for calculating directionalities.
+        The 'An' term required for calculating directionalities. Using the pre-calculated `An` 
+        saves time for repeated use if it was not already available. 
     dB_directivity : np.array
         Array with 20log10(on-axis/off-axis) values. 
     '''
@@ -296,37 +316,3 @@ def piston_in_sphere_directivity(thetas, param,**kwargs):
     ratios = directivity(thetas, A_n, param)
     dB_directivity = 20*np.log10(np.float32(ratios))
     return A_n, dB_directivity
-
-# #%%
-# if __name__ == '__main__':
-#     kaval = 10
-#     ka = acb(kaval)
-#     kv = 2*pi/(330.0/50000.0)
-#     av = ka/kv
-#     alphav = pi/3
-#     Rv = av/sin(alphav)
-#     params = {'k':kv,
-#               'a':av,
-#               'alpha': alphav,
-#               'R': Rv}
-#     print(f'The DPS is: {ctx.dps}')
-#     #mmn_mat = make_Mmn(params)
-#     import pandas as pd
-#     plotdata = pd.read_csv('tests/plots_data/pistoninsphere.csv')        
-#     by_ka = plotdata.groupby('ka')
-#     angles = np.radians(by_ka.get_group(kaval)['theta_deg']).tolist()
-#     angles_acb = [acb(each) for each in angles]
-    
-#     #%%
-#     an, dbdirn = piston_in_sphere_directivity(angles_acb, params)
-#     #%%
-#     #an, dbdirn = piston_in_sphere_directivity(angles_acb, params, A_n=an)
-#     # %% 
-#     dirnlty_ground = by_ka.get_group(kaval)['relonaxis_db']
-#     import matplotlib.pyplot as plt 
-#     plt.figure()
-#     a0 = plt.subplot(111, projection='polar')
-#     plt.plot(angles, dirnlty_ground,'-*',label='ground')
-#     plt.plot(angles, dbdirn, '-*',label='output')
-#     plt.legend()
-#     #plt.ylim(-60,0);plt.yticks(np.arange(-60,10,10))
