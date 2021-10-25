@@ -3,14 +3,14 @@
 FLINT piston in sphere
 ======================
 This example shows how to run the FLINT piston in sphere implementation. 
-The ```python-flint``` package is the python port for the FLINT package in C, 
-and runs extremely fast in comparison to ```mpmath```. However, it does
+The :code:`python-flint` package is the python port for the FLINT package in C, 
+and runs extremely fast in comparison to :code:`mpmath`. However, it does
 have its own conventions. This run-through will highlight. 
 
 Important
 ~~~~~~~~~
-The Python ```python-flint``` package currently only works on Linux. See [here](https://github.com/fredrik-johansson/python-flint/)
-and [here too](https://fredrikj.net/python-flint/).
+The :code:`python-flint` package currently only works on Linux. See `here <https://github.com/fredrik-johansson/python-flint/>`_
+and `here too <https://fredrikj.net/python-flint/>`_.
 """
 
 import matplotlib.pyplot as plt
@@ -24,8 +24,9 @@ ka_values  = [1, 5, 10]
 a = 0.01 # piston of 1cm radius 
 angles = np.linspace(0,-np.pi,100) # angles from 0-180 degrees
 
-#%% The ````flint``` implementation of piston in a sphere only accepts an ```acb``` 
-# complex number (see `here <https://fredrikj.net/python-flint/acb.html?highlight=acb>`),
+# %% 
+# The :code:`flint` implementation of piston in a sphere only accepts an ```acb``` 
+# complex number (see `here <https://fredrikj.net/python-flint/acb.html?highlight=acb>`_),
 # and not an inbuilt float or np.float object.  Also note how even functions
 # like `sin` and :math:`\pi` are called from the ```acb``` module (```acb.pi```, ```acb.sin```). 
 

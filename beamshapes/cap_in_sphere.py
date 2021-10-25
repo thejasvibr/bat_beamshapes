@@ -12,8 +12,8 @@ Notes
 Experience has shown it's best to leave the dps un-specified while using this
 module. I guess this is because of the summation terms.
 
-ToDo
-----
+To Do
+-----
 * Implement the special case of alpha = pi/2, described by equations 12.60
 """
 import copy

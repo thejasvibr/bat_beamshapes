@@ -14,8 +14,7 @@ Linux machines (as of python-flint 0.3.0 - but perhaps later releases may be OS-
 
 References
 ----------
-Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers.
-Academic Press.
+Beranek, L. L., & Mellow, T. (2012). Acoustics: sound fields and transducers. Academic Press.
 
 See Also 
 --------
@@ -71,7 +70,7 @@ def pprime_cosalpha(n, alpha):
     final_term = -sin(alpha)*(numerator/denominator)
     return final_term
 
- Calculating N -  using the formula from T. Mellow's code.
+# Calculating N -  using the formula from T. Mellow's code.
 def calc_defaultNN(param):
     ka = param['k']*param['a']
     return conv_acb_to_int(12+2*ka/sin(param['alpha']))
@@ -123,7 +122,7 @@ def kmn_func(alpha,m,n):
         output = m_eq_n(alpha, m, n)
     return output
 
- eqn. 12.106
+# eqn. 12.106
 alternate_hankels = lambda n,kr1 : n*sph_hankel2(n-1, kr1) - (n+1)*sph_hankel2(n+1, kr1)
 
 

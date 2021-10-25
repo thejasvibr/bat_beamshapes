@@ -19,7 +19,7 @@ Check out a general introduction to the concepts of the package :doc:`here <gene
 Why `beamshapes`?
 ~~~~~~~~~~~~~~~~~
 While there are many sound radiation models described in the literature, there aren't
-that many (or any?) openly available computational implementations of their beamshapes.
+that many (also see `levitate <https://github.com/AppliedAcousticsChalmers/levitate/blob/master/levitate/transducers.py>`_ and `pyroomacoustics <https://pyroomacoustics.readthedocs.io/en/pypi-release/pyroomacoustics.directivities.html>`_) openly available computational implementations of their beamshapes.
 
 Who is this useful for? 
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -49,7 +49,10 @@ that may be of interest or to get an idea of how the wishlist models look like!
 
 Package installation
 ~~~~~~~~~~~~~~~~~~~~
-Install from the `GitHub repo <https://github.com/thejasvibr/bat_beamshapes>`_ directly by cloning and 
+
+`pip installation` : Install the latest stable version with :code:`pip install beamshapes` 
+
+`Local installation` : Install from the `GitHub repo <https://github.com/thejasvibr/bat_beamshapes>`_ directly by cloning and 
 following the instructions in the README.
 
 

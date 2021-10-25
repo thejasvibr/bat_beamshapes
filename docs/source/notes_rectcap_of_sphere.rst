@@ -146,7 +146,7 @@ Definition of |I0n|:
     P^{-1}_{n}\bigg( \frac{-cos\:\phi}{\sqrt{cos^{2}\:\phi+tan^{2}\:\alpha}}\bigg)d\phi \\
 
 Computational implementation of |I0n|:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. math::
 
