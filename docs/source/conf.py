@@ -63,10 +63,10 @@ html_theme_options = {
     'style_external_links': False,
     # Toc options
     'collapse_navigation': False,
-    'sticky_navigation': True,
-    'navigation_depth':5
+    'navigation_depth':3,
 }
-
+# 
+# 'sticky_navigation': False,
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

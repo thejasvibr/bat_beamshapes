@@ -3,6 +3,7 @@
 FLINT piston in sphere
 ======================
 This example shows how to run the FLINT piston in sphere implementation. 
+
 The :code:`python-flint` package is the python port for the FLINT package in C, 
 and runs extremely fast in comparison to :code:`mpmath`. However, it does
 have its own conventions. This run-through will highlight. 
@@ -12,6 +13,7 @@ Important
 The :code:`python-flint` package currently only works on Linux. See `here <https://github.com/fredrik-johansson/python-flint/>`_
 and `here too <https://fredrikj.net/python-flint/>`_.
 """
+# sphinx_gallery_thumbnail_path = '_static//flint_pistoninsphere.png'
 
 import matplotlib.pyplot as plt
 import numpy as np 

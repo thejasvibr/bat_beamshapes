@@ -9,7 +9,7 @@ from mpmath import sin
 import numpy as np 
 import matplotlib.pyplot as plt
 from beamshapes import cap_in_sphere_directivity
-
+# sphinx_gallery_thumbnail_path = '_static//capsphere_ka-10.0_dps=50.png'
 # %% 
 # This model assumes a curved portion of a sphere (the 'cap') oscillates
 # to produce sound. One cool thing about this model is that it produces somewhat

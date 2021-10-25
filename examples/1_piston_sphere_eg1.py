@@ -3,6 +3,8 @@ Piston in a rigid sphere: the bat version
 =========================================
 
 """
+# sphinx_gallery_thumbnail_path = '_static/peak_and_higher_harmonic.png'
+
 import beamshapes
 import matplotlib.pyplot as plt
 import mpmath

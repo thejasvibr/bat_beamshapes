@@ -4,6 +4,7 @@
 Piston in an infinite baffle example
 ====================================
 """
+# sphinx_gallery_thumbnail_path = '_static//PIB.png'
 
 #%% The piston in an infinite baffle is a classic model used to describe
 # the beamshapes of mouth-emitting bat species [1,2] (among other animals eg. [3]). 

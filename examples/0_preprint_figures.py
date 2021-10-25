@@ -19,6 +19,7 @@ Some of the models are computationally intensive and do take a long time, depend
 on your system. The piston in a sphere can take over 10 minutes to run for example!!
 
 """
+
 import mpmath
 import numpy as np 
 import matplotlib.pyplot as plt
@@ -26,6 +27,9 @@ from beamshapes import piston_in_infinite_baffle as piston_infbaf
 from beamshapes import piston_in_sphere_directivity 
 from beamshapes import cap_in_sphere_directivity
 from beamshapes import point_source_on_a_sphere_directivity
+
+# sphinx_gallery_thumbnail_path = '_static//piston_sphere_baffle.png'
+
 
 # the 'if__name__' pattern for a module is odd - but is required when running code with 
 # the multiprocessing package in Windows. The example should work without the if __name__
