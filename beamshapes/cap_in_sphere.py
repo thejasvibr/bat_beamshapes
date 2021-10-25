@@ -214,15 +214,3 @@ def cap_in_sphere_directivity(angles, params):
                             'float32')
 
     return None, directivity
-
-# if __name__ == '__main__':
-#     kaval = 30
-#     paramv = {}
-#     paramv['R'] = 0.01
-#     paramv['alpha'] = mpmath.pi/3
-#     paramv['a'] = paramv['R']*mpmath.sin(paramv['alpha'])
-#     paramv['k'] = kaval/paramv['a']
-#     angles = mpmath.linspace(0,mpmath.pi,10)
-#     outs = cap_in_sphere_directivity(angles,
-#                                                    paramv)
-#     #print()

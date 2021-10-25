@@ -157,22 +157,3 @@ def vibrating_cap_of_sphere(theta, k, **kwargs):
 
     return(H_theta)
 
-
-if __name__ == '__main__':
-    thetas = np.arange(0.0, 2 * np.pi, 0.01)
-        
-    freq = 5*10**3
-    wavelen = 330/freq
-    kv = 2*np.pi/wavelen
-    Rv = 0.1
-    ka = 3
-    a = ka/kv
-    alpha = np.arcsin(a/Rv)
-    q = np.array([vibrating_cap_of_sphere(thetav, kv, R=Rv, theta_0=alpha) for thetav in thetas], dtype='float64')
-
-    plt.figure()
-    ax = plt.subplot(111, projection='polar')
-    ax.set_theta_zero_location('E')
-    ax.plot(thetas, 20 * np.log10(q))
-    plt.ylim(-30,0);plt.yticks([0,-20,-40])
-
