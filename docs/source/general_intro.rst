@@ -1,5 +1,5 @@
 Concepts behind :code:`beamshapes`
-==================================
+=============================
 Sound sources don't radiate sound uniformly most of the time. Even us humans for instance, we emit more energy while talking to the front than to the back. The exact (non-uniform) pattern in which sound is radiated defines the 'beamshape' of a source. The beamshape is typically a combination of the frequency of emitted sound and the geometry of the vibrating surface and its associated (non-vibrating) surfaces. 
 
 Let's go through the main concepts required to use the `beamshapes` package.
@@ -26,8 +26,8 @@ Piston in an infinite baffle
 
 `Piston in an infinite baffle schematic`
 
-Here a rigid circular disk (the 'piston') vibrates back and forth between a hole in a huge baffle that matches the disk's size.
-The parameters needed to define this model are the wavenumber and piston radius. 
+Here a rigid circular disk (the 'piston') vibrates back and forth across a hole (of matching size) set in a huge baffle .
+The parameters needed to define this model are the wavenumber (`k` - see below for a list of all common abbreviations) and piston radius (`a`).  
 
 Reference : Chp 13, Beranek, L. L., & Mellow, T. (2019). Acoustics: sound fields and transducers. Academic Press.
 
@@ -39,7 +39,7 @@ Point on a sphere
 `Point on a sphere schematic`
 
 An infinitesimally small portion of a sphere's surface (the 'point') is considered to vibrate. The rest of the sphere does not vibrate.
-The parameters needed to define this model are the wavenumber and sphere radius. 
+The parameters needed to define this model are the wavenumber (`k`) and sphere radius (`R`). 
 
 Reference: Chp 12, Beranek, L. L., & Mellow, T. (2019). Acoustics: sound fields and transducers.
 Academic Press.
@@ -56,7 +56,7 @@ The 'sliced' part of a sphere is the 'cap' in this case. The cap moves with an a
 Portions of the cap closer to the periphery vibrate less than portions close to the center, this is summarised by the 
 relation :math:`u(R,\theta) = u_{0}cos \theta`, where :math:`\theta` is the distended angle from the cap's centre. 
 
-The parameters needed to define this model are wavenumber, sphere radius, and the aperture angle of the cap. 
+The parameters needed to define this model are wavenumber (`k`), sphere radius (`R`), and the aperture angle of the cap (:math:`\alpha`). 
 
 Reference: Chp 12, Beranek, L. L., & Mellow, T. (2019). Acoustics: sound fields and transducers.
 Academic Press.
@@ -70,14 +70,14 @@ Piston in a sphere
 `Piston in a sphere schematic`
 
 A sphere is sliced, and the 'cap' is discarded. The 'open' portion of the sliced sphere is now replaced with a piston. 
-This piston in the sphere vibrates to produce sound. The parameters needed to define this model are wavenumber, sphere radius, 
-aperture angle of the piston, and piston radius. 
+This piston in the sphere vibrates to produce sound. The parameters needed to define this model are wavenumber (`k`), sphere radius (`R`), 
+aperture angle of the piston (:math:`\alpha`), and piston radius (`a`). 
 
 Reference: Chp 12, Beranek, L. L., & Mellow, T. (2019). Acoustics: sound fields and transducers.
 Academic Press.
 
-Input Parameters
-----------------
+Common parameters and abbreviations
+-----------------------------------
 The inputs will tend to be model-specific, but the common input parameters
 to keep in mind are:
 
