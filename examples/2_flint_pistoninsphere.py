@@ -34,13 +34,12 @@ angles_as_acb = [acb(each) for each in angles]
 R = acb(0.1) # radius of a sphere
 alpha = acb.pi()/acb(6)
 a_value = R*acb.sin(alpha)
-piston_in_sphere_D = np.zeros(angles.size)
+piston_in_sphere_D = np.zeros((angles.size, len(ka_values)))
 
 for j,each_ka in enumerate(ka_values):
     k_value = acb(each_ka)/a_value
     parameters = {'k':k_value, 'a':a_value, 'R': R, 'alpha':alpha}
-    A_n, piston_in_sphere_D[:,j] = pistonsphere_directivity(angles_as_acb,
-                                                                    parameters)
+    A_n, piston_in_sphere_D[:,j] = pistonsphere_directivity(angles_as_acb, parameters)
 
 line_types = ['dotted', 'dashed', 'solid']
 plt.figure()
@@ -56,10 +55,16 @@ tick_labels = []
 for each in tick_angles:
     tick_labels.append(f'{each}'+'$^{\circ}$')
 
-
 plt.yticks([-12,-24,-36, -48],['',-24,'', -48], fontsize=6)        
 
 plt.xticks(np.radians(tick_angles) ,tick_labels , fontsize=6)
-#a1.tick_params(axis='both', pad=0.5)
+
 a1.xaxis.set_tick_params(pad=-3.5)
-plt.legend(loc=(-0.27,-0.23), frameon=False, fontsize=7)
+plt.legend(loc=(-0.2, 0.0), frameon=False, fontsize=12)
+# plt.savefig('../docs/source/_static/flint_capinsphere.png')
+
+#%%
+#.. image:: ../_static//flint_pistoninsphere.png
+#  :width: 400
+
+
