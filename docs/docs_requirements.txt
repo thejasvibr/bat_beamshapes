@@ -7,6 +7,6 @@ sympy
 scipy
 tqdm
 recommonmark 
-sphinx==3.5.3
+sphinx==4.2.0
 sphinx_gallery==0.8.2
 sphinx_rtd_theme

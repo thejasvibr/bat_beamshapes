@@ -6,7 +6,6 @@
 Beamshapes: directivity patterns for various sound sources
 ==========================================================
 
-
 .. include:: ./intro_why_who.rst
 
 .. toctree::
