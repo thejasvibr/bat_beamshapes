@@ -34,6 +34,7 @@ If you'd like to estimate test coverage:
 
 * Install the [```coverage```](https://coverage.readthedocs.io/en/6.0.2/) package: ```pip install coverage``` 
 * Change directories and enter the repo ```cd bat_beamshapes```
+* Run the tests with ```coverage``` and ```unittest``` with: ```coverage run -m unittest discover```
 * To generate an overall report on coverage: ```coverage report```
 
 ## Documentation
