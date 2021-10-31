@@ -29,12 +29,54 @@ sum_term = Sum(numerator_sumterm/denominator_sumterm, (n, 0, NN))
 d_theta = (1/(kR**2))*sum_term
 
 d_theta_func = lambdify([theta,k,R,NN],d_theta)
+
+docs_for_dtheta = '''On-axis level for point on a sphere. 
+                 Lambdified version of :code:`d_theta` SymPy expression.
+                 
+                 Parameters
+                 ----------
+                 theta : np.float>0
+                    Elevation/azimuth off-axis angle in radians. 
+                 k : np.float>0
+                    Wavenumber
+                 R : np.float>0
+                    Radius of sphere 
+                 NN : int
+                    Number of summation steps that must be calculated.
+                 
+                 Returns 
+                 -------
+                 _ : np.float
+                    Off-axis level at :math:`\\theta` for point-source on a sphere.
+                 '''
+d_theta_func.__doc__ = docs_for_dtheta
+
 # eqn. 12.47 
 onaxis_num_sumterm = I**n*(2*n+1)**2
 onaxissum_term = Sum(onaxis_num_sumterm/denominator_sumterm, (n,0,NN))
 d_zero = (1/(kR**2))*onaxissum_term
 
 d_zero_func = lambdify([k,R,NN],d_zero)
+
+docs_for_dzero = '''On-axis level for point on a sphere. 
+                 Lambdified version of :code:`d_zero` SymPy expression.
+                 
+                 Parameters
+                 ----------
+                 k : np.float>0
+                    Wavenumber
+                 R : np.float>0
+                    Radius of sphere 
+                 NN : int 
+                    Number of summation steps that must be calculated.
+                 
+                 Returns 
+                 -------
+                 _ : np.float
+                    On-axis level for point-source on a sphere.
+                 '''
+
+d_zero_func.__doc__ = docs_for_dzero
 
 def point_source_on_a_sphere_directivity(angles, param, parallel=False):
     '''Directivity for point source on a sphere.

@@ -86,6 +86,27 @@ def d_0_t3_func(k_v, R_v, alpha_v, theta_v):
     #return mpmath.nsum(lambdify([n],version_with_freen, 'mpmath'), [2, int(5+2*k_v*R_v)])
 
 def d_theta(**param):
+    '''Calculates off-axis levels for cap in a sphere. 
+    
+    Parameters
+    ----------
+    param : dictionary
+        With the following keys and entries:
+        k : mpmath.mpf      
+            Wavenumber
+        R : mpmath.mpf
+            Sphere radius
+        alpha: mpmath.mpf
+            Cap half-aperture in radians
+        theta : mpmath.mpf  
+            Azimuth/elevation at which level is to be calculated
+            in radians.
+
+    Returns
+    -------
+    final_d_theta: mpmath.mpf
+        Calculated level at angle :math:`\theta`
+    '''
     brackets_term1 = d_theta_t1_func(param['k'], param['R'],
                                      param['alpha'], param['theta'])
     brackets_term2 = d_theta_t2_func(param['k'], param['R'],

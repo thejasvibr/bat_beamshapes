@@ -50,7 +50,7 @@ def conv_acb_to_int(X):
     return int_out
 
 
-## !! ATTENTION -- the FLINT legendre has diff conventions than the 
+# ! ATTENTION -- the FLINT legendre has diff conventions than the 
 # mpmath one !! 
 legendre_p = lambda n,z : flint.acb.legendre_p(z,n) 
 
@@ -234,6 +234,36 @@ def make_bm(param):
     return bm_mat
 
 def dtheta(theta, An, param):
+    '''Calculates off-axis level for the python-flint 
+    piston in a sphere implementation. 
+    
+    Parameters
+    ----------
+    theta : flint.acb
+        Azimuth/elevation angle in radius
+    An : flint.acb_mat
+        Coefficients which satisfy various conditions 
+        for the piston in a sphere. 
+    
+    param: dictionary   
+        Dictionary with the following keys and entries.
+        
+        k : flint.acb 
+            Wavenumber of sound
+        R : flint.acb
+            Radius of the sphere
+        alpha : flint.acb
+            Half-aperture of the cap.
+            
+    Returns 
+    -------
+    pt1*sum_term : flint.acb
+        Level at angle :math:`\theta` for piston in a sphere.
+        
+    See Also
+    --------
+    piston_in_sphere_flint.make_Mmn_pll, piston_in_sphere_flint.make_bm
+    '''
     k,R,alpha = (param[each] for each in ['k','R','alpha'])
     NN = max([An.ncols(),An.nrows()])
     I_n_mat = acb_mat(1,NN)
@@ -252,6 +282,32 @@ def dtheta(theta, An, param):
     return pt1*sum_term
 
 def dzero(An, param):
+    '''
+    Parameters
+    ----------
+    An : flint.acb_mat
+        Coefficients which satisfy various conditions 
+        for the piston in a sphere. 
+    
+    param: dictionary   
+    Dictionary with the following keys and entries.
+        
+        k : flint.acb 
+            Wavenumber of sound
+        R : flint.acb
+            Radius of the sphere
+        alpha : flint.acb
+            Half-aperture of the cap.
+    
+    Returns
+    -------
+    pt1*sum_term : flint.acb
+        On-axis level for piston in a sphere.
+
+    See Also
+    --------
+    piston_in_sphere_flint.make_Mmn_pll, piston_in_sphere_flint.make_bm
+    '''
     k,R,alpha = (param[each] for each in ['k','R','alpha'])
     NN = max([An.ncols(),An.nrows()])
     I_n_mat = acb_mat(1,NN)
@@ -264,6 +320,9 @@ def dzero(An, param):
     return pt1*sum_term
 
 def directivity(thetas, An, param):
+    '''Directivity :math:`D_{\theta}\D_{0}` for piston in a sphere - python-flint 
+    implementation. 
+    '''
     d_zero_val = dzero(An, param)
     ratios = []
     for each in thetas:
@@ -281,7 +340,8 @@ def piston_in_sphere_directivity(thetas, param,**kwargs):
     thetas : list with acb entries
         List with angles in radians.
     param: dictionary
-    Dictionary with at least the following keys:
+    Dictionary with at least the following keys and entries
+    
             k : mpmath.mpf>0
                 Wavenumber. 
             R : mpmath.mpf>0
