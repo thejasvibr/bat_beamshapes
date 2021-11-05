@@ -50,7 +50,9 @@ def angle_bet_bat_and_mic(batpos, micpos, call_direction=0):
     by 3 points: a point in line with the call direction, 
     the bat itself, and the microphone position. 
     
-    IMPORTANT: The call_direction is expected as angles reported in radians
+    IMPORTANT
+    ---------
+    The call_direction is expected as angles reported in radians
     in an CCW direction. The OUTPUT however is reported as relative off-axis
     angle in a CW direction. 
     
@@ -62,6 +64,7 @@ def angle_bet_bat_and_mic(batpos, micpos, call_direction=0):
         Defaults to 0 radians (North)
     micpos : Nx2 np.array
         XY positions of 1-N mics
+
     Returns
     -------
     rel_angle : Nx1 np.array

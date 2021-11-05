@@ -14,7 +14,7 @@ animal sound production. Of course, any type of sound can be studied this way!!
 import matplotlib.pyplot as plt
 import numpy as np 
 import beamshapes.sim_reclevels as simlevels
-
+import mpmath
 
 
 #%% 
@@ -48,7 +48,7 @@ flight_path_y = np.array([0.3, 0.8, 1.2, 0.6, 0.4])
 flight_path = np.column_stack((flight_path_x, flight_path_y))
 
 # Where was the bat aiming it's call? 
-call_directions = np.deg2rad(np.array([15, 60, 140, 160, 200]))
+call_directions = np.pi/2-np.deg2rad(np.array([15, 60, 140, 160, 200]))
 
 
 plt.figure()
@@ -56,7 +56,7 @@ plt.plot(flight_path[:,0], flight_path[:,1], '*')
 plt.plot(mic_posns[:,0], mic_posns[:,1],'r*')
 
 for i, direction in enumerate(call_directions):
-    arrow_dx, arrow_dy = np.sin(direction), np.cos(direction)
+    arrow_dx, arrow_dy = np.cos(direction), np.sin(direction)
     arrow_dx *= 0.5
     arrow_dy *= 0.5
     plt.arrow(flight_path[i,0], flight_path[i,1],arrow_dx, arrow_dy, head_width=0.05)
@@ -72,7 +72,32 @@ for i, call_level in enumerate(onaxis_levels):
     received_omnidirn_level[:,i] = simlevels.calc_mic_level_nobeamshape(call_level,
                                                        flight_path[i,:].reshape(-1,2),
                                                        mic_posns)
+#%%
+# Let's calculate the relative mic to bat angles to get the relative addition or reduction
+# of call level. 
+comparitive_angle = np.zeros((mic_posns.shape[0], 5))
+for i, call_direction in enumerate(call_directions):
+    comparitive_angle[:,i] = simlevels.angle_bet_bat_and_mic(flight_path[i,:],
+                                                             mic_posns,
+                                                                 call_directions[i])
+
+
 #%% 
 # Having calculated the received levels assuming an omnidirectional call, let's now
 # include the beamshapes arising from a piston in a sphere. Let's start by calculating the 
 # relative bat to mic 
+alpha = mpmath.pi/8 # half-aperture of 22.
+R = 6e-3
+paramv = {}
+paramv['R'] = R
+paramv['alpha'] = alpha
+
+a_calc = paramv['R']*mpmath.sin(paramv['alpha'])
+k = overall_ka[0]/a_calc
+
+
+
+
+
+
+
