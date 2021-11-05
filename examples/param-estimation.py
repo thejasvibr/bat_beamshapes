@@ -13,6 +13,8 @@ animal sound production. Of course, any type of sound can be studied this way!!
 '''
 import matplotlib.pyplot as plt
 import numpy as np 
+import beamshapes.sim_reclevels as simlevels
+
 
 
 #%% 
@@ -35,9 +37,42 @@ mic_posns[-4:,1] = np.linspace(0,2,4)[::-1]
 
 # Define on-axis level for each of the 5 calls (dB SPL re 20 muPa at 1m)
 # These levels are semi-realistic!
-onaxis_level = [100, 96, 90, 84, 84]
+onaxis_levels = [100, 96, 90, 84, 84]
 
 # Define the directivity function broadly by altering ka for each call
 overall_ka = [10, 5, 4, 3, 2]
+#%%
+# Where was the bat at each of the 5 call emissinos?
+flight_path_x =  np.array([0.45, 1.0, 1.5, 2.0, 2.4])
+flight_path_y = np.array([0.3, 0.8, 1.2, 0.6, 0.4])
+flight_path = np.column_stack((flight_path_x, flight_path_y))
 
-# Assign 
+# Where was the bat aiming it's call? 
+call_directions = np.deg2rad(np.array([15, 60, 140, 160, 200]))
+
+
+plt.figure()
+plt.plot(flight_path[:,0], flight_path[:,1], '*')
+plt.plot(mic_posns[:,0], mic_posns[:,1],'r*')
+
+for i, direction in enumerate(call_directions):
+    arrow_dx, arrow_dy = np.sin(direction), np.cos(direction)
+    arrow_dx *= 0.5
+    arrow_dy *= 0.5
+    plt.arrow(flight_path[i,0], flight_path[i,1],arrow_dx, arrow_dy, head_width=0.05)
+    plt.text(flight_path[i,0]-0.5, flight_path[i,1]+0.1,f'direction: {np.round(np.degrees(call_directions[i]),2)}')
+    plt.text(flight_path[i,0]-0.1, flight_path[i,1]+0.2,f'SL: {onaxis_levels[i]}')
+    plt.text(flight_path[i,0]-0.1, flight_path[i,1]+0.3,f'ka: {overall_ka[i]}')
+
+#%%
+# Calculate the received levels at each mic assuming an omnidirectional call
+
+received_omnidirn_level = np.zeros((mic_posns.shape[0], 5))
+for i, call_level in enumerate(onaxis_levels):
+    received_omnidirn_level[:,i] = simlevels.calc_mic_level_nobeamshape(call_level,
+                                                       flight_path[i,:].reshape(-1,2),
+                                                       mic_posns)
+#%% 
+# Having calculated the received levels assuming an omnidirectional call, let's now
+# include the beamshapes arising from a piston in a sphere. Let's start by calculating the 
+# relative bat to mic 
