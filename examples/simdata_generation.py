@@ -1,13 +1,13 @@
 '''
-Source parameter estimation
-===========================
+Source parameter estimation - generating the data
+=================================================
 Sounds recorded in nature are often directional (bird songs, bat calls, etc.). This
 directionality means a set of observations (reduction in call level) may be only due
 to the animal turning one way or the other - and not necessarily because of an actual 
 change in sound production. Fitting a `source model <../general_intro.rst>` helps in accounting for 
 sound directionality and actually being able to estimate many other aspects of sound production. 
 
-Let's simulate an example to show the power of actually using a source model to study 
+Let's make simulated data to show the power of actually using a source model to study 
 animal sound production. Of course, any type of sound can be studied this way!! 
 
 This example will go through the following steps:
@@ -34,6 +34,8 @@ if __name__ == '__main__':
     import mpmath
 
 #%% 
+# Define mic and bat positions 
+# ----------------------------
 # Let's simulate a bat that emits five calls as it flies through a room with 12 microphones. 
 # We'll pretend our simulated bat is a flying piston in a sphere for now. In general, here we'll
 # simulate the following progressive trends 1) reduction in call level 2) 'widening' of the beam. 
@@ -50,7 +52,10 @@ if __name__ == '__main__':
     mic_posns[:4,1] = np.linspace(0,2,4)
     mic_posns[4:8,1] = 2.5
     mic_posns[-4:,1] = np.linspace(0,2,4)[::-1]
-    
+
+#%% 
+# Define call direction, on-axis level and parameters of the source model
+# -----------------------------------------------------------------------
     # Define on-axis level for each of the 5 calls (dB SPL re 20 muPa at 1m)
     # These levels are semi-realistic!
     onaxis_levels = [100, 96, 90, 84, 84]
@@ -82,8 +87,20 @@ if __name__ == '__main__':
         plt.text(flight_path[i,0]-0.1, flight_path[i,1]+0.2,f'SL: {onaxis_levels[i]}')
         plt.text(flight_path[i,0]-0.1, flight_path[i,1]+0.3,f'ka: {overall_ka[i]}')
     plt.savefig('../docs/source/_static/simulated_data.png')
+
 #%%
-# Calculate the received levels at each mic assuming an omnidirectional call
+#.. image:: ../_static/simulated_data.png
+#  :width: 400
+#  :alt: simulated data
+
+#%% 
+#
+# `An overview of the call parameters with respect to mic positions (red stars). Call direction is shown by an arrow, while
+# other parameters are shown in text`
+
+#%%
+# Calculate received levels at mics assuming an omnidirectional source
+# --------------------------------------------------------------------
     
     received_omnidirn_level = np.zeros((mic_posns.shape[0], 5))
     for i, call_level in enumerate(onaxis_levels):
@@ -91,6 +108,8 @@ if __name__ == '__main__':
                                                            flight_path[i,:].reshape(-1,2),
                                                            mic_posns)
 #%%
+# Calculate mic to call-direction relative angles 
+# -----------------------------------------------
 # Let's calculate the relative mic to bat angles to get the relative addition or reduction
 # of call level. 
     comparitive_angle = np.zeros((mic_posns.shape[0], 5))
@@ -101,6 +120,8 @@ if __name__ == '__main__':
 
 
 #%% 
+# Generate beamshape from source model 
+# ------------------------------------
 # Having calculated the received levels assuming an omnidirectional call, let's now
 # include the beamshapes arising from a piston in a sphere. Let's start by calculating the 
 # relative bat to mic 
@@ -128,15 +149,15 @@ if __name__ == '__main__':
     for i in range(5):
         relative_off_axis[:,i] += np.array(all_beamshapes[i]).flatten()
 #%%
-
+# Add/subtract the relative change for off-axis angles 
+# ----------------------------------------------------
 # save the relative levels
-    # relative_off_axis_csv = pd.DataFrame(relative_off_axis)
-    # relative_off_axis_csv.to_csv('../docs/source/_static/call_beamshapes_dthetadzero-db.csv')
+    relative_off_axis_csv = pd.DataFrame(relative_off_axis)
+    relative_off_axis_csv.to_csv('../docs/source/_static/call_beamshapes_dthetadzero-db.csv')
     
-    # run this lines above if there is no csv data
     
-    relative_off_axis = pd.read_csv('../docs/source/_static/call_beamshapes_dthetadzero-db.csv')
-    relative_off_axis = relative_off_axis.to_numpy()
+    # relative_off_axis = pd.read_csv('../docs/source/_static/call_beamshapes_dthetadzero-db.csv')
+    # relative_off_axis = relative_off_axis.to_numpy()
     
     # include the directivity into the omnidirectional model received levels 
     
