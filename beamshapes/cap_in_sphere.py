@@ -104,7 +104,7 @@ def d_theta(**param):
 
     Returns
     -------
-    final_d_theta: mpmath.mpf
+    final_d_theta : mpmath.mpf
         Calculated level at angle :math:`\theta`
     '''
     brackets_term1 = d_theta_t1_func(param['k'], param['R'],

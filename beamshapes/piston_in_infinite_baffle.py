@@ -32,8 +32,15 @@ def d_theta_func(kv,av,thetav):
         Piston radius
     thetav : float  
         Azimuth/elevation angle in radians
+    
+    Returns
+    -------
+    _ : float
+        Numerical solution for eqn. 13.102
+
     '''
-    # The function must be used in the limit version to get valid outputs. 
+
+    
     subs_dtheta = d_theta.subs({'k':kv,'a':av})
     return lambdify([], limit(subs_dtheta, theta, thetav))()
 

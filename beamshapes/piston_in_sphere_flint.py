@@ -258,7 +258,7 @@ def dtheta(theta, An, param):
     Returns 
     -------
     pt1*sum_term : flint.acb
-        Level at angle :math:`\theta` for piston in a sphere.
+        Level at angle :math:`\\theta` for piston in a sphere.
         
     See Also
     --------
