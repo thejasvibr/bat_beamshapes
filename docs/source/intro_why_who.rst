@@ -11,7 +11,7 @@ Check out a general introduction to the concepts of the package :doc:`here <gene
 Why `beamshapes`?
 ~~~~~~~~~~~~~~~~~
 While there are many sound radiation models described in the literature, there aren't
-that many (also see `levitate <https://github.com/AppliedAcousticsChalmers/levitate/blob/master/levitate/transducers.py>`_ and `pyroomacoustics <https://pyroomacoustics.readthedocs.io/en/pypi-release/pyroomacoustics.directivities.html>`_) openly available computational implementations of their beamshapes.
+that many (also see `levitate <https://github.com/AppliedAcousticsChalmers/levitate/blob/master/levitate/transducers.py>`_ ) openly available computational implementations of their beamshapes. Existing packages focus on implementing directivities with analytical solutions - which can be calculated directly and quickly. `beamshapes` aims to increase the breadth of implemented directivities beyond those with analytical solutions. 
 
 Who is this useful for? 
 ~~~~~~~~~~~~~~~~~~~~~~~

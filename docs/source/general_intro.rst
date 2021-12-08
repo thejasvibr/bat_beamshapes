@@ -81,7 +81,7 @@ Common parameters and abbreviations
 The inputs will tend to be model-specific, but the common input parameters
 to keep in mind are:
 
-    #. `k`, wavenumber. This is :math:`\frac{2\pi}{\lambda}` - this is another wave of defining the frequency of the vibrating part, and the sound produced. :math:`\lambda` is the wavelength of the sound, also defined as :math:`\frac{v_\text{sound}}{\text{frequency}}`. 
+    #. `k`, wavenumber. This is :math:`\frac{2\pi}{\lambda}` - this is another way of defining the frequency of the vibration. :math:`\lambda` is the wavelength of the sound, also defined as :math:`\frac{v_\text{sound}}{\text{frequency}}`. 
     #. `a` : piston radius, wherever applicable
     #. `R` : sphere radius, wherever applicable. 
     #. :math:`\alpha, \theta, \phi`: various angles describing the size of the oscillating portion. These angles are in radians - not degrees!
