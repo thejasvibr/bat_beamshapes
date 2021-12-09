@@ -65,7 +65,7 @@ def piston_in_infinite_baffle_directivity(angles, param):
     Returns 
     -------
     _ : None 
-    beamshape : np.array
+    dtheta_by_dzero : np.array
         Array with dB(D_theta/D_0).
         The number of items is equal to the number of angles.
     
