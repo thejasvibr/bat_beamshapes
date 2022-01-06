@@ -31,7 +31,7 @@ Directivity ($D$) describes the relative sound levels at a given angle $D(\theta
 with relation to the level on-axis ($D(0)$, and thus $directivity = \frac{D_{\theta}}{D_{0}}$). Directivity
 functions exist for a wide variety of sound sources that can be modelled analytically. A well-known example 
 of a directivity function is of the piston in an infinite baffle. The piston is a circular surface of radius
-$a$, vibrating back and forth about a hole in an infinite wall or baffle. The directivity is described by $\frac{2J_{1}(ka \times sin \theta)}{ka \times sin \theta}$, where $J_{1}$ is the Bessel's function of the first kind, $k$ is the wavenumber, where $k = \frac{2\pi f}{c}$, where $f$ is the frequency of the sound, and $c$ is the speed of sound. The angle of the receiver is $\theta$, which varies from 0-2$\pi$ radians in the azimuth. 
+$a$, vibrating back and forth about a hole in an infinite wall or baffle. The directivity is described by $\frac{2J_{1}(ka \times sin \theta)}{ka \times sin \theta}$, where $J_{1}$ is the Bessel's function of the first kind, $k$ is the wavenumber, where $k = \frac{2\pi f}{c}$, where $f$ is the frequency of the sound, and $c$ is the speed of sound. The angle of the receiver is $\theta$, which varies from 0-2$\pi$ radians in the azimuth. The ```beamshapes``` package aims to provide an easy interface to generate direcitivities of various sound sources.
 
 Directivity functions can be used in a two-fold manner 1) to deliberately engineer devices to suit particular specifications, e.g. loudspeaker sound fields [@beranek2012acoustics] and 2) to infer parameters of a sound source itself having assumed a relevant model, e.g. estimating the direction of call emission [@guarato2011method] and mouth aperture of bat echolocation calls [@jakobsen2013convergent;@kounitsky2015bats].
 
@@ -54,12 +54,7 @@ Future releases of ```beamshapes``` are scheduled to include directivity pattern
 
 
 # Software packages used in this work
-```beamshapes``` relies on the Python open-source ecosystem and is built on the numpy, scipy, sympy, mpmath and flint libraries [@2020NumPy;@2020SciPy;@meurer2017sympy;@mpmath;@hart2011flint]. 
-
-
-# Package repository
-```beamshapes``` can be currently accessed at https://github.com/thejasvibr/bat_beamshapes.git and the documentation with examples are hosted at https://beamshapes.readthedocs.io/en/latest/ .
-
+```beamshapes``` relies on the Python open-source ecosystem and is built on the ```numpy```[@2020NumPy], ```scipy```[@2020SciPy], ```sympy```[@2020SciPy], ```mpmath``` [@mpmath] and ```flint``` [@hart2011flint] libraries. 
 
 # Acknowledgements
 TB thanks Gaurav Dhariwal for his continual math advice and inputs, and Tim Mellow for 
