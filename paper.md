@@ -54,7 +54,7 @@ Future releases of ```beamshapes``` are scheduled to include directivity pattern
 
 
 # Software packages used in this work
-```beamshapes``` relies on the Python open-source ecosystem and is built on the ```numpy```[@2020NumPy], ```scipy```[@2020SciPy], ```sympy```[@2020SciPy], ```mpmath``` [@mpmath] and ```flint``` [@hart2011flint] libraries. 
+```beamshapes``` relies on the Python open-source ecosystem and is built on the ```numpy``` [@2020NumPy], ```scipy``` [@2020SciPy], ```sympy``` [@meurer2017sympy], ```mpmath``` [@mpmath] and ```flint``` [@hart2011flint] libraries. 
 
 # Acknowledgements
 TB thanks Gaurav Dhariwal for his continual math advice and inputs, and Tim Mellow for 
