@@ -43,30 +43,35 @@ For the steps below to work you need to have a working Python installation that 
 ## Detailed documentation 
 For more details on the concepts and source documentation - please check out the [online docs](https://beamshapes.rtfd.io).
 
-
 ## Citation information 
-If you use this package - please do consider citing the preprint: 
+If you use this package - please cite the paper: 
 
-*Beleyur, T. (2021, August 5). beamshapes : a Python package to generate directivity patterns for various sound sources. https://doi.org/10.31219/osf.io/zc52t, version {VERSIONNUMBER-HERE} *
+APA-style format
 
-You can access the version number of the package being used with 
-```
->>> import beamshapes
->>> print(beamshapes.__version__)
-```
+*Beleyur, T., (2022). beamshapes: a Python package to generate directivity patterns for various sound source models. Journal of Open Source Software, 7(69), 3740, https://doi.org/10.21105/joss.03740*
+
 
 Bibtext format: 
 
 ```
-@misc{beleyur_2021,
- title={beamshapes : a Python package to generate directivity patterns for various sound sources},
- url={osf.io/zc52t},
- DOI={10.31219/osf.io/zc52t},
- publisher={OSF Preprints},
- author={Beleyur, Thejasvi},
- year={2021},
- month={Aug}
+@article{Beleyur2022,
+  doi = {10.21105/joss.03740},
+  url = {https://doi.org/10.21105/joss.03740},
+  year = {2022},
+  publisher = {The Open Journal},
+  volume = {7},
+  number = {69},
+  pages = {3740},
+  author = {Thejasvi Beleyur},
+  title = {```beamshapes```: a Python package to generate directivity patterns for various sound source models},
+  journal = {Journal of Open Source Software}
 }
+```
+If possible, and space allows also do mention the package version (e.g. beamshapes 0.2.X) .
+You can access the version number of the package being used with 
+```
+>>> import beamshapes
+>>> print(beamshapes.__version__)
 ```
 
 
@@ -74,9 +79,3 @@ Bibtext format:
 ## Future implementations
 * Piston on a cylinder
 * Rectangular piston on a prolate spheroid ([paper](https://asa.scitation.org/doi/pdf/10.1121/1.1778840?casa_token=wDAHTxJBISUAAAAA:MW-OSeGIkft-mces_mJgFBuyOhzI1qpPbc_7Xuu9EhDDD8CF8vnCIYaGyVivUb2qOpFda4GkPWto))
-
-
-TODO:
-* Add more examples 
-* Remove 'a' parameter from piston in sphere directivity?  (next releases, this is backwards incompatible!)
-
